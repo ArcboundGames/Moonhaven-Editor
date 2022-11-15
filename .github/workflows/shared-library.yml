@@ -1,0 +1,41 @@
+name: Shared Library Editor
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    paths:
+      - SharedLibrary/**
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - SharedLibrary/**
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Setup
+      working-directory: ./SharedLibrary
+      run: |
+        npm ci
+    - name: Lint
+      working-directory: ./SharedLibrary
+      run: |
+        npm run lint
+    - name: Test
+      working-directory: ./SharedLibrary
+      run: |
+        npm test
