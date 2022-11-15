@@ -30,7 +30,7 @@ jobs:
     - name: Setup
       working-directory: ./Editor
       run: |
-        npm install
+        npm ci
 
     - name: Lint
       working-directory: ./Editor
