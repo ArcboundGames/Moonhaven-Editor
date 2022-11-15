@@ -1,0 +1,1728 @@
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+
+import {
+  ALL_SEASONS,
+  CONDITIONS,
+  IMAGE_FILE_EXTENSION,
+  INVENTORY_TYPE_LARGE,
+  INVENTORY_TYPE_NONE,
+  INVENTORY_TYPE_SMALL,
+  LOOT_TYPE_DROP,
+  LOOT_TYPE_NONE,
+  LOOT_TYPE_STAGE_DROP,
+  OBJECTS_DATA_FILE,
+  PLACEMENT_LAYER_IN_AIR,
+  PLACEMENT_LAYER_IN_GROUND,
+  PLACEMENT_LAYER_ON_GROUND,
+  PLACEMENT_POSITION_CENTER,
+  PLACEMENT_POSITION_EDGE,
+  SEASONS,
+  STAGES_TYPE_BREAKABLE,
+  STAGES_TYPE_GROWABLE,
+  STAGES_TYPE_GROWABLE_WITH_HEALTH,
+  STAGES_TYPE_NONE
+} from '../../../../../../../SharedLibrary/src/constants';
+import { validateObjectGeneralTab, validatePhysicsTab } from '../../../../../../../SharedLibrary/src/dataValidation';
+import {
+  createObjectSprites,
+  toInventoryType,
+  toLootType,
+  toPlacementLayer,
+  toPlacementPosition,
+  toSeason,
+  toStagesType
+} from '../../../../../../../SharedLibrary/src/util/converters.util';
+import { isNotNullish, isNullish } from '../../../../../../../SharedLibrary/src/util/null.util';
+import { getObjectSetting } from '../../../../../../../SharedLibrary/src/util/objectType.util';
+import { toTitleCaseFromKey } from '../../../../../../../SharedLibrary/src/util/string.util';
+import { useAppDispatch, useAppSelector, useDebounce, useQuery } from '../../../../hooks';
+import { selectPath } from '../../../../store/slices/data';
+import { selectLootTables, selectLootTablesByKey } from '../../../../store/slices/lootTables';
+import {
+  selectObjectCategories,
+  selectObjectCategoriesByKey,
+  selectObjectSubCategories,
+  selectObjectSubCategoriesByKey,
+  selectObjectSubCategory,
+  selectObjectType,
+  selectObjectTypesByKey,
+  selectObjectTypesSortedWithName,
+  selectSelectedObjectCategory,
+  selectSelectedObjectSubCategory,
+  updateObjects
+} from '../../../../store/slices/objects';
+import { selectSkillsSortedWithName } from '../../../../store/slices/skills';
+import { getNewObject } from '../../../../util/section.util';
+import { getSectionPath, getSpriteCountFromImagePath } from '../../../../util/sprite.util';
+import {
+  validateObject,
+  validateObjectPlacementSpawningTab,
+  validateObjectSpriteStageTab
+} from '../../../../util/validate.util';
+import { useUpdateLocalization } from '../../../hooks/useUpdateLocalization.hook';
+import Checkbox from '../../../widgets/form/Checkbox';
+import MultiSelect from '../../../widgets/form/MultiSelect';
+import NumberTextField from '../../../widgets/form/NumberTextField';
+import ObjectMultiSelect from '../../../widgets/form/object/ObjectMultiSelect';
+import Select from '../../../widgets/form/Select';
+import TextField from '../../../widgets/form/TextField';
+import Vector2Field from '../../../widgets/form/Vector2Field';
+import Card from '../../../widgets/layout/Card';
+import FormBox from '../../../widgets/layout/FormBox';
+import TabPanel from '../../../widgets/TabPanel';
+import Tabs from '../../../widgets/tabs/Tabs';
+import DataViewer from '../../DataViewer';
+import { useByAdjacentPlacementLayer, useByBelowPlacementLayer } from './hooks/useByPlacementLayer';
+import usePath from './hooks/usePath';
+import StagesCard from './objectTypeView/StagesCard';
+import CollidersCard from './widgets/CollidersCard';
+import { OverriddenObjectPropertyCard as OverriddenObjectProperty } from './widgets/OverriddenPropertyCard';
+import SpritesCard from './widgets/SpritesCard';
+
+import type {
+  ObjectSubCategory,
+  ObjectType,
+  SpawningCondition
+} from '../../../../../../../SharedLibrary/src/interface';
+
+const ObjectTypeView = () => {
+  const { dataKey = '' } = useParams();
+
+  const dispatch = useAppDispatch();
+
+  const objectType = useAppSelector(useMemo(() => selectObjectType(dataKey), [dataKey]));
+  const objectTypeSubCategory = useAppSelector(
+    useMemo(() => selectObjectSubCategory(objectType?.subCategoryKey), [objectType?.subCategoryKey])
+  );
+
+  const query = useQuery();
+
+  const queryTab = Number(query.get('tab') ?? 0);
+  const [tab, setTab] = useState(queryTab);
+  useEffect(() => {
+    if (!Number.isNaN(queryTab) && queryTab !== tab) {
+      setTab(queryTab);
+    }
+  }, [queryTab, tab]);
+
+  const [spriteCount, setSpriteCount] = useState<number>(0);
+
+  const [dataKeyChanged, setDataKeyChanged] = useState<boolean>(true);
+  const categories = useAppSelector(selectObjectCategories);
+  const subCategories = useAppSelector(selectObjectSubCategories);
+  const path = useAppSelector(selectPath);
+
+  const allObjects = useAppSelector(selectObjectTypesSortedWithName);
+  const objectsByKey = useAppSelector(selectObjectTypesByKey);
+
+  const selectedObjectCategory = useAppSelector(selectSelectedObjectCategory);
+  const selectedObjectSubCategory = useAppSelector(selectSelectedObjectSubCategory);
+
+  const categoriesByKey = useAppSelector(selectObjectCategoriesByKey);
+  const subCategoriesByKey = useAppSelector(selectObjectSubCategoriesByKey);
+  const lootTables = useAppSelector(selectLootTables);
+  const lootTablesByKey = useAppSelector(selectLootTablesByKey);
+
+  const sortedSkills = useAppSelector(selectSkillsSortedWithName);
+
+  const queryObjectCategory = query.get('objectCategory');
+  const queryObjectSubCategory = query.get('objectSubCategory');
+
+  const defaultObject = useMemo(() => {
+    const newObject = getNewObject(objectsByKey);
+
+    newObject.id = Math.max(...allObjects.map((otherObject) => otherObject.id)) + 1;
+
+    const objectCategory = queryObjectCategory ?? selectedObjectCategory;
+    if (objectCategory && objectCategory !== 'ALL') {
+      newObject.categoryKey = objectCategory;
+    }
+
+    const objectSubCategory = queryObjectSubCategory ?? selectedObjectSubCategory;
+    if (objectSubCategory && objectSubCategory !== 'ALL') {
+      newObject.subCategoryKey = objectSubCategory;
+    }
+
+    newObject.worldSize = {
+      x: 1,
+      y: 1
+    };
+
+    newObject.sprite = {
+      defaultSprite: 0,
+      width: 16,
+      height: 16,
+      pivotOffset: {
+        x: 0,
+        y: 0
+      }
+    };
+
+    return newObject;
+  }, [
+    objectsByKey,
+    allObjects,
+    queryObjectCategory,
+    selectedObjectCategory,
+    queryObjectSubCategory,
+    selectedObjectSubCategory
+  ]);
+
+  const [editData, setEditData] = useState<ObjectType | undefined>(dataKey === 'new' ? defaultObject : objectType);
+
+  const dataKeys = useMemo(
+    () => ({
+      current: editData?.key ?? dataKey,
+      route: dataKey
+    }),
+    [dataKey, editData?.key]
+  );
+
+  const {
+    saveLocalizations,
+    getLocalizedValue,
+    tempData,
+    updateLocalizedValue,
+    deleteLocalizations,
+    getLocalizedName,
+    isLocalizationDirty
+  } = useUpdateLocalization({
+    prefix: 'object',
+    keys: useMemo(() => ['name'], []),
+    fallbackName: 'Unknown Object',
+    dataKeys
+  });
+
+  const debouncedTempData = useDebounce(tempData, 300);
+
+  useEffect(() => {
+    setDataKeyChanged(true);
+  }, [dataKey]);
+
+  useEffect(() => {
+    setEditData(objectType);
+  }, [objectType]);
+
+  useEffect(() => {
+    if (dataKey === editData?.key || dataKey === 'new') {
+      setDataKeyChanged(false);
+    }
+  }, [dataKey, editData?.key]);
+
+  const debouncedEditData = useDebounce(editData, dataKeyChanged ? 0 : 500);
+
+  const imagePath = usePath(path, '..', getSectionPath('object'), `${dataKey?.toLowerCase()}${IMAGE_FILE_EXTENSION}`);
+
+  const spriteWidth = debouncedEditData?.sprite?.width;
+  const spriteHeight = debouncedEditData?.sprite?.height;
+
+  useEffect(() => {
+    let alive = true;
+
+    async function spriteCountGetter() {
+      if (!imagePath || !spriteWidth || !spriteHeight) {
+        return;
+      }
+
+      const newSpriteCount = await getSpriteCountFromImagePath(imagePath, spriteWidth, spriteHeight);
+      if (alive) {
+        setSpriteCount(newSpriteCount);
+      }
+    }
+
+    spriteCountGetter();
+    return () => {
+      alive = false;
+    };
+  }, [imagePath, spriteHeight, spriteWidth]);
+
+  const getGeneralTabErrors = useCallback(
+    (data: ObjectType) =>
+      validateObjectGeneralTab(
+        data,
+        categoriesByKey,
+        subCategories,
+        subCategoriesByKey,
+        lootTablesByKey,
+        debouncedTempData.localization,
+        debouncedTempData.localizationKeys,
+        []
+      ),
+    [
+      categoriesByKey,
+      debouncedTempData.localization,
+      debouncedTempData.localizationKeys,
+      lootTablesByKey,
+      subCategories,
+      subCategoriesByKey
+    ]
+  );
+
+  const getPlacementAndSpawningErrors = useCallback(
+    (data: ObjectType) => validateObjectPlacementSpawningTab(data, categoriesByKey, subCategoriesByKey, objectsByKey),
+    [categoriesByKey, objectsByKey, subCategoriesByKey]
+  );
+
+  const getPhysicsTabErrors = useCallback((data: ObjectType) => validatePhysicsTab(data), []);
+
+  const getSpriteStageTabErrors = useCallback(
+    (data: ObjectType) =>
+      validateObjectSpriteStageTab(data, categoriesByKey, subCategoriesByKey, lootTablesByKey, path),
+    [categoriesByKey, lootTablesByKey, path, subCategoriesByKey]
+  );
+
+  const filteredSubCategories = useMemo(() => {
+    let { categoryKey } = defaultObject;
+    if (!dataKeyChanged) {
+      categoryKey = debouncedEditData?.categoryKey;
+    } else if (objectType?.categoryKey) {
+      categoryKey = objectType?.categoryKey;
+    }
+
+    if (!categoryKey) {
+      return [];
+    }
+
+    return subCategories?.filter((subCategory: ObjectSubCategory) => subCategory.categoryKey === categoryKey);
+  }, [defaultObject, dataKeyChanged, objectType?.categoryKey, subCategories, debouncedEditData?.categoryKey]);
+
+  const placementLayer = useMemo(
+    () => getObjectSetting('placementLayer', editData, categoriesByKey, subCategoriesByKey).value,
+    [categoriesByKey, editData, subCategoriesByKey]
+  );
+
+  const changesSpritesWithSeason = useMemo(
+    () => getObjectSetting('changesSpritesWithSeason', editData, categoriesByKey, subCategoriesByKey).value,
+    [categoriesByKey, editData, subCategoriesByKey]
+  );
+
+  const stagesType = useMemo(
+    () => getObjectSetting('stagesType', editData, categoriesByKey, subCategoriesByKey).value,
+    [categoriesByKey, editData, subCategoriesByKey]
+  );
+
+  const lootType = useMemo(
+    () => getObjectSetting('lootType', editData, categoriesByKey, subCategoriesByKey).value,
+    [categoriesByKey, editData, subCategoriesByKey]
+  );
+
+  const { belowCategories, belowSubCategories, belowObjects } = useByBelowPlacementLayer(
+    placementLayer,
+    categories,
+    subCategories,
+    allObjects,
+    categoriesByKey,
+    subCategoriesByKey
+  );
+
+  const { adjacentCategories, adjacentSubCategories, adjacentObjects } = useByAdjacentPlacementLayer(
+    placementLayer,
+    categories,
+    subCategories,
+    allObjects,
+    categoriesByKey,
+    subCategoriesByKey
+  );
+
+  const validate = useCallback(
+    async (data: ObjectType) => {
+      if (!path) {
+        return ['File path not found'];
+      }
+      return validateObject(
+        data,
+        categoriesByKey,
+        subCategories,
+        subCategoriesByKey,
+        lootTablesByKey,
+        objectsByKey,
+        debouncedTempData.localization,
+        debouncedTempData.localizationKeys,
+        path
+      );
+    },
+    [
+      path,
+      categoriesByKey,
+      subCategories,
+      subCategoriesByKey,
+      lootTablesByKey,
+      objectsByKey,
+      debouncedTempData.localization,
+      debouncedTempData.localizationKeys
+    ]
+  );
+  const onSave = useCallback(
+    (dataSaved: ObjectType[], newObject: ObjectType | undefined) => {
+      dispatch(updateObjects(dataSaved));
+
+      if (newObject) {
+        saveLocalizations();
+      } else {
+        deleteLocalizations();
+      }
+    },
+    [deleteLocalizations, dispatch, saveLocalizations]
+  );
+  const getFileData = useCallback(() => {
+    return {
+      categories,
+      subCategories,
+      objects: allObjects
+    };
+  }, [categories, subCategories, allObjects]);
+
+  const onDataChange = useCallback((data: ObjectType | undefined) => setEditData(data), []);
+
+  return (
+    <DataViewer
+      dataKey={dataKey}
+      valueDataKey={editData?.key}
+      section="object"
+      file={OBJECTS_DATA_FILE}
+      fileSection="objects"
+      value={objectType}
+      defaultValue={defaultObject}
+      getFileData={getFileData}
+      getName={getLocalizedName}
+      onDataChange={onDataChange}
+      validate={validate}
+      onSave={onSave}
+      dirty={isLocalizationDirty}
+    >
+      {({ data, handleOnChange, disabled }) => (
+        <>
+          <Tabs
+            data={debouncedEditData}
+            dataKey={dataKey}
+            section="object"
+            ariaLabel="object tabs"
+            onChange={(newTab) => setTab(newTab)}
+          >
+            {{
+              label: 'General',
+              validate: getGeneralTabErrors
+            }}
+            {{
+              label: 'Placement & Spawning',
+              validate: getPlacementAndSpawningErrors
+            }}
+            {{
+              label: 'Sprites & Stages',
+              validate: getSpriteStageTabErrors
+            }}
+            {{
+              label: 'Physics',
+              validate: getPhysicsTabErrors
+            }}
+          </Tabs>
+          <TabPanel value={tab} index={0}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+              <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
+                <Card header="General">
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                    <FormBox>
+                      <NumberTextField
+                        label="ID"
+                        value={data.id}
+                        onChange={(value) =>
+                          handleOnChange({
+                            id: value
+                          })
+                        }
+                        required
+                        min={1}
+                        disabled={disabled}
+                        wholeNumber
+                      />
+                    </FormBox>
+                    <FormBox>
+                      <TextField
+                        label="Name"
+                        value={getLocalizedValue('name')}
+                        onChange={(value) => updateLocalizedValue('name', value)}
+                        required
+                        disabled={disabled}
+                      />
+                    </FormBox>
+                    <FormBox>
+                      <TextField
+                        label="Key"
+                        value={data.key}
+                        onChange={(key) => handleOnChange({ key })}
+                        required
+                        disabled={disabled}
+                      />
+                    </FormBox>
+                  </Box>
+                </Card>
+                <OverriddenObjectProperty
+                  title="Loot"
+                  level={0}
+                  type={data}
+                  setting="lootType"
+                  onOverrideChange={(overridden) =>
+                    handleOnChange({
+                      settings: {
+                        ...data.settings,
+                        lootType: overridden ? LOOT_TYPE_DROP : undefined
+                      }
+                    })
+                  }
+                  disabled={disabled}
+                >
+                  {{
+                    control: (controlled, value, helperText) => (
+                      <Select
+                        label="Loot Type"
+                        disabled={disabled || controlled}
+                        value={value}
+                        onChange={
+                          controlled
+                            ? undefined
+                            : (newValue) =>
+                                handleOnChange({
+                                  settings: {
+                                    ...data.settings,
+                                    lootType: toLootType(newValue)
+                                  }
+                                })
+                        }
+                        options={[
+                          {
+                            label: 'None',
+                            value: LOOT_TYPE_NONE,
+                            emphasize: true
+                          },
+                          {
+                            label: 'Drops',
+                            value: LOOT_TYPE_DROP
+                          },
+                          {
+                            label: 'Drops from stages',
+                            value: LOOT_TYPE_STAGE_DROP
+                          }
+                        ]}
+                        helperText={helperText}
+                      />
+                    ),
+                    other: (controlledLootType) =>
+                      controlledLootType === LOOT_TYPE_DROP ? (
+                        <FormBox>
+                          <Select
+                            label="Loot Table"
+                            required
+                            disabled={disabled}
+                            value={data.lootTableKey}
+                            onChange={(newValue) =>
+                              handleOnChange({
+                                lootTableKey: newValue
+                              })
+                            }
+                            options={lootTables.map((lootTable) => ({
+                              value: lootTable.key,
+                              label: toTitleCaseFromKey(lootTable.key)
+                            }))}
+                          />
+                        </FormBox>
+                      ) : null
+                  }}
+                </OverriddenObjectProperty>
+                <OverriddenObjectProperty
+                  title="Water"
+                  level={0}
+                  type={data}
+                  setting="requiresWater"
+                  onOverrideChange={(overridden) =>
+                    handleOnChange({
+                      settings: {
+                        ...data.settings,
+                        requiresWater: overridden ? false : undefined
+                      }
+                    })
+                  }
+                  disabled={disabled}
+                >
+                  {{
+                    control: (controlled, value, helperText) => (
+                      <Checkbox
+                        label="Requires Water"
+                        checked={value}
+                        onChange={
+                          controlled
+                            ? undefined
+                            : (newValue) =>
+                                handleOnChange({
+                                  settings: {
+                                    ...data.settings,
+                                    requiresWater: newValue
+                                  }
+                                })
+                        }
+                        disabled={disabled || controlled}
+                        helperText={helperText}
+                      />
+                    ),
+                    other: (requiresWater) =>
+                      requiresWater ? (
+                        <FormBox key="expireChanceBox">
+                          <NumberTextField
+                            label="Expire Chance"
+                            value={data.expireChance}
+                            onChange={(value) =>
+                              handleOnChange({
+                                expireChance: value
+                              })
+                            }
+                            required
+                            min={0}
+                            max={100}
+                            endAdornment="%"
+                            disabled={disabled}
+                            wholeNumber
+                          />
+                        </FormBox>
+                      ) : null
+                  }}
+                </OverriddenObjectProperty>
+                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                  <OverriddenObjectProperty
+                    title="Breakable"
+                    level={0}
+                    type={data}
+                    setting="breakable"
+                    onOverrideChange={(overridden) =>
+                      handleOnChange({
+                        settings: {
+                          ...data.settings,
+                          breakable: overridden ? false : undefined
+                        }
+                      })
+                    }
+                    disabled={disabled}
+                  >
+                    {{
+                      control: (controlled, value, helperText) => (
+                        <Checkbox
+                          label="Breakable"
+                          checked={value}
+                          onChange={
+                            controlled
+                              ? undefined
+                              : (newValue) =>
+                                  handleOnChange({
+                                    settings: {
+                                      ...data.settings,
+                                      breakable: newValue
+                                    }
+                                  })
+                          }
+                          disabled={disabled || controlled}
+                          helperText={helperText}
+                        />
+                      )
+                    }}
+                  </OverriddenObjectProperty>
+                  <OverriddenObjectProperty
+                    title="Inventory"
+                    level={0}
+                    type={data}
+                    setting="inventoryType"
+                    onOverrideChange={(overridden) =>
+                      handleOnChange({
+                        settings: {
+                          ...data.settings,
+                          inventoryType: overridden ? INVENTORY_TYPE_NONE : undefined
+                        }
+                      })
+                    }
+                    disabled={disabled}
+                  >
+                    {{
+                      control: (controlled, value, helperText) => (
+                        <Select
+                          label="Inventory Type"
+                          disabled={disabled || controlled}
+                          value={value}
+                          onChange={
+                            controlled
+                              ? undefined
+                              : (newValue) =>
+                                  handleOnChange({
+                                    settings: {
+                                      ...data.settings,
+                                      inventoryType: toInventoryType(newValue)
+                                    }
+                                  })
+                          }
+                          options={[
+                            {
+                              label: 'None',
+                              value: INVENTORY_TYPE_NONE,
+                              emphasize: true
+                            },
+                            {
+                              label: 'Small',
+                              value: INVENTORY_TYPE_SMALL
+                            },
+                            {
+                              label: 'Large',
+                              value: INVENTORY_TYPE_LARGE
+                            }
+                          ]}
+                          helperText={helperText}
+                          error={
+                            data.settings?.isWorkstation &&
+                            getObjectSetting('inventoryType', data, categoriesByKey, subCategoriesByKey).value !==
+                              INVENTORY_TYPE_SMALL
+                          }
+                        />
+                      )
+                    }}
+                  </OverriddenObjectProperty>
+                </Box>
+              </Box>
+              <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
+                <Card header="Category">
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                    <FormBox>
+                      <Select
+                        label="Category"
+                        required
+                        disabled={disabled}
+                        value={data.categoryKey}
+                        onChange={(newValue) =>
+                          handleOnChange({
+                            categoryKey: newValue
+                          })
+                        }
+                        options={categories.map((entry) => ({
+                          value: entry.key,
+                          label: toTitleCaseFromKey(entry.key)
+                        }))}
+                      />
+                    </FormBox>
+                    <FormBox>
+                      {filteredSubCategories?.length ? (
+                        <Select
+                          key="sub-category"
+                          label="Sub Category"
+                          required
+                          disabled={disabled}
+                          value={data.subCategoryKey}
+                          onChange={(newValue) =>
+                            handleOnChange({
+                              subCategoryKey: newValue
+                            })
+                          }
+                          options={filteredSubCategories.map((entry) => ({
+                            value: entry.key,
+                            label: toTitleCaseFromKey(entry.key)
+                          }))}
+                        />
+                      ) : null}
+                    </FormBox>
+                  </Box>
+                </Card>
+                <OverriddenObjectProperty
+                  title="Health"
+                  level={0}
+                  type={data}
+                  setting="hasHealth"
+                  onOverrideChange={(overridden) =>
+                    handleOnChange({
+                      settings: {
+                        ...data.settings,
+                        hasHealth: overridden ? false : undefined
+                      }
+                    })
+                  }
+                  disabled={disabled}
+                >
+                  {{
+                    control: (controlled, value, helperText) => (
+                      <Checkbox
+                        label="Has Health"
+                        checked={value}
+                        onChange={
+                          controlled
+                            ? undefined
+                            : (newValue) =>
+                                handleOnChange({
+                                  settings: {
+                                    ...data.settings,
+                                    hasHealth: newValue
+                                  }
+                                })
+                        }
+                        disabled={disabled || controlled}
+                        helperText={helperText}
+                      />
+                    ),
+                    other: (hasHealth) =>
+                      hasHealth ? (
+                        <FormBox>
+                          <NumberTextField
+                            label="Health"
+                            value={data.health}
+                            onChange={(value) =>
+                              handleOnChange({
+                                health: value
+                              })
+                            }
+                            required
+                            min={1}
+                            disabled={disabled}
+                            wholeNumber
+                          />
+                        </FormBox>
+                      ) : null
+                  }}
+                </OverriddenObjectProperty>
+                <OverriddenObjectProperty
+                  title="Workstation"
+                  level={0}
+                  type={data}
+                  setting="isWorkstation"
+                  onOverrideChange={(overridden) =>
+                    handleOnChange({
+                      settings: {
+                        ...data.settings,
+                        isWorkstation: overridden ? false : undefined
+                      }
+                    })
+                  }
+                  disabled={disabled}
+                >
+                  {{
+                    control: (controlled, value, helperText) => (
+                      <Checkbox
+                        label="Is Workstation"
+                        checked={value}
+                        onChange={
+                          controlled
+                            ? undefined
+                            : (newValue) =>
+                                handleOnChange({
+                                  settings: {
+                                    ...data.settings,
+                                    isWorkstation: newValue
+                                  }
+                                })
+                        }
+                        disabled={disabled || controlled}
+                        helperText={helperText}
+                      />
+                    ),
+                    other: (isWorkstation) =>
+                      isWorkstation ? (
+                        <FormBox>
+                          <Select
+                            label="Skill"
+                            value={data.craftingSpeedIncreaseSkillKey}
+                            onChange={(newValue) =>
+                              handleOnChange({
+                                craftingSpeedIncreaseSkillKey: newValue
+                              })
+                            }
+                            disabled={disabled}
+                            options={sortedSkills?.map((entry) => ({
+                              label: entry.name,
+                              value: entry.key
+                            }))}
+                          />
+                        </FormBox>
+                      ) : null
+                  }}
+                </OverriddenObjectProperty>
+                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                  <OverriddenObjectProperty
+                    title="Destroy"
+                    level={0}
+                    type={data}
+                    setting="destroyOnHarvest"
+                    onOverrideChange={(overridden) =>
+                      handleOnChange({
+                        settings: {
+                          ...data.settings,
+                          destroyOnHarvest: overridden ? false : undefined
+                        }
+                      })
+                    }
+                    disabled={disabled}
+                  >
+                    {{
+                      control: (controlled, value, helperText) => (
+                        <Checkbox
+                          label="Destroy on Harvest"
+                          checked={value}
+                          onChange={
+                            controlled
+                              ? undefined
+                              : (newValue) =>
+                                  handleOnChange({
+                                    settings: {
+                                      ...data.settings,
+                                      destroyOnHarvest: newValue
+                                    }
+                                  })
+                          }
+                          disabled={disabled || controlled}
+                          helperText={helperText}
+                        />
+                      )
+                    }}
+                  </OverriddenObjectProperty>
+                  <OverriddenObjectProperty
+                    title="Harvest"
+                    level={0}
+                    type={data}
+                    setting="canHarvestWithHand"
+                    onOverrideChange={(overridden) =>
+                      handleOnChange({
+                        settings: {
+                          ...data.settings,
+                          canHarvestWithHand: overridden ? false : undefined
+                        }
+                      })
+                    }
+                    disabled={disabled}
+                  >
+                    {{
+                      control: (controlled, value, helperText) => (
+                        <Checkbox
+                          label="Can Harvest with Hand"
+                          checked={value}
+                          onChange={
+                            controlled
+                              ? undefined
+                              : (newValue) =>
+                                  handleOnChange({
+                                    settings: {
+                                      ...data.settings,
+                                      canHarvestWithHand: newValue
+                                    }
+                                  })
+                          }
+                          disabled={disabled || controlled}
+                          helperText={helperText}
+                        />
+                      )
+                    }}
+                  </OverriddenObjectProperty>
+                  <OverriddenObjectProperty
+                    title="Open / Close"
+                    level={0}
+                    type={data}
+                    setting="canOpen"
+                    onOverrideChange={(overridden) =>
+                      handleOnChange({
+                        settings: {
+                          ...data.settings,
+                          canOpen: overridden ? false : undefined
+                        }
+                      })
+                    }
+                    disabled={disabled}
+                  >
+                    {{
+                      control: (controlled, value, helperText) => (
+                        <Checkbox
+                          label="Can Open"
+                          checked={value}
+                          onChange={
+                            controlled
+                              ? undefined
+                              : (newValue) =>
+                                  handleOnChange({
+                                    settings: {
+                                      ...data.settings,
+                                      canOpen: newValue
+                                    }
+                                  })
+                          }
+                          disabled={disabled || controlled}
+                          helperText={helperText}
+                        />
+                      )
+                    }}
+                  </OverriddenObjectProperty>
+                  {stagesType && stagesType !== STAGES_TYPE_NONE && lootType && lootType !== LOOT_TYPE_NONE ? (
+                    <Card header="Experience">
+                      <FormBox>
+                        <NumberTextField
+                          label="Experience"
+                          value={data.experience}
+                          onChange={(value) =>
+                            handleOnChange({
+                              experience: value
+                            })
+                          }
+                          required
+                          min={1}
+                          disabled={disabled}
+                          wholeNumber
+                        />
+                      </FormBox>
+                    </Card>
+                  ) : null}
+                </Box>
+              </Box>
+            </Box>
+          </TabPanel>
+          <TabPanel value={tab} index={1}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+              <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
+                <OverriddenObjectProperty
+                  title="Position"
+                  level={0}
+                  type={data}
+                  setting="placementPosition"
+                  onOverrideChange={(overridden) =>
+                    handleOnChange({
+                      settings: {
+                        ...data.settings,
+                        placementPosition: overridden ? PLACEMENT_POSITION_CENTER : undefined
+                      }
+                    })
+                  }
+                  disabled={disabled}
+                >
+                  {{
+                    control: (controlled, value, helperText) => (
+                      <Select
+                        label="Placement Position"
+                        disabled={disabled || controlled}
+                        required
+                        value={value}
+                        onChange={
+                          controlled
+                            ? undefined
+                            : (newValue) =>
+                                handleOnChange({
+                                  settings: {
+                                    ...data.settings,
+                                    placementPosition: toPlacementPosition(newValue)
+                                  }
+                                })
+                        }
+                        options={[
+                          {
+                            label: 'Center',
+                            value: PLACEMENT_POSITION_CENTER
+                          },
+                          {
+                            label: 'Edge',
+                            value: PLACEMENT_POSITION_EDGE
+                          }
+                        ]}
+                        helperText={helperText}
+                        error={
+                          data.settings?.isWorkstation &&
+                          getObjectSetting('inventoryType', data, categoriesByKey, subCategoriesByKey).value !==
+                            INVENTORY_TYPE_SMALL
+                        }
+                      />
+                    )
+                  }}
+                </OverriddenObjectProperty>
+                <OverriddenObjectProperty
+                  title="Layer"
+                  level={0}
+                  type={data}
+                  setting="placementLayer"
+                  onOverrideChange={(overridden) =>
+                    handleOnChange({
+                      settings: {
+                        ...data.settings,
+                        placementLayer: overridden ? PLACEMENT_LAYER_ON_GROUND : undefined
+                      }
+                    })
+                  }
+                  disabled={disabled}
+                >
+                  {{
+                    control: (controlled, value, helperText) => (
+                      <Select
+                        label="Placement Layer"
+                        disabled={disabled || controlled}
+                        required
+                        value={value}
+                        onChange={
+                          controlled
+                            ? undefined
+                            : (newValue) =>
+                                handleOnChange({
+                                  settings: {
+                                    ...data.settings,
+                                    placementLayer: toPlacementLayer(newValue)
+                                  }
+                                })
+                        }
+                        options={[
+                          {
+                            label: 'In Ground',
+                            value: PLACEMENT_LAYER_IN_GROUND
+                          },
+                          {
+                            label: 'On Ground',
+                            value: PLACEMENT_LAYER_ON_GROUND
+                          },
+                          {
+                            label: 'In Air',
+                            value: PLACEMENT_LAYER_IN_AIR
+                          }
+                        ]}
+                        helperText={helperText}
+                        error={
+                          data.settings?.isWorkstation &&
+                          getObjectSetting('inventoryType', data, categoriesByKey, subCategoriesByKey).value !==
+                            INVENTORY_TYPE_SMALL
+                        }
+                      />
+                    )
+                  }}
+                </OverriddenObjectProperty>
+                <OverriddenObjectProperty
+                  title="Spawning Conditions"
+                  level={0}
+                  type={data}
+                  setting="spawningConditions"
+                  controlStyle="multiple"
+                  onOverrideChange={(overridden) =>
+                    handleOnChange({
+                      settings: {
+                        ...data.settings,
+                        spawningConditions: overridden ? [] : undefined
+                      }
+                    })
+                  }
+                  sx={{ gridColumn: '1 / span 2' }}
+                  disabled={disabled}
+                >
+                  {{
+                    control: (controlled, value, helperText) => (
+                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                          {(CONDITIONS as SpawningCondition[]).map((condition) => (
+                            <FormBox key={`condition-${condition}`}>
+                              <Checkbox
+                                label={toTitleCaseFromKey(condition)}
+                                checked={Boolean(value?.includes(condition))}
+                                onChange={
+                                  controlled
+                                    ? undefined
+                                    : (newValue) => {
+                                        const spawningConditions = [...(value || [])];
+                                        if (newValue) {
+                                          spawningConditions.push(condition);
+                                        } else {
+                                          const index = spawningConditions.indexOf(condition);
+                                          if (index > -1) {
+                                            spawningConditions.splice(index, 1);
+                                          }
+                                        }
+                                        handleOnChange({
+                                          settings: {
+                                            ...data.settings,
+                                            spawningConditions
+                                          }
+                                        });
+                                      }
+                                }
+                                disabled={disabled || controlled}
+                                helperText={helperText}
+                              />
+                            </FormBox>
+                          ))}
+                        </Box>
+                        {helperText}
+                      </Box>
+                    )
+                  }}
+                </OverriddenObjectProperty>
+                {stagesType === STAGES_TYPE_GROWABLE || stagesType === STAGES_TYPE_GROWABLE_WITH_HEALTH ? (
+                  <Card key="season" header="Season">
+                    <FormBox>
+                      <Select
+                        label="Season"
+                        required
+                        disabled={disabled}
+                        value={data.season}
+                        onChange={(value) => handleOnChange({ season: toSeason(value) })}
+                        options={[ALL_SEASONS, ...SEASONS]?.map((entry) => ({
+                          label: toTitleCaseFromKey(entry),
+                          value: entry
+                        }))}
+                      />
+                    </FormBox>
+                  </Card>
+                ) : null}
+              </Box>
+              <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
+                <Card header="Required Below">
+                  <OverriddenObjectProperty
+                    layout="inline"
+                    level={0}
+                    type={data}
+                    setting="requiredBelowObjectCategoryKeys"
+                    onOverrideChange={(overridden) =>
+                      handleOnChange({
+                        settings: {
+                          ...data.settings,
+                          requiredBelowObjectCategoryKeys: overridden ? [] : undefined
+                        }
+                      })
+                    }
+                    disabled={disabled}
+                  >
+                    {{
+                      control: (controlled, value, helperText) => (
+                        <MultiSelect
+                          label="Object Category"
+                          values={value}
+                          onChange={(values: string[]) =>
+                            handleOnChange({
+                              settings: {
+                                ...data.settings,
+                                requiredBelowObjectCategoryKeys: values.length === 0 ? undefined : values
+                              }
+                            })
+                          }
+                          options={belowCategories.map((option) => ({
+                            label: toTitleCaseFromKey(option.key),
+                            value: option.key
+                          }))}
+                          disabled={disabled || controlled || belowCategories.length === 0}
+                          helperText={helperText}
+                        />
+                      )
+                    }}
+                  </OverriddenObjectProperty>
+                  <OverriddenObjectProperty
+                    layout="inline"
+                    level={0}
+                    type={data}
+                    setting="requiredBelowObjectSubCategoryKeys"
+                    onOverrideChange={(overridden) =>
+                      handleOnChange({
+                        settings: {
+                          ...data.settings,
+                          requiredBelowObjectSubCategoryKeys: overridden ? [] : undefined
+                        }
+                      })
+                    }
+                    disabled={disabled}
+                  >
+                    {{
+                      control: (controlled, value, helperText) => (
+                        <MultiSelect
+                          label="Object Sub Category"
+                          values={value}
+                          onChange={(values: string[]) =>
+                            handleOnChange({
+                              settings: {
+                                ...data.settings,
+                                requiredBelowObjectSubCategoryKeys: values.length === 0 ? undefined : values
+                              }
+                            })
+                          }
+                          options={belowSubCategories.map((option) => ({
+                            label: toTitleCaseFromKey(option.key),
+                            value: option.key
+                          }))}
+                          disabled={disabled || controlled || belowSubCategories.length === 0}
+                          helperText={helperText}
+                        />
+                      )
+                    }}
+                  </OverriddenObjectProperty>
+                  <OverriddenObjectProperty
+                    layout="inline"
+                    level={0}
+                    type={data}
+                    setting="requiredBelowObjectKeys"
+                    onOverrideChange={(overridden) =>
+                      handleOnChange({
+                        settings: {
+                          ...data.settings,
+                          requiredBelowObjectKeys: overridden ? [] : undefined
+                        }
+                      })
+                    }
+                    disabled={disabled}
+                  >
+                    {{
+                      control: (controlled, value, helperText) => (
+                        <ObjectMultiSelect
+                          label="Object"
+                          values={value}
+                          onChange={(values: string[]) =>
+                            handleOnChange({
+                              settings: {
+                                ...data.settings,
+                                requiredBelowObjectKeys: values.length === 0 ? undefined : values
+                              }
+                            })
+                          }
+                          objects={belowObjects}
+                          disabled={disabled || controlled || belowObjects.length === 0}
+                          helperText={helperText}
+                        />
+                      )
+                    }}
+                  </OverriddenObjectProperty>
+                </Card>
+              </Box>
+              <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
+                <Card header="Required Adjacent">
+                  <OverriddenObjectProperty
+                    layout="inline"
+                    level={0}
+                    type={data}
+                    setting="requiredAdjacentObjectCategoryKeys"
+                    onOverrideChange={(overridden) =>
+                      handleOnChange({
+                        settings: {
+                          ...data.settings,
+                          requiredAdjacentObjectCategoryKeys: overridden ? [] : undefined
+                        }
+                      })
+                    }
+                    disabled={disabled}
+                  >
+                    {{
+                      control: (controlled, value, helperText) => (
+                        <MultiSelect
+                          label="Object Category"
+                          values={value}
+                          onChange={(values: string[]) =>
+                            handleOnChange({
+                              settings: {
+                                ...data.settings,
+                                requiredAdjacentObjectCategoryKeys: values.length === 0 ? undefined : values
+                              }
+                            })
+                          }
+                          options={adjacentCategories.map((option) => ({
+                            label: toTitleCaseFromKey(option.key),
+                            value: option.key
+                          }))}
+                          disabled={disabled || controlled || adjacentCategories.length === 0}
+                          helperText={helperText}
+                        />
+                      )
+                    }}
+                  </OverriddenObjectProperty>
+                  <OverriddenObjectProperty
+                    layout="inline"
+                    level={0}
+                    type={data}
+                    setting="requiredAdjacentObjectSubCategoryKeys"
+                    onOverrideChange={(overridden) =>
+                      handleOnChange({
+                        settings: {
+                          ...data.settings,
+                          requiredAdjacentObjectSubCategoryKeys: overridden ? [] : undefined
+                        }
+                      })
+                    }
+                    disabled={disabled}
+                  >
+                    {{
+                      control: (controlled, value, helperText) => (
+                        <MultiSelect
+                          label="Object Sub Category"
+                          values={value}
+                          onChange={(values: string[]) =>
+                            handleOnChange({
+                              settings: {
+                                ...data.settings,
+                                requiredAdjacentObjectSubCategoryKeys: values.length === 0 ? undefined : values
+                              }
+                            })
+                          }
+                          options={adjacentSubCategories.map((option) => ({
+                            label: toTitleCaseFromKey(option.key),
+                            value: option.key
+                          }))}
+                          disabled={disabled || controlled || adjacentSubCategories.length === 0}
+                          helperText={helperText}
+                        />
+                      )
+                    }}
+                  </OverriddenObjectProperty>
+                  <OverriddenObjectProperty
+                    layout="inline"
+                    level={0}
+                    type={data}
+                    setting="requiredAdjacentObjectKeys"
+                    onOverrideChange={(overridden) =>
+                      handleOnChange({
+                        settings: {
+                          ...data.settings,
+                          requiredAdjacentObjectKeys: overridden ? [] : undefined
+                        }
+                      })
+                    }
+                    disabled={disabled}
+                  >
+                    {{
+                      control: (controlled, value, helperText) => (
+                        <MultiSelect
+                          label="Object"
+                          values={value}
+                          onChange={(values: string[]) =>
+                            handleOnChange({
+                              settings: {
+                                ...data.settings,
+                                requiredAdjacentObjectKeys: values.length === 0 ? undefined : values
+                              }
+                            })
+                          }
+                          options={adjacentObjects.map((option) => ({
+                            label: option.name,
+                            value: option.key
+                          }))}
+                          disabled={disabled || controlled || adjacentObjects.length === 0}
+                          helperText={helperText}
+                        />
+                      )
+                    }}
+                  </OverriddenObjectProperty>
+                </Card>
+              </Box>
+            </Box>
+          </TabPanel>
+          <TabPanel value={tab} index={2}>
+            <>
+              <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
+                  <Card header="Sprite">
+                    <Typography gutterBottom variant="subtitle2" component="div">
+                      Size
+                    </Typography>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                      <FormBox>
+                        <NumberTextField
+                          label="Width"
+                          value={data.sprite?.width}
+                          onChange={(value) =>
+                            handleOnChange({
+                              sprite: {
+                                ...(data.sprite ?? createObjectSprites()),
+                                width: value
+                              }
+                            })
+                          }
+                          required
+                          min={16}
+                          disabled={disabled}
+                          wholeNumber
+                          helperText="Pixels"
+                        />
+                      </FormBox>
+                      <FormBox>
+                        <NumberTextField
+                          label="Height"
+                          value={data.sprite?.height}
+                          onChange={(value) =>
+                            handleOnChange({
+                              sprite: {
+                                ...(data.sprite ?? createObjectSprites()),
+                                height: value
+                              }
+                            })
+                          }
+                          required
+                          min={16}
+                          disabled={disabled}
+                          wholeNumber
+                          helperText="Pixels"
+                        />
+                      </FormBox>
+                    </Box>
+                    <Typography gutterBottom variant="subtitle2" component="div" sx={{ marginTop: 2 }}>
+                      Pivot Offset
+                    </Typography>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                      <Vector2Field
+                        value={data.sprite?.pivotOffset}
+                        helperText="Pixels"
+                        disabled={disabled}
+                        onChange={(pivotOffset) =>
+                          handleOnChange({
+                            sprite: {
+                              ...(data.sprite ?? createObjectSprites()),
+                              pivotOffset
+                            }
+                          })
+                        }
+                      />
+                    </Box>
+                  </Card>
+                  {isNullish(stagesType) || stagesType === STAGES_TYPE_NONE ? (
+                    <SpritesCard
+                      section="object"
+                      spriteCount={spriteCount}
+                      dataKey={data.key}
+                      dataKeyChanged={dataKeyChanged}
+                      spriteWidth={spriteWidth}
+                      spriteHeight={spriteHeight}
+                      showDefaultSprite
+                      defaultSprite={objectTypeSubCategory?.rulesets?.[0]?.defaultSprite ?? data.sprite?.defaultSprite}
+                      canChangeDefaultSprite={!objectTypeSubCategory?.rulesets?.[0]?.defaultSprite}
+                      onDefaultSpriteChange={(defaultSprite) =>
+                        handleOnChange({
+                          sprite: {
+                            ...(data.sprite ?? createObjectSprites()),
+                            defaultSprite
+                          }
+                        })
+                      }
+                      disabled={disabled}
+                      sprites={data.sprite?.sprites}
+                      onChange={(index, objectSprite) => {
+                        const sprites = { ...(data.sprite?.sprites ?? {}) };
+                        if (objectSprite === undefined) {
+                          delete sprites[index];
+                        } else {
+                          sprites[index] = objectSprite;
+                        }
+                        handleOnChange({
+                          sprite: {
+                            ...(data.sprite ?? createObjectSprites()),
+                            sprites
+                          }
+                        });
+                      }}
+                    />
+                  ) : null}
+                </Box>
+                <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                    <OverriddenObjectProperty
+                      title="Stages Type"
+                      level={0}
+                      type={data}
+                      setting="stagesType"
+                      onOverrideChange={(overridden) =>
+                        handleOnChange({
+                          settings: {
+                            ...data.settings,
+                            stagesType: overridden ? STAGES_TYPE_GROWABLE : undefined
+                          }
+                        })
+                      }
+                      disabled={disabled}
+                    >
+                      {{
+                        control: (controlled, value, helperText) => (
+                          <Select
+                            label="Stages Type"
+                            disabled={disabled || controlled}
+                            required
+                            value={value}
+                            onChange={
+                              controlled
+                                ? undefined
+                                : (newValue) =>
+                                    handleOnChange({
+                                      settings: {
+                                        ...data.settings,
+                                        stagesType: toStagesType(newValue)
+                                      }
+                                    })
+                            }
+                            options={[
+                              {
+                                label: 'None',
+                                value: STAGES_TYPE_NONE,
+                                emphasize: true
+                              },
+                              {
+                                label: 'Growable',
+                                value: STAGES_TYPE_GROWABLE
+                              },
+                              {
+                                label: 'Growable with health',
+                                value: STAGES_TYPE_GROWABLE_WITH_HEALTH
+                              },
+                              {
+                                label: 'Breakable',
+                                value: STAGES_TYPE_BREAKABLE
+                              }
+                            ]}
+                            helperText={helperText}
+                            error={
+                              (value === undefined || value === STAGES_TYPE_NONE) &&
+                              getObjectSetting('lootType', data, categoriesByKey, subCategoriesByKey).value ===
+                                LOOT_TYPE_STAGE_DROP
+                            }
+                          />
+                        )
+                      }}
+                    </OverriddenObjectProperty>
+                    <OverriddenObjectProperty
+                      title="Seasons"
+                      level={0}
+                      type={data}
+                      setting="changesSpritesWithSeason"
+                      onOverrideChange={(overridden) =>
+                        handleOnChange({
+                          settings: {
+                            ...data.settings,
+                            changesSpritesWithSeason: overridden ? false : undefined
+                          }
+                        })
+                      }
+                      disabled={disabled}
+                    >
+                      {{
+                        control: (controlled, value, helperText) => (
+                          <Checkbox
+                            label="Changes Sprites with Season"
+                            checked={value}
+                            onChange={
+                              controlled
+                                ? undefined
+                                : (newValue) =>
+                                    handleOnChange({
+                                      settings: {
+                                        ...data.settings,
+                                        changesSpritesWithSeason: newValue
+                                      }
+                                    })
+                            }
+                            disabled={disabled || controlled}
+                            helperText={helperText}
+                          />
+                        )
+                      }}
+                    </OverriddenObjectProperty>
+                  </Box>
+                  <Card header="World Size">
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                      <FormBox>
+                        <NumberTextField
+                          label="Width"
+                          value={data.worldSize?.x}
+                          onChange={(value) =>
+                            handleOnChange({
+                              worldSize: {
+                                x: value,
+                                y: data.worldSize?.y ?? 1
+                              }
+                            })
+                          }
+                          required
+                          min={1}
+                          disabled={disabled}
+                          wholeNumber
+                          helperText="World tiles"
+                        />
+                      </FormBox>
+                      <FormBox>
+                        <NumberTextField
+                          label="Height"
+                          value={data.worldSize?.y}
+                          onChange={(value) =>
+                            handleOnChange({
+                              worldSize: {
+                                y: value,
+                                x: data.worldSize?.x ?? 1
+                              }
+                            })
+                          }
+                          required
+                          min={1}
+                          disabled={disabled}
+                          wholeNumber
+                          helperText="World tiles"
+                        />
+                      </FormBox>
+                    </Box>
+                  </Card>
+                </Box>
+              </Box>
+              {isNotNullish(stagesType) && stagesType !== STAGES_TYPE_NONE ? (
+                <StagesCard
+                  stages={data.stages}
+                  lootType={lootType}
+                  stagesType={stagesType}
+                  disabled={disabled}
+                  lootTables={lootTables}
+                  dataKey={data.key}
+                  dataKeyChanged={dataKeyChanged}
+                  spriteWidth={spriteWidth}
+                  spriteHeight={spriteHeight}
+                  defaultSprite={data.sprite?.defaultSprite}
+                  expectedStageCount={spriteCount}
+                  onDefaultSpriteChange={(defaultSprite) =>
+                    handleOnChange({
+                      sprite: {
+                        ...(data.sprite ?? createObjectSprites()),
+                        defaultSprite
+                      }
+                    })
+                  }
+                  onChange={(stages) => handleOnChange({ stages })}
+                  showDefaultSprite
+                  canChangeDefaultSprite={!objectTypeSubCategory?.rulesets?.[0]?.defaultSprite}
+                  sprites={data.sprite?.sprites}
+                  onSpriteChange={(index, objectSprite) => {
+                    const sprites = { ...(data.sprite?.sprites ?? {}) };
+                    if (objectSprite === undefined) {
+                      delete sprites[index];
+                    } else {
+                      sprites[index] = objectSprite;
+                    }
+                    handleOnChange({
+                      sprite: {
+                        ...(data.sprite ?? createObjectSprites()),
+                        sprites
+                      }
+                    });
+                  }}
+                  changesSpritesWithSeason={changesSpritesWithSeason}
+                />
+              ) : null}
+            </>
+          </TabPanel>
+          <TabPanel value={tab} index={3}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+              <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
+                <CollidersCard
+                  collidersType="colliders"
+                  colliders={data.colliders}
+                  disabled={disabled}
+                  onChange={(colliders) => handleOnChange({ colliders })}
+                />
+              </Box>
+              <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
+                <CollidersCard
+                  collidersType="sprite-colliders"
+                  colliders={data.sprite?.sprites}
+                  disabled={disabled}
+                  onChange={(sprites) => {
+                    handleOnChange({
+                      sprite: {
+                        ...(data.sprite ?? createObjectSprites()),
+                        sprites
+                      }
+                    });
+                  }}
+                />
+              </Box>
+            </Box>
+          </TabPanel>
+        </>
+      )}
+    </DataViewer>
+  );
+};
+
+export default ObjectTypeView;
