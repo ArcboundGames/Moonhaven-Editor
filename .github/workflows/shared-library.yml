@@ -1,4 +1,4 @@
-name: Shared Library Editor
+name: Shared Library
 
 on:
   workflow_dispatch:
