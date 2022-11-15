@@ -27,8 +27,17 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Build
+    - name: Setup
       working-directory: ./Editor
       run: |
         npm install
+
+    - name: Lint
+      working-directory: ./Editor
+      run: |
+        npm run lint
+
+    - name: Build
+      working-directory: ./Editor
+      run: |
         npm run build
