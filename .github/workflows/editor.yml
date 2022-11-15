@@ -1,6 +1,7 @@
 name: NodeJS with Webpack
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "main" ]
     paths:
@@ -27,6 +28,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Build
+      working-directory: ./Editor
       run: |
         npm install
         npm run build
