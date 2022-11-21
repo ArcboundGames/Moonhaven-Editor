@@ -39,7 +39,6 @@ const ItemViewFishingTab = ({ data, disabled, handleOnChange }: ItemViewFishingT
       <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
         <OverriddenItemPropertyCard
           title="Fishing"
-          level={0}
           type={data}
           setting="fishingItemType"
           onOverrideChange={(overridden) =>

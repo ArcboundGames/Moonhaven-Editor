@@ -37,7 +37,6 @@ const ShopTimesCard = ({ openTimes, closeTimes, disabled = true, onChange }: Sho
 
   return (
     <Card header="Times">
-      {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
       {[...Array(DAYS_IN_A_WEEK)].map((_, day) => {
         return (
           <Box

@@ -116,7 +116,6 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
           <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
             <Card header="Weapon">
               <OverriddenItemPropertyCard
-                level={0}
                 type={data}
                 setting="weaponType"
                 layout="inline"
@@ -235,7 +234,6 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
             <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
               <Card header="Input">
                 <OverriddenItemPropertyCard
-                  level={0}
                   type={data}
                   layout="inline"
                   setting="hasCombatPriority"
@@ -272,7 +270,6 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                   }}
                 </OverriddenItemPropertyCard>
                 <OverriddenItemPropertyCard
-                  level={0}
                   type={data}
                   layout="inline"
                   setting="resetTriggerOnAttack"
@@ -310,7 +307,6 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                 </OverriddenItemPropertyCard>
               </Card>
               <OverriddenItemPropertyCard
-                level={0}
                 type={data}
                 setting="damagedIncreasedBySkillKey"
                 onOverrideChange={(overridden) =>
@@ -356,7 +352,6 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
             <Card header="Projectiles">
               <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(1, minmax(0, 1fr))', marginTop: 2 }}>
                 <OverriddenItemPropertyCard
-                  level={0}
                   type={data}
                   setting="projectileItemCategoryKeys"
                   layout="inline"
@@ -399,7 +394,6 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                   }}
                 </OverriddenItemPropertyCard>
                 <OverriddenItemPropertyCard
-                  level={0}
                   type={data}
                   setting="projectileItemKeys"
                   layout="inline"
@@ -446,7 +440,6 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
               <Card header="Target Creatures">
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(1, minmax(0, 1fr))', marginTop: 2 }}>
                   <OverriddenItemPropertyCard
-                    level={0}
                     type={data}
                     setting="damagesCreatureCategoryKeys"
                     layout="inline"
@@ -489,7 +482,6 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                     }}
                   </OverriddenItemPropertyCard>
                   <OverriddenItemPropertyCard
-                    level={0}
                     type={data}
                     setting="damagesCreatureKeys"
                     layout="inline"
@@ -533,7 +525,6 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
               <Card header="Target Objects">
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(1, minmax(0, 1fr))', marginTop: 2 }}>
                   <OverriddenItemPropertyCard
-                    level={0}
                     type={data}
                     setting="damagesObjectCategoryKeys"
                     layout="inline"
@@ -576,7 +567,6 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                     }}
                   </OverriddenItemPropertyCard>
                   <OverriddenItemPropertyCard
-                    level={0}
                     type={data}
                     setting="damagesObjectSubCategoryKeys"
                     layout="inline"
@@ -619,7 +609,6 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                     }}
                   </OverriddenItemPropertyCard>
                   <OverriddenItemPropertyCard
-                    level={0}
                     type={data}
                     setting="damagesObjectKeys"
                     layout="inline"

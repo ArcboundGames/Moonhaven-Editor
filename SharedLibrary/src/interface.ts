@@ -391,6 +391,7 @@ export interface ObjectType {
   experience: number;
   season?: Season | typeof ALL_SEASONS;
   craftingSpeedIncreaseSkillKey?: string;
+  lightPosition?: Vector2;
 }
 
 export interface RawObjectSprites extends DeepNullish<Omit<ObjectSprites, 'sprites'>> {
@@ -497,6 +498,7 @@ export interface ObjectSettings {
   inventoryType?: InventoryType;
   canOpen?: boolean;
   changesSpritesWithSeason?: boolean;
+  lightLevel?: number;
 }
 
 export interface Vector2 {

@@ -26,6 +26,8 @@ const saveJsonToFile = async function (
 ) {
   const dataString = prettier.format(JSON.stringify(data, null, 2), { parser: 'json', plugins: [parserBabel] });
 
+  console.log(dataString);
+
   switch (section) {
     case 'item':
     case 'item-category':

@@ -143,7 +143,6 @@ const SpritesCard = React.memo(
   }: SpritesCardProps) => {
     return (
       <Card header="Sprites">
-        {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
         {[...Array(spriteCount)].map((_, index) => (
           <SpriteFields
             key={`sprite-${index}`}

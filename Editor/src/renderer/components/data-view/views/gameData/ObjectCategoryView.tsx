@@ -56,6 +56,7 @@ import { getObjectListSpriteIndex, getObjectsSpritesCountsWithSeason } from '../
 import { validateObjectCategory, validateObjectCategoryPlacementSpawningTab } from '../../../../util/validate.util';
 import Checkbox from '../../../widgets/form/Checkbox';
 import MultiSelect from '../../../widgets/form/MultiSelect';
+import NumberTextField from '../../../widgets/form/NumberTextField';
 import Select from '../../../widgets/form/Select';
 import TextField from '../../../widgets/form/TextField';
 import Card from '../../../widgets/layout/Card';
@@ -512,6 +513,7 @@ const ObjectCategoryView = () => {
                         <Select
                           label="Inventory Type"
                           disabled={disabled}
+                          required
                           value={data.settings?.inventoryType}
                           onChange={(newValue) =>
                             handleOnChange({
@@ -537,6 +539,21 @@ const ObjectCategoryView = () => {
                             }
                           ]}
                           error={data.settings?.isWorkstation && data.settings?.inventoryType !== INVENTORY_TYPE_SMALL}
+                        />
+                      </FormBox>
+                      <FormBox>
+                        <NumberTextField
+                          label="Light Level"
+                          value={data.settings?.lightLevel}
+                          disabled={disabled}
+                          onChange={(newValue) =>
+                            handleOnChange({
+                              settings: {
+                                ...data.settings,
+                                lightLevel: newValue
+                              }
+                            })
+                          }
                         />
                       </FormBox>
                     </Box>

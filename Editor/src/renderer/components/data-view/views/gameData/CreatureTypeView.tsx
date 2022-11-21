@@ -413,7 +413,6 @@ const CreatureTypeView = () => {
                 </Card>
                 <OverriddenCreaturePropertyCard
                   title="Dialogue"
-                  level={0}
                   type={data}
                   setting="hasDialogue"
                   onOverrideChange={(overridden) =>
@@ -451,7 +450,6 @@ const CreatureTypeView = () => {
                 </OverriddenCreaturePropertyCard>
                 <OverriddenCreaturePropertyCard
                   title="Combat"
-                  level={0}
                   type={data}
                   setting="hasHealth"
                   onOverrideChange={(overridden) =>
@@ -509,7 +507,6 @@ const CreatureTypeView = () => {
                   <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
                     <OverriddenCreaturePropertyCard
                       title="Shopkeeper"
-                      level={0}
                       type={data}
                       setting="isShopkeeper"
                       onOverrideChange={(overridden) =>
@@ -805,7 +802,6 @@ const CreatureTypeView = () => {
                             />
                           </Box>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
                             {[...Array(DAYS_IN_A_WEEK)].map((_, day) => (
                               <DayBox
                                 key={`day-${day}`}

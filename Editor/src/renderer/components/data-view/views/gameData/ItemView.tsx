@@ -418,7 +418,6 @@ const ItemView = () => {
                 </Card>
                 <OverriddenItemPropertyCard
                   title="Placement"
-                  level={0}
                   type={data}
                   setting="placeable"
                   onOverrideChange={(overridden) =>
@@ -471,7 +470,6 @@ const ItemView = () => {
                 </OverriddenItemPropertyCard>
                 <OverriddenItemPropertyCard
                   title="Durability"
-                  level={0}
                   type={data}
                   setting="hasDurability"
                   onOverrideChange={(overridden) =>
@@ -523,7 +521,6 @@ const ItemView = () => {
 
                 <OverriddenItemPropertyCard
                   title="Light"
-                  level={0}
                   type={data}
                   setting="hasLight"
                   onOverrideChange={(overridden) =>
@@ -619,7 +616,6 @@ const ItemView = () => {
                     </Card>
                     <Card header="Farming">
                       <OverriddenItemPropertyCard
-                        level={0}
                         type={data}
                         setting="createsFarmland"
                         layout="inline"
@@ -657,7 +653,6 @@ const ItemView = () => {
                         }}
                       </OverriddenItemPropertyCard>
                       <OverriddenItemPropertyCard
-                        level={0}
                         type={data}
                         setting="destroysFarmland"
                         layout="inline"
@@ -695,7 +690,6 @@ const ItemView = () => {
                         }}
                       </OverriddenItemPropertyCard>
                       <OverriddenItemPropertyCard
-                        level={0}
                         type={data}
                         setting="watersGround"
                         layout="inline"
@@ -778,7 +772,6 @@ const ItemView = () => {
                     ) : null}
                     <OverriddenItemPropertyCard
                       title="Food"
-                      level={0}
                       type={data}
                       setting="isEdible"
                       onOverrideChange={(overridden) =>
@@ -867,7 +860,6 @@ const ItemView = () => {
                     </OverriddenItemPropertyCard>
                     <OverriddenItemPropertyCard
                       title="Water"
-                      level={0}
                       type={data}
                       setting="filledFromType"
                       onOverrideChange={(overridden) =>

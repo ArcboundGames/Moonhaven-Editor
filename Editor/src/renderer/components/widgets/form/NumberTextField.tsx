@@ -5,23 +5,21 @@ import { useEffect, useMemo, useState } from 'react';
 import type { InputProps } from '@mui/material/Input';
 import type { InputBaseComponentProps } from '@mui/material/InputBase';
 import type { SxProps, Theme } from '@mui/material/styles';
+import type { TextFieldProps } from '@mui/material/TextField';
 
-interface NumberTextFieldProps {
+export type NumberTextFieldProps = Omit<TextFieldProps, 'label' | 'value' | 'onChange' | 'error'> & {
   label: string;
   value: number | undefined;
   onChange?: (value: number) => void;
-  required?: boolean;
   error?: boolean;
-  disabled?: boolean;
   wholeNumber?: boolean;
-  helperText?: React.ReactNode;
   sx?: SxProps<Theme> | undefined;
   min?: number;
   max?: number;
   step?: number;
   startAdornment?: React.ReactNode;
   endAdornment?: React.ReactNode;
-}
+};
 
 const NumberTextField = ({
   label,
@@ -37,7 +35,9 @@ const NumberTextField = ({
   max,
   step,
   startAdornment,
-  endAdornment
+  endAdornment,
+  InputLabelProps,
+  ...otherProps
 }: NumberTextFieldProps) => {
   const id = useMemo(() => label.toLowerCase().replace(' ', '_'), [label]);
 
@@ -123,6 +123,11 @@ const NumberTextField = ({
       disabled={disabled}
       helperText={helperText}
       sx={sx}
+      InputLabelProps={{
+        shrink: true,
+        ...(InputLabelProps ?? {})
+      }}
+      {...otherProps}
     />
   );
 };

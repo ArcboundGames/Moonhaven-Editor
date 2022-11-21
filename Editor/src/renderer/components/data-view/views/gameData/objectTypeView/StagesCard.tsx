@@ -314,7 +314,6 @@ const StageFields = ({
                                 onChange({ jumpToStage: value });
                               }
                             }}
-                            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                             options={[...Array(total)].map((_, i) => ({
                               label: `Stage ${i + 1}`,
                               value: i

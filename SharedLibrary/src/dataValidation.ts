@@ -2022,6 +2022,11 @@ export function validateObjectCategoryGeneralTab(rawCategory: ProcessedRawObject
     `Loot type ${LOOT_TYPE_STAGE_DROP} requires stages`
   );
 
+  const lightLevel = rawCategory.settings?.lightLevel;
+  if (isNotNullish(lightLevel)) {
+    assert(lightLevel >= 0 && lightLevel < 20, 'Light level must be between 0 and 20');
+  }
+
   return errors;
 }
 
@@ -2206,6 +2211,11 @@ export function validateObjectSubCategoryGeneralTab(
 
   if (inventoryTypeControlledBy === 0 || isWorkstationControlledBy === 0) {
     assert(!isWorkstation || inventoryType === INVENTORY_TYPE_SMALL, `Workstations must have small inventories`);
+  }
+
+  const { value: lightLevel } = getObjectSetting('lightLevel', rawSubCategory, categoriesByKey, {});
+  if (isNotNullish(lightLevel)) {
+    assert(lightLevel >= 0 && lightLevel < 20, 'Light level must be between 0 and 20');
   }
 
   return errors;
@@ -2554,6 +2564,24 @@ export function validateObjectGeneralTab(
   if (stagesType && stagesType !== STAGES_TYPE_NONE && lootType && lootType !== LOOT_TYPE_NONE) {
     assert(rawType.experience > 0, 'Experience must be greater than 0');
     assert(rawType.experience % 1 === 0, 'Experience must be a whole number');
+  }
+
+  const lightLevel = getObjectSetting('lightLevel', rawType, categoriesByKey, subCategoriesByKey).value;
+  if (isNotNullish(lightLevel)) {
+    assert(lightLevel >= 0 && lightLevel < 20, 'Light level must be between 0 and 20');
+    if (lightLevel >= 0) {
+      assert(isNotNullish(rawType.lightPosition), 'No light position');
+      if (isNotNullish(rawType.lightPosition)) {
+        assert(
+          rawType.lightPosition.x >= 0 && rawType.lightPosition.x < rawType.sprite.width,
+          `Light position x value must be between 0 and ${rawType.sprite.width - 1} (inclusive)`
+        );
+        assert(
+          rawType.lightPosition.y >= 0 && rawType.lightPosition.y < rawType.sprite.height,
+          `Light position y value must be between 0 and ${rawType.sprite.height - 1} (inclusive)`
+        );
+      }
+    }
   }
 
   return errors;

@@ -3,27 +3,15 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { isNotEmpty } from '../../../../../../SharedLibrary/src/util/string.util';
 
-import type { InputBaseComponentProps } from '@mui/material/InputBase';
-import type { SxProps, Theme } from '@mui/material/styles';
-import type { KeyboardEventHandler } from 'react';
+import type { TextFieldProps as MuiTextFieldProps } from '@mui/material/TextField';
 
-interface TextFieldProps {
+export type TextFieldProps = Omit<MuiTextFieldProps, 'label' | 'value' | 'defaultValue' | 'onChange' | 'error' | 'type'> & {
   label?: string;
   value?: string | undefined;
   defaultValue?: string | undefined;
-  inputProps?: InputBaseComponentProps | undefined;
-  inputRef?: React.RefObject<HTMLInputElement>;
   onChange?: (value: string) => void;
-  onKeyDown?: KeyboardEventHandler<HTMLInputElement>;
-  required?: boolean;
   error?: boolean;
-  disabled?: boolean;
-  helperText?: React.ReactNode;
-  sx?: SxProps<Theme> | undefined;
-  multiline?: boolean;
-  rows?: number;
-  autoFocus?: boolean;
-}
+};
 
 const TextField = (props: TextFieldProps) => {
   const { onChange, error, ...otherProps } = props;

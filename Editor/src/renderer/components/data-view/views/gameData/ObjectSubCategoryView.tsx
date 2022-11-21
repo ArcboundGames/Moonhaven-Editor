@@ -57,6 +57,7 @@ import {
 } from '../../../../util/validate.util';
 import Checkbox from '../../../widgets/form/Checkbox';
 import MultiSelect from '../../../widgets/form/MultiSelect';
+import NumberTextField from '../../../widgets/form/NumberTextField';
 import Select from '../../../widgets/form/Select';
 import TextField from '../../../widgets/form/TextField';
 import Card from '../../../widgets/layout/Card';
@@ -69,12 +70,12 @@ import { useByAdjacentPlacementLayer, useByBelowPlacementLayer } from './hooks/u
 import CollidersCard from './widgets/CollidersCard';
 import { OverriddenObjectPropertyCard as OverriddenObjectProperty } from './widgets/OverriddenPropertyCard';
 
-import type { DataViewListItem } from '../../DataViewList';
 import type {
   LocalizedObjectType,
   ObjectSubCategory,
   SpawningCondition
 } from '../../../../../../../SharedLibrary/src/interface';
+import type { DataViewListItem } from '../../DataViewList';
 
 const ObjectSubCategoryView = () => {
   const { dataKey = '' } = useParams();
@@ -325,7 +326,6 @@ const ObjectSubCategoryView = () => {
                 </Card>
                 <OverriddenObjectProperty
                   title="Loot"
-                  level={0}
                   type={data}
                   setting="lootType"
                   onOverrideChange={(overridden) =>
@@ -377,7 +377,6 @@ const ObjectSubCategoryView = () => {
                 </OverriddenObjectProperty>
                 <OverriddenObjectProperty
                   title="Water"
-                  level={0}
                   type={data}
                   setting="requiresWater"
                   onOverrideChange={(overridden) =>
@@ -414,7 +413,6 @@ const ObjectSubCategoryView = () => {
                 </OverriddenObjectProperty>
                 <OverriddenObjectProperty
                   title="Health"
-                  level={0}
                   type={data}
                   setting="hasHealth"
                   onOverrideChange={(overridden) =>
@@ -451,7 +449,6 @@ const ObjectSubCategoryView = () => {
                 </OverriddenObjectProperty>
                 <OverriddenObjectProperty
                   title="Stages"
-                  level={0}
                   type={data}
                   setting="stagesType"
                   onOverrideChange={(overridden) =>
@@ -513,7 +510,6 @@ const ObjectSubCategoryView = () => {
                 </OverriddenObjectProperty>
                 <OverriddenObjectProperty
                   title="Workstation"
-                  level={0}
                   type={data}
                   setting="isWorkstation"
                   onOverrideChange={(overridden) =>
@@ -550,7 +546,6 @@ const ObjectSubCategoryView = () => {
                 </OverriddenObjectProperty>
                 <OverriddenObjectProperty
                   title="Destroy"
-                  level={0}
                   type={data}
                   setting="destroyOnHarvest"
                   onOverrideChange={(overridden) =>
@@ -587,7 +582,6 @@ const ObjectSubCategoryView = () => {
                 </OverriddenObjectProperty>
                 <OverriddenObjectProperty
                   title="Harvest"
-                  level={0}
                   type={data}
                   setting="canHarvestWithHand"
                   onOverrideChange={(overridden) =>
@@ -624,7 +618,6 @@ const ObjectSubCategoryView = () => {
                 </OverriddenObjectProperty>
                 <OverriddenObjectProperty
                   title="Breakable"
-                  level={0}
                   type={data}
                   setting="breakable"
                   onOverrideChange={(overridden) =>
@@ -661,7 +654,6 @@ const ObjectSubCategoryView = () => {
                 </OverriddenObjectProperty>
                 <OverriddenObjectProperty
                   title="Inventory"
-                  level={0}
                   type={data}
                   setting="inventoryType"
                   onOverrideChange={(overridden) =>
@@ -679,6 +671,7 @@ const ObjectSubCategoryView = () => {
                       <Select
                         label="Inventory Type"
                         disabled={disabled || controlled}
+                        required
                         value={value}
                         onChange={
                           controlled
@@ -718,7 +711,6 @@ const ObjectSubCategoryView = () => {
                 </OverriddenObjectProperty>
                 <OverriddenObjectProperty
                   title="Open / Close"
-                  level={0}
                   type={data}
                   setting="canOpen"
                   onOverrideChange={(overridden) =>
@@ -755,7 +747,6 @@ const ObjectSubCategoryView = () => {
                 </OverriddenObjectProperty>
                 <OverriddenObjectProperty
                   title="Seasons"
-                  level={0}
                   type={data}
                   setting="changesSpritesWithSeason"
                   onOverrideChange={(overridden) =>
@@ -790,6 +781,44 @@ const ObjectSubCategoryView = () => {
                     )
                   }}
                 </OverriddenObjectProperty>
+                <OverriddenObjectProperty
+                  title="Light Level"
+                  type={data}
+                  setting="lightLevel"
+                  onOverrideChange={(overridden) =>
+                    handleOnChange({
+                      settings: {
+                        ...data.settings,
+                        lightLevel: overridden ? 0 : undefined
+                      }
+                    })
+                  }
+                  disabled={disabled}
+                >
+                  {{
+                    control: (controlled, value, helperText) => (
+                      <NumberTextField
+                        label="Light Level"
+                        value={value}
+                        onChange={
+                          controlled
+                            ? undefined
+                            : (newValue) => {
+                                console.log(newValue);
+                                handleOnChange({
+                                  settings: {
+                                    ...data.settings,
+                                    lightLevel: newValue
+                                  }
+                                });
+                              }
+                        }
+                        disabled={disabled || controlled}
+                        helperText={helperText}
+                      />
+                    )
+                  }}
+                </OverriddenObjectProperty>
               </Box>
               <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
                 <Card
@@ -811,7 +840,6 @@ const ObjectSubCategoryView = () => {
               <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
                 <OverriddenObjectProperty
                   title="Position"
-                  level={0}
                   type={data}
                   setting="placementPosition"
                   onOverrideChange={(overridden) =>
@@ -864,7 +892,6 @@ const ObjectSubCategoryView = () => {
                 </OverriddenObjectProperty>
                 <OverriddenObjectProperty
                   title="Layer"
-                  level={0}
                   type={data}
                   setting="placementLayer"
                   onOverrideChange={(overridden) =>
@@ -921,7 +948,6 @@ const ObjectSubCategoryView = () => {
                 </OverriddenObjectProperty>
                 <OverriddenObjectProperty
                   title="Spawning Conditions"
-                  level={0}
                   type={data}
                   setting="spawningConditions"
                   controlStyle="multiple"
@@ -982,7 +1008,6 @@ const ObjectSubCategoryView = () => {
                 <Card header="Required Below">
                   <OverriddenObjectProperty
                     layout="inline"
-                    level={0}
                     type={data}
                     setting="requiredBelowObjectCategoryKeys"
                     onOverrideChange={(overridden) =>
@@ -1020,7 +1045,6 @@ const ObjectSubCategoryView = () => {
                   </OverriddenObjectProperty>
                   <OverriddenObjectProperty
                     layout="inline"
-                    level={0}
                     type={data}
                     setting="requiredBelowObjectSubCategoryKeys"
                     onOverrideChange={(overridden) =>
@@ -1058,7 +1082,6 @@ const ObjectSubCategoryView = () => {
                   </OverriddenObjectProperty>
                   <OverriddenObjectProperty
                     layout="inline"
-                    level={0}
                     type={data}
                     setting="requiredBelowObjectKeys"
                     onOverrideChange={(overridden) =>
@@ -1100,7 +1123,6 @@ const ObjectSubCategoryView = () => {
                 <Card header="Required Adjacent">
                   <OverriddenObjectProperty
                     layout="inline"
-                    level={0}
                     type={data}
                     setting="requiredAdjacentObjectCategoryKeys"
                     onOverrideChange={(overridden) =>
@@ -1138,7 +1160,6 @@ const ObjectSubCategoryView = () => {
                   </OverriddenObjectProperty>
                   <OverriddenObjectProperty
                     layout="inline"
-                    level={0}
                     type={data}
                     setting="requiredAdjacentObjectSubCategoryKeys"
                     onOverrideChange={(overridden) =>
@@ -1176,7 +1197,6 @@ const ObjectSubCategoryView = () => {
                   </OverriddenObjectProperty>
                   <OverriddenObjectProperty
                     layout="inline"
-                    level={0}
                     type={data}
                     setting="requiredAdjacentObjectKeys"
                     onOverrideChange={(overridden) =>

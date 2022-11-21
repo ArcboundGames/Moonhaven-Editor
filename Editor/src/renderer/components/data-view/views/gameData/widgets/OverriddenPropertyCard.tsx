@@ -60,21 +60,21 @@ export interface ItemSettingsProps<K extends keyof ItemSettings> extends BaseOve
   type?: ItemType;
   setting: K;
   children: { control: ItemChildControl<K>; other?: ItemOtherChildren<K> };
-  level: 0 | 1;
+  level?: 0 | 1;
 }
 
 export interface ObjectSettingsProps<K extends keyof ObjectSettings> extends BaseOverrideCardProps {
   type?: ObjectType | ObjectSubCategory;
   setting: K;
   children: { control: ObjectChildControl<K>; other?: ObjectOtherChildren<K> };
-  level: 0 | 1 | 2;
+  level?: 0 | 1 | 2;
 }
 
 export interface CreatureSettingsProps<K extends keyof CreatureSettings> extends BaseOverrideCardProps {
   type?: CreatureType;
   setting: K;
   children: { control: CreatureChildControl<K>; other?: CreatureOtherChildren<K> };
-  level: 0 | 1;
+  level?: 0 | 1;
 }
 
 export interface BaseOverrideCardProps {
@@ -130,7 +130,6 @@ function useOverrideCard(props: BaseOverrideCardProps) {
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: `repeat(2, minmax(0, 1fr))`,
             alignItems: 'flex-start',
             ...wrapperSx
           }}
@@ -190,7 +189,7 @@ function useOverrideCard(props: BaseOverrideCardProps) {
 }
 
 export const OverriddenObjectPropertyCard = <K extends keyof ObjectSettings>(props: ObjectSettingsProps<K>) => {
-  const { setting, type, children, level } = props;
+  const { setting, type, children, level = 0 } = props;
 
   const { overridden, setOverridden, renderHelperText, render } = useOverrideCard(props);
 
@@ -224,7 +223,7 @@ export const OverriddenObjectPropertyCard = <K extends keyof ObjectSettings>(pro
 };
 
 export const OverriddenItemPropertyCard = <K extends keyof ItemSettings>(props: ItemSettingsProps<K>) => {
-  const { setting, type, children, level } = props;
+  const { setting, type, children, level = 0 } = props;
 
   const { overridden, setOverridden, renderHelperText, render } = useOverrideCard(props);
 
@@ -254,7 +253,7 @@ export const OverriddenItemPropertyCard = <K extends keyof ItemSettings>(props: 
 };
 
 export const OverriddenCreaturePropertyCard = <K extends keyof CreatureSettings>(props: CreatureSettingsProps<K>) => {
-  const { setting, type, children, level } = props;
+  const { setting, type, children, level = 0 } = props;
 
   const { overridden, setOverridden, renderHelperText, render } = useOverrideCard(props);
 

@@ -341,7 +341,6 @@ const DialogueTreeView = () => {
               <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
                 <Card header="Days">
                   <Box display="flex" sx={{ width: '100%', justifyContent: 'center' }}>
-                    {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
                     {[...Array(DAYS_IN_A_WEEK)].map((_, day) => {
                       return (
                         <FormBox key={`day-${day}`} sx={{ width: 'unset' }}>
