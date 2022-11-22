@@ -174,7 +174,7 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "eslint-plugin-react": "7.30.1",
     "eslint-plugin-unicorn": "44.0.2",
-    "eslint": "8.27.0",
+    "eslint": "8.28.0",
     "file-loader": "6.2.0",
     "html-webpack-plugin": "5.5.0",
     "identity-obj-proxy": "3.0.0",
