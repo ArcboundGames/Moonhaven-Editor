@@ -186,7 +186,7 @@
     "react-test-renderer": "18.2.0",
     "rimraf": "3.0.2",
     "sass-loader": "13.0.2",
-    "sass": "1.54.4",
+    "sass": "1.56.1",
     "style-loader": "3.3.1",
     "terser-webpack-plugin": "5.3.5",
     "ts-jest": "29.0.3",
