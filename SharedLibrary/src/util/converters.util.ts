@@ -471,6 +471,7 @@ export function toProcessedRawItemType(rawItemType: RawItemType | undefined | nu
     filledLevel: rawItemType?.filledLevel ?? 0,
     filledItemTypeKey: fromNullish(rawItemType?.filledItemTypeKey),
     sellPrice: rawItemType?.sellPrice ?? 0,
+    lightLevel: fromNullish(rawItemType?.lightLevel),
     lightPosition: toVector2(rawItemType?.lightPosition),
     animationSampleRate: rawItemType?.animationSampleRate ?? PLAYER_ANIMATION_SAMPLE_RATE,
     projectileSpeed: rawItemType?.projectileSpeed ?? 0,
@@ -634,6 +635,7 @@ export function toProcessedRawObjectType(rawObjectType: RawObjectType | undefine
     experience: rawObjectType?.experience ?? 0,
     season: fromNullish(rawObjectType?.season),
     craftingSpeedIncreaseSkillKey: fromNullish(rawObjectType?.craftingSpeedIncreaseSkillKey),
+    lightLevel: fromNullish(rawObjectType?.lightLevel),
     lightPosition: toVector2(rawObjectType?.lightPosition)
   };
 }
@@ -1517,7 +1519,7 @@ export function toProcessedRawObjectSettings(rawObjectSettings: RawObjectSetting
     inventoryType: fromNullish(rawObjectSettings.inventoryType),
     canOpen: fromNullish(rawObjectSettings.canOpen),
     changesSpritesWithSeason: fromNullish(rawObjectSettings.changesSpritesWithSeason),
-    lightLevel: fromNullish(rawObjectSettings.lightLevel)
+    hasLight: fromNullish(rawObjectSettings.hasLight)
   };
 }
 

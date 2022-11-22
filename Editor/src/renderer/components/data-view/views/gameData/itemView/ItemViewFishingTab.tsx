@@ -7,7 +7,6 @@ import {
   FISHING_ITEM_TYPE_NONE,
   FISHING_ITEM_TYPE_POLE
 } from '../../../../../../../../SharedLibrary/src/constants';
-import { toFishingItemType } from '../../../../../../../../SharedLibrary/src/util/converters.util';
 import { getItemSetting } from '../../../../../../../../SharedLibrary/src/util/itemType.util';
 import { useAppSelector } from '../../../../../hooks';
 import { selectItemCategoriesByKey } from '../../../../../store/slices/items';
@@ -41,35 +40,19 @@ const ItemViewFishingTab = ({ data, disabled, handleOnChange }: ItemViewFishingT
           title="Fishing"
           type={data}
           setting="fishingItemType"
-          onOverrideChange={(overridden) =>
-            handleOnChange({
-              settings: {
-                ...data.settings,
-                fishingItemType: overridden ? FISHING_ITEM_TYPE_NONE : undefined
-              }
-            })
-          }
+          onChange={handleOnChange}
+          defaultValue={FISHING_ITEM_TYPE_NONE}
           disabled={disabled}
         >
           {{
-            control: (controlled, value, helperText) => (
+            control: ({ controlled, value, helperText, onChange }) => (
               <Select
                 label="Fishing Item Type"
                 required
                 disabled={controlled || disabled}
                 value={value}
                 helperText={helperText}
-                onChange={
-                  controlled
-                    ? undefined
-                    : (newValue) =>
-                        handleOnChange({
-                          settings: {
-                            ...data.settings,
-                            fishingItemType: toFishingItemType(newValue)
-                          }
-                        })
-                }
+                onChange={onChange}
                 options={[
                   {
                     label: 'None',

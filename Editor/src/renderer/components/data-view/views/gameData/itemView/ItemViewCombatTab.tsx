@@ -9,7 +9,6 @@ import {
   WEAPON_TYPE_PROJECTILE_LAUNCHER
 } from '../../../../../../../../SharedLibrary/src/constants';
 import { getDamagableData, getProjectileData } from '../../../../../../../../SharedLibrary/src/util/combat.util';
-import { toWeaponType } from '../../../../../../../../SharedLibrary/src/util/converters.util';
 import { getItemSetting } from '../../../../../../../../SharedLibrary/src/util/itemType.util';
 import { isNullish } from '../../../../../../../../SharedLibrary/src/util/null.util';
 import { toTitleCaseFromKey } from '../../../../../../../../SharedLibrary/src/util/string.util';
@@ -32,7 +31,6 @@ import {
   selectObjectTypesSortedWithName
 } from '../../../../../store/slices/objects';
 import { selectSkillsSortedWithName } from '../../../../../store/slices/skills';
-import Checkbox from '../../../../widgets/form/Checkbox';
 import CreatureMultiSelect from '../../../../widgets/form/creature/CreatureMultiSelect';
 import ItemMultiSelect from '../../../../widgets/form/item/ItemMultiSelect';
 import MultiSelect from '../../../../widgets/form/MultiSelect';
@@ -119,32 +117,19 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                 type={data}
                 setting="weaponType"
                 layout="inline"
-                onOverrideChange={(overridden) =>
-                  handleOnChange({
-                    settings: {
-                      ...data.settings,
-                      weaponType: overridden ? weaponType : undefined
-                    }
-                  })
-                }
+                onChange={handleOnChange}
+                defaultValue={weaponType ?? WEAPON_TYPE_NONE}
                 disabled={disabled}
               >
                 {{
-                  control: (controlled, value, helperText) => (
+                  control: ({ controlled, value, helperText, onChange }) => (
                     <Select
                       label="Weapon Type"
                       required
                       disabled={disabled}
                       value={value}
                       error={!controlled && !isWeaponTypeNone && value === undefined}
-                      onChange={(newValue) =>
-                        handleOnChange({
-                          settings: {
-                            ...data.settings,
-                            weaponType: toWeaponType(newValue)
-                          }
-                        })
-                      }
+                      onChange={onChange}
                       options={[
                         {
                           label: 'None',
@@ -234,104 +219,39 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
             <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
               <Card header="Input">
                 <OverriddenItemPropertyCard
+                  label="Has Combat Priority"
                   type={data}
                   layout="inline"
                   setting="hasCombatPriority"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        hasCombatPriority: overridden ? false : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={false}
                   disabled={isWeaponTypeNone || disabled}
-                >
-                  {{
-                    control: (controlled, value, helperText) => (
-                      <Checkbox
-                        label="Has Combat Priority"
-                        checked={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    hasCombatPriority: newValue
-                                  }
-                                })
-                        }
-                        disabled={isWeaponTypeNone || disabled || controlled}
-                        helperText={helperText}
-                      />
-                    )
-                  }}
-                </OverriddenItemPropertyCard>
+                  variant="boolean"
+                />
                 <OverriddenItemPropertyCard
+                  label="Reset Trigger on Attack"
                   type={data}
                   layout="inline"
                   setting="resetTriggerOnAttack"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        resetTriggerOnAttack: overridden ? false : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={false}
                   disabled={isWeaponTypeNone || disabled}
-                >
-                  {{
-                    control: (controlled, value, helperText) => (
-                      <Checkbox
-                        label="Reset Trigger on Attack"
-                        checked={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    resetTriggerOnAttack: newValue
-                                  }
-                                })
-                        }
-                        disabled={isWeaponTypeNone || disabled || controlled}
-                        helperText={helperText}
-                      />
-                    )
-                  }}
-                </OverriddenItemPropertyCard>
+                  variant="boolean"
+                />
               </Card>
               <OverriddenItemPropertyCard
                 type={data}
                 setting="damagedIncreasedBySkillKey"
-                onOverrideChange={(overridden) =>
-                  handleOnChange({
-                    settings: {
-                      ...data.settings,
-                      damagedIncreasedBySkillKey: overridden ? '' : undefined
-                    }
-                  })
-                }
+                onChange={handleOnChange}
+                defaultValue={''}
                 disabled={isWeaponTypeNone || disabled}
               >
                 {{
-                  control: (controlled, value, helperText) => (
+                  control: ({ controlled, value, helperText, onChange }) => (
                     <Select
                       label="Skill"
                       value={value}
-                      onChange={(newValue) =>
-                        handleOnChange({
-                          settings: {
-                            ...data.settings,
-                            damagedIncreasedBySkillKey: newValue
-                          }
-                        })
-                      }
+                      onChange={onChange}
                       disabled={controlled || disabled}
                       options={sortedSkills?.map((entry) => ({
                         label: entry.name,
@@ -355,29 +275,16 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                   type={data}
                   setting="projectileItemCategoryKeys"
                   layout="inline"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        projectileItemCategoryKeys: overridden ? [] : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={[]}
                   disabled={isWeaponTypeNone || disabled}
                 >
                   {{
-                    control: (controlled, value, helperText) => (
+                    control: ({ controlled, value, helperText, onChange }) => (
                       <MultiSelect
                         label="Projectile Item Category"
                         values={data.settings?.projectileItemCategoryKeys}
-                        onChange={(values: string[]) =>
-                          handleOnChange({
-                            settings: {
-                              ...data.settings,
-                              projectileItemCategoryKeys: values.length === 0 ? undefined : values
-                            }
-                          })
-                        }
+                        onChange={onChange}
                         options={projectileItemCategories.map((option) => ({
                           label: toTitleCaseFromKey(option.key),
                           value: option.key
@@ -397,29 +304,16 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                   type={data}
                   setting="projectileItemKeys"
                   layout="inline"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        projectileItemKeys: overridden ? [] : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={[]}
                   disabled={isWeaponTypeNone || disabled}
                 >
                   {{
-                    control: (controlled, value, helperText) => (
+                    control: ({ controlled, value, helperText, onChange }) => (
                       <ItemMultiSelect
                         label="Projectile Item"
                         values={data.settings?.projectileItemKeys}
-                        onChange={(values: string[]) =>
-                          handleOnChange({
-                            settings: {
-                              ...data.settings,
-                              projectileItemKeys: values.length === 0 ? undefined : values
-                            }
-                          })
-                        }
+                        onChange={onChange}
                         items={projectileItems}
                         disabled={
                           disabled ||
@@ -443,29 +337,16 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                     type={data}
                     setting="damagesCreatureCategoryKeys"
                     layout="inline"
-                    onOverrideChange={(overridden) =>
-                      handleOnChange({
-                        settings: {
-                          ...data.settings,
-                          damagesCreatureCategoryKeys: overridden ? [] : undefined
-                        }
-                      })
-                    }
+                    onChange={handleOnChange}
+                    defaultValue={[]}
                     disabled={isWeaponTypeNone || disabled}
                   >
                     {{
-                      control: (controlled, value, helperText) => (
+                      control: ({ controlled, value, helperText, onChange }) => (
                         <MultiSelect
                           label="Damages Creature Category"
                           values={data.settings?.damagesCreatureCategoryKeys}
-                          onChange={(values: string[]) =>
-                            handleOnChange({
-                              settings: {
-                                ...data.settings,
-                                damagesCreatureCategoryKeys: values.length === 0 ? undefined : values
-                              }
-                            })
-                          }
+                          onChange={onChange}
                           options={damagableCreatureCategories.map((option) => ({
                             label: toTitleCaseFromKey(option.key),
                             value: option.key
@@ -485,29 +366,16 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                     type={data}
                     setting="damagesCreatureKeys"
                     layout="inline"
-                    onOverrideChange={(overridden) =>
-                      handleOnChange({
-                        settings: {
-                          ...data.settings,
-                          damagesCreatureKeys: overridden ? [] : undefined
-                        }
-                      })
-                    }
+                    onChange={handleOnChange}
+                    defaultValue={[]}
                     disabled={isWeaponTypeNone || disabled}
                   >
                     {{
-                      control: (controlled, value, helperText) => (
+                      control: ({ controlled, value, helperText, onChange }) => (
                         <CreatureMultiSelect
                           label="Damages Creature"
                           values={data.settings?.damagesCreatureKeys}
-                          onChange={(values: string[]) =>
-                            handleOnChange({
-                              settings: {
-                                ...data.settings,
-                                damagesCreatureKeys: values.length === 0 ? undefined : values
-                              }
-                            })
-                          }
+                          onChange={onChange}
                           creatures={damagableCreatures}
                           disabled={
                             disabled ||
@@ -528,29 +396,16 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                     type={data}
                     setting="damagesObjectCategoryKeys"
                     layout="inline"
-                    onOverrideChange={(overridden) =>
-                      handleOnChange({
-                        settings: {
-                          ...data.settings,
-                          damagesObjectCategoryKeys: overridden ? [] : undefined
-                        }
-                      })
-                    }
+                    onChange={handleOnChange}
+                    defaultValue={[]}
                     disabled={isWeaponTypeNone || disabled}
                   >
                     {{
-                      control: (controlled, value, helperText) => (
+                      control: ({ controlled, value, helperText, onChange }) => (
                         <MultiSelect
                           label="Damages Object Category"
                           values={data.settings?.damagesObjectCategoryKeys}
-                          onChange={(values: string[]) =>
-                            handleOnChange({
-                              settings: {
-                                ...data.settings,
-                                damagesObjectCategoryKeys: values.length === 0 ? undefined : values
-                              }
-                            })
-                          }
+                          onChange={onChange}
                           options={damagableObjectCategories.map((option) => ({
                             label: toTitleCaseFromKey(option.key),
                             value: option.key
@@ -570,29 +425,16 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                     type={data}
                     setting="damagesObjectSubCategoryKeys"
                     layout="inline"
-                    onOverrideChange={(overridden) =>
-                      handleOnChange({
-                        settings: {
-                          ...data.settings,
-                          damagesObjectSubCategoryKeys: overridden ? [] : undefined
-                        }
-                      })
-                    }
+                    onChange={handleOnChange}
+                    defaultValue={[]}
                     disabled={isWeaponTypeNone || disabled}
                   >
                     {{
-                      control: (controlled, value, helperText) => (
+                      control: ({ controlled, value, helperText, onChange }) => (
                         <MultiSelect
                           label="Damages Object Sub Category"
                           values={data.settings?.damagesObjectSubCategoryKeys}
-                          onChange={(values: string[]) =>
-                            handleOnChange({
-                              settings: {
-                                ...data.settings,
-                                damagesObjectSubCategoryKeys: values.length === 0 ? undefined : values
-                              }
-                            })
-                          }
+                          onChange={onChange}
                           options={damagableObjectSubCategories.map((option) => ({
                             label: toTitleCaseFromKey(option.key),
                             value: option.key
@@ -612,29 +454,16 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                     type={data}
                     setting="damagesObjectKeys"
                     layout="inline"
-                    onOverrideChange={(overridden) =>
-                      handleOnChange({
-                        settings: {
-                          ...data.settings,
-                          damagesObjectKeys: overridden ? [] : undefined
-                        }
-                      })
-                    }
+                    onChange={handleOnChange}
+                    defaultValue={[]}
                     disabled={isWeaponTypeNone || disabled}
                   >
                     {{
-                      control: (controlled, value, helperText) => (
+                      control: ({ controlled, value, helperText, onChange }) => (
                         <MultiSelect
                           label="Damages Object"
                           values={data.settings?.damagesObjectKeys}
-                          onChange={(values: string[]) =>
-                            handleOnChange({
-                              settings: {
-                                ...data.settings,
-                                damagesObjectKeys: values.length === 0 ? undefined : values
-                              }
-                            })
-                          }
+                          onChange={onChange}
                           options={damagableObjects.map((option) => ({
                             label: option.name,
                             value: option.key

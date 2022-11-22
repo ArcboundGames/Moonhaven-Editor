@@ -13,7 +13,6 @@ import {
   WEAPON_TYPE_NONE
 } from '../../../../../../../SharedLibrary/src/constants';
 import { getDamagableData, getProjectileData } from '../../../../../../../SharedLibrary/src/util/combat.util';
-import { toFilledFromType } from '../../../../../../../SharedLibrary/src/util/converters.util';
 import { getItemSetting } from '../../../../../../../SharedLibrary/src/util/itemType.util';
 import { isNotNullish } from '../../../../../../../SharedLibrary/src/util/null.util';
 import { toTitleCaseFromKey } from '../../../../../../../SharedLibrary/src/util/string.util';
@@ -51,7 +50,6 @@ import {
   validateItemGeneralTab
 } from '../../../../util/validate.util';
 import { useUpdateLocalization } from '../../../hooks/useUpdateLocalization.hook';
-import Checkbox from '../../../widgets/form/Checkbox';
 import ItemSelect from '../../../widgets/form/item/ItemSelect';
 import NumberTextField from '../../../widgets/form/NumberTextField';
 import Select from '../../../widgets/form/Select';
@@ -418,38 +416,15 @@ const ItemView = () => {
                 </Card>
                 <OverriddenItemPropertyCard
                   title="Placement"
+                  label="Placeable"
                   type={data}
                   setting="placeable"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        placeable: overridden ? false : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={false}
                   disabled={disabled}
+                  variant="boolean"
                 >
                   {{
-                    control: (controlled, value, helperText) => (
-                      <Checkbox
-                        label="Placeable"
-                        checked={value}
-                        helperText={helperText}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    placeable: newValue
-                                  }
-                                })
-                        }
-                        disabled={disabled || controlled}
-                      />
-                    ),
                     other: (placeable) =>
                       placeable ? (
                         <FormBox key="lootTableKey">
@@ -470,38 +445,15 @@ const ItemView = () => {
                 </OverriddenItemPropertyCard>
                 <OverriddenItemPropertyCard
                   title="Durability"
+                  label="Has Durability"
                   type={data}
                   setting="hasDurability"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        hasDurability: overridden ? false : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={false}
                   disabled={disabled}
+                  variant="boolean"
                 >
                   {{
-                    control: (controlled, value, helperText) => (
-                      <Checkbox
-                        label="Has Durability"
-                        checked={value}
-                        helperText={helperText}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    hasDurability: newValue
-                                  }
-                                })
-                        }
-                        disabled={disabled || controlled}
-                      />
-                    ),
                     other: (placeable) =>
                       placeable ? (
                         <FormBox key="durability">
@@ -521,39 +473,15 @@ const ItemView = () => {
 
                 <OverriddenItemPropertyCard
                   title="Light"
+                  label="Has Light"
                   type={data}
                   setting="hasLight"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        hasLight: overridden ? false : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={false}
                   disabled={disabled}
+                  variant="boolean"
                 >
                   {{
-                    control: (controlled, value, helperText) => (
-                      <Checkbox
-                        sx={{ width: '100%' }}
-                        label="Has Light"
-                        checked={value}
-                        helperText={helperText}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    hasLight: newValue
-                                  }
-                                })
-                        }
-                        disabled={disabled || controlled}
-                      />
-                    ),
                     other: (settingValue) =>
                       settingValue ? (
                         <Box key="light-position">
@@ -616,116 +544,35 @@ const ItemView = () => {
                     </Card>
                     <Card header="Farming">
                       <OverriddenItemPropertyCard
+                        label="Creates Farmland"
                         type={data}
                         setting="createsFarmland"
                         layout="inline"
-                        onOverrideChange={(overridden) =>
-                          handleOnChange({
-                            settings: {
-                              ...data.settings,
-                              createsFarmland: overridden ? false : undefined
-                            }
-                          })
-                        }
+                        onChange={handleOnChange}
+                        defaultValue={false}
                         disabled={disabled}
-                      >
-                        {{
-                          control: (controlled, value, helperText) => (
-                            <Checkbox
-                              sx={{ width: '100%' }}
-                              label="Creates Farmland"
-                              checked={value}
-                              helperText={helperText}
-                              onChange={
-                                controlled
-                                  ? undefined
-                                  : (newValue) =>
-                                      handleOnChange({
-                                        settings: {
-                                          ...data.settings,
-                                          createsFarmland: newValue
-                                        }
-                                      })
-                              }
-                              disabled={disabled || controlled}
-                            />
-                          )
-                        }}
-                      </OverriddenItemPropertyCard>
+                        variant="boolean"
+                      />
                       <OverriddenItemPropertyCard
+                        label="Destroys Farmland"
                         type={data}
                         setting="destroysFarmland"
                         layout="inline"
-                        onOverrideChange={(overridden) =>
-                          handleOnChange({
-                            settings: {
-                              ...data.settings,
-                              destroysFarmland: overridden ? false : undefined
-                            }
-                          })
-                        }
+                        onChange={handleOnChange}
+                        defaultValue={false}
                         disabled={disabled}
-                      >
-                        {{
-                          control: (controlled, value, helperText) => (
-                            <Checkbox
-                              sx={{ width: '100%' }}
-                              label="Destroys Farmland"
-                              checked={value}
-                              helperText={helperText}
-                              onChange={
-                                controlled
-                                  ? undefined
-                                  : (newValue) =>
-                                      handleOnChange({
-                                        settings: {
-                                          ...data.settings,
-                                          destroysFarmland: newValue
-                                        }
-                                      })
-                              }
-                              disabled={disabled || controlled}
-                            />
-                          )
-                        }}
-                      </OverriddenItemPropertyCard>
+                        variant="boolean"
+                      />
                       <OverriddenItemPropertyCard
+                        label="Waters Ground"
                         type={data}
                         setting="watersGround"
                         layout="inline"
-                        onOverrideChange={(overridden) =>
-                          handleOnChange({
-                            settings: {
-                              ...data.settings,
-                              watersGround: overridden ? false : undefined
-                            }
-                          })
-                        }
+                        onChange={handleOnChange}
+                        defaultValue={false}
                         disabled={disabled}
-                      >
-                        {{
-                          control: (controlled, value, helperText) => (
-                            <Checkbox
-                              sx={{ width: '100%' }}
-                              label="Waters Ground"
-                              checked={value}
-                              helperText={helperText}
-                              onChange={
-                                controlled
-                                  ? undefined
-                                  : (newValue) =>
-                                      handleOnChange({
-                                        settings: {
-                                          ...data.settings,
-                                          watersGround: newValue
-                                        }
-                                      })
-                              }
-                              disabled={disabled || controlled}
-                            />
-                          )
-                        }}
-                      </OverriddenItemPropertyCard>
+                        variant="boolean"
+                      />
                     </Card>
                   </Box>
                   <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
@@ -772,43 +619,20 @@ const ItemView = () => {
                     ) : null}
                     <OverriddenItemPropertyCard
                       title="Food"
+                      label="Is Edible"
                       type={data}
                       setting="isEdible"
-                      onOverrideChange={(overridden) =>
-                        handleOnChange({
-                          settings: {
-                            ...data.settings,
-                            isEdible: overridden ? false : undefined
-                          }
-                        })
-                      }
+                      onChange={handleOnChange}
+                      defaultValue={false}
                       disabled={disabled}
                       wrapperSx={{
                         display: 'flex',
                         flexDirection: 'column',
                         width: '100%'
                       }}
+                      variant="boolean"
                     >
                       {{
-                        control: (controlled, value, helperText) => (
-                          <Checkbox
-                            label="Is Edible"
-                            checked={value}
-                            helperText={helperText}
-                            onChange={
-                              controlled
-                                ? undefined
-                                : (newValue) =>
-                                    handleOnChange({
-                                      settings: {
-                                        ...data.settings,
-                                        isEdible: newValue
-                                      }
-                                    })
-                            }
-                            disabled={disabled || controlled}
-                          />
-                        ),
                         other: (isEdible) =>
                           isEdible ? (
                             <>
@@ -862,14 +686,8 @@ const ItemView = () => {
                       title="Water"
                       type={data}
                       setting="filledFromType"
-                      onOverrideChange={(overridden) =>
-                        handleOnChange({
-                          settings: {
-                            ...data.settings,
-                            filledFromType: overridden ? FILLED_FROM_TYPE_NONE : undefined
-                          }
-                        })
-                      }
+                      onChange={handleOnChange}
+                      defaultValue={FILLED_FROM_TYPE_NONE}
                       disabled={disabled}
                       wrapperSx={{
                         display: 'flex',
@@ -878,23 +696,13 @@ const ItemView = () => {
                       }}
                     >
                       {{
-                        control: (controlled, value, helperText) => (
+                        control: ({ controlled, value, helperText, onChange }) => (
                           <Select
                             label="Filled From Type"
                             required
-                            disabled={disabled}
+                            disabled={controlled || disabled}
                             value={value}
-                            onChange={
-                              controlled
-                                ? undefined
-                                : (newValue) =>
-                                    handleOnChange({
-                                      settings: {
-                                        ...data.settings,
-                                        filledFromType: toFilledFromType(newValue)
-                                      }
-                                    })
-                            }
+                            onChange={onChange}
                             options={[
                               {
                                 label: 'None',

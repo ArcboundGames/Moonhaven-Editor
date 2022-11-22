@@ -179,6 +179,7 @@ export interface ItemType {
   filledLevel: number;
   filledItemTypeKey?: string;
   sellPrice: number;
+  lightLevel?: number;
   lightPosition?: Vector2;
   animationSampleRate?: number;
 
@@ -391,6 +392,7 @@ export interface ObjectType {
   experience: number;
   season?: Season | typeof ALL_SEASONS;
   craftingSpeedIncreaseSkillKey?: string;
+  lightLevel?: number;
   lightPosition?: Vector2;
 }
 
@@ -498,7 +500,7 @@ export interface ObjectSettings {
   inventoryType?: InventoryType;
   canOpen?: boolean;
   changesSpritesWithSeason?: boolean;
-  lightLevel?: number;
+  hasLight?: boolean;
 }
 
 export interface Vector2 {
