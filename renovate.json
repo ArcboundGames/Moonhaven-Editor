@@ -17,6 +17,12 @@
       "addLabels": ["dev dependencies"]
     },
     {
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor"],
+      "addLabels": ["automerge"],
+      "automerge": true
+    },
+    {
       "matchUpdateTypes": ["patch"],
       "addLabels": ["patch", "automerge"],
       "automerge": true
