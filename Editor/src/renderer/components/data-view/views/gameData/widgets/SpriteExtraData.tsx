@@ -74,7 +74,7 @@ export const SpriteExtraData = ({
               onChange(index, {
                 ...(sprite ?? createObjectSprite()),
                 pivotOffset: {
-                  x: value,
+                  x: value ?? 0,
                   y: sprite?.pivotOffset?.y ?? 0
                 }
               });
@@ -96,7 +96,7 @@ export const SpriteExtraData = ({
                 ...(sprite ?? createObjectSprite()),
                 pivotOffset: {
                   x: sprite?.pivotOffset?.x ?? 0,
-                  y: value
+                  y: value ?? 0
                 }
               });
             }}
@@ -126,7 +126,7 @@ export const SpriteExtraData = ({
               onChange(index, {
                 ...(sprite ?? createObjectSprite()),
                 spriteOffset: {
-                  x: value,
+                  x: value ?? 0,
                   y: sprite?.spriteOffset?.y ?? 0
                 }
               });
@@ -148,7 +148,7 @@ export const SpriteExtraData = ({
                 ...(sprite ?? createObjectSprite()),
                 spriteOffset: {
                   x: sprite?.spriteOffset?.x ?? 0,
-                  y: value
+                  y: value ?? 0
                 }
               });
             }}

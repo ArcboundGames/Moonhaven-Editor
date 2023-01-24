@@ -26,13 +26,6 @@ import {
   validateObjectSubCategorySpriteRulesTab,
   validatePhysicsTab
 } from '../../../../../../../SharedLibrary/src/dataValidation';
-import {
-  toInventoryType,
-  toLootType,
-  toPlacementLayer,
-  toPlacementPosition,
-  toStagesType
-} from '../../../../../../../SharedLibrary/src/util/converters.util';
 import { getObjectSetting } from '../../../../../../../SharedLibrary/src/util/objectType.util';
 import { toTitleCaseFromKey } from '../../../../../../../SharedLibrary/src/util/string.util';
 import { useAppDispatch, useAppSelector, useDebounce, useQuery } from '../../../../hooks';
@@ -57,7 +50,6 @@ import {
 } from '../../../../util/validate.util';
 import Checkbox from '../../../widgets/form/Checkbox';
 import MultiSelect from '../../../widgets/form/MultiSelect';
-import NumberTextField from '../../../widgets/form/NumberTextField';
 import Select from '../../../widgets/form/Select';
 import TextField from '../../../widgets/form/TextField';
 import Card from '../../../widgets/layout/Card';
@@ -328,33 +320,17 @@ const ObjectSubCategoryView = () => {
                   title="Loot"
                   type={data}
                   setting="lootType"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        lootType: overridden ? LOOT_TYPE_DROP : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={LOOT_TYPE_DROP}
                   disabled={disabled}
                 >
                   {{
-                    control: (controlled, value, helperText) => (
+                    control: ({ controlled, value, helperText, onChange }) => (
                       <Select
                         label="Loot Type"
                         disabled={disabled || controlled}
                         value={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    lootType: toLootType(newValue)
-                                  }
-                                })
-                        }
+                        onChange={onChange}
                         options={[
                           {
                             label: 'None',
@@ -377,108 +353,40 @@ const ObjectSubCategoryView = () => {
                 </OverriddenObjectProperty>
                 <OverriddenObjectProperty
                   title="Water"
+                  label="Requires Water"
                   type={data}
                   setting="requiresWater"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        requiresWater: overridden ? false : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={false}
                   disabled={disabled}
-                >
-                  {{
-                    control: (controlled, value, helperText) => (
-                      <Checkbox
-                        label="Requires Water"
-                        checked={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    requiresWater: newValue
-                                  }
-                                })
-                        }
-                        disabled={disabled || controlled}
-                        helperText={helperText}
-                      />
-                    )
-                  }}
-                </OverriddenObjectProperty>
+                  variant="boolean"
+                />
                 <OverriddenObjectProperty
                   title="Health"
+                  label="Has Health"
                   type={data}
                   setting="hasHealth"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        hasHealth: overridden ? false : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={false}
                   disabled={disabled}
-                >
-                  {{
-                    control: (controlled, value, helperText) => (
-                      <Checkbox
-                        label="Has Health"
-                        checked={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    hasHealth: newValue
-                                  }
-                                })
-                        }
-                        disabled={disabled || controlled}
-                        helperText={helperText}
-                      />
-                    )
-                  }}
-                </OverriddenObjectProperty>
+                  variant="boolean"
+                />
                 <OverriddenObjectProperty
                   title="Stages"
                   type={data}
                   setting="stagesType"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        stagesType: overridden ? STAGES_TYPE_GROWABLE : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={STAGES_TYPE_GROWABLE}
                   disabled={disabled}
                 >
                   {{
-                    control: (controlled, value, helperText) => (
+                    control: ({ controlled, value, helperText, onChange }) => (
                       <Select
                         label="Stages Type"
                         disabled={disabled || controlled}
                         required
                         value={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    stagesType: toStagesType(newValue)
-                                  }
-                                })
-                        }
+                        onChange={onChange}
                         options={[
                           {
                             label: 'None',
@@ -510,180 +418,60 @@ const ObjectSubCategoryView = () => {
                 </OverriddenObjectProperty>
                 <OverriddenObjectProperty
                   title="Workstation"
+                  label="Is Workstation"
                   type={data}
                   setting="isWorkstation"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        isWorkstation: overridden ? false : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={false}
                   disabled={disabled}
-                >
-                  {{
-                    control: (controlled, value, helperText) => (
-                      <Checkbox
-                        label="Is Workstation"
-                        checked={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    isWorkstation: newValue
-                                  }
-                                })
-                        }
-                        disabled={disabled || controlled}
-                        helperText={helperText}
-                      />
-                    )
-                  }}
-                </OverriddenObjectProperty>
+                  variant="boolean"
+                />
                 <OverriddenObjectProperty
                   title="Destroy"
+                  label="Destroy on Harvest"
                   type={data}
                   setting="destroyOnHarvest"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        destroyOnHarvest: overridden ? false : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={false}
                   disabled={disabled}
-                >
-                  {{
-                    control: (controlled, value, helperText) => (
-                      <Checkbox
-                        label="Destroy on Harvest"
-                        checked={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    destroyOnHarvest: newValue
-                                  }
-                                })
-                        }
-                        disabled={disabled || controlled}
-                        helperText={helperText}
-                      />
-                    )
-                  }}
-                </OverriddenObjectProperty>
+                  variant="boolean"
+                />
                 <OverriddenObjectProperty
                   title="Harvest"
+                  label="Can Harvest with Hand"
                   type={data}
                   setting="canHarvestWithHand"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        canHarvestWithHand: overridden ? false : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={false}
                   disabled={disabled}
-                >
-                  {{
-                    control: (controlled, value, helperText) => (
-                      <Checkbox
-                        label="Destroy on Harvest"
-                        checked={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    canHarvestWithHand: newValue
-                                  }
-                                })
-                        }
-                        disabled={disabled || controlled}
-                        helperText={helperText}
-                      />
-                    )
-                  }}
-                </OverriddenObjectProperty>
+                  variant="boolean"
+                />
                 <OverriddenObjectProperty
                   title="Breakable"
+                  label="Breakable"
                   type={data}
                   setting="breakable"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        breakable: overridden ? false : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={false}
                   disabled={disabled}
-                >
-                  {{
-                    control: (controlled, value, helperText) => (
-                      <Checkbox
-                        label="Breakable"
-                        checked={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    breakable: newValue
-                                  }
-                                })
-                        }
-                        disabled={disabled || controlled}
-                        helperText={helperText}
-                      />
-                    )
-                  }}
-                </OverriddenObjectProperty>
+                  variant="boolean"
+                />
                 <OverriddenObjectProperty
                   title="Inventory"
                   type={data}
                   setting="inventoryType"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        inventoryType: overridden ? INVENTORY_TYPE_NONE : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={INVENTORY_TYPE_NONE}
                   disabled={disabled}
                 >
                   {{
-                    control: (controlled, value, helperText) => (
+                    control: ({ controlled, value, helperText, onChange }) => (
                       <Select
                         label="Inventory Type"
                         disabled={disabled || controlled}
                         required
                         value={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    inventoryType: toInventoryType(newValue)
-                                  }
-                                })
-                        }
+                        onChange={onChange}
                         options={[
                           {
                             label: 'None',
@@ -711,114 +499,34 @@ const ObjectSubCategoryView = () => {
                 </OverriddenObjectProperty>
                 <OverriddenObjectProperty
                   title="Open / Close"
+                  label="Can Open"
                   type={data}
                   setting="canOpen"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        canOpen: overridden ? false : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={false}
                   disabled={disabled}
-                >
-                  {{
-                    control: (controlled, value, helperText) => (
-                      <Checkbox
-                        label="Can Open"
-                        checked={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    canOpen: newValue
-                                  }
-                                })
-                        }
-                        disabled={disabled || controlled}
-                        helperText={helperText}
-                      />
-                    )
-                  }}
-                </OverriddenObjectProperty>
+                  variant="boolean"
+                />
                 <OverriddenObjectProperty
                   title="Seasons"
+                  label="Changes Sprites with Season"
                   type={data}
                   setting="changesSpritesWithSeason"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        changesSpritesWithSeason: overridden ? false : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={false}
                   disabled={disabled}
-                >
-                  {{
-                    control: (controlled, value, helperText) => (
-                      <Checkbox
-                        label="Changes Sprites with Season"
-                        checked={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    changesSpritesWithSeason: newValue
-                                  }
-                                })
-                        }
-                        disabled={disabled || controlled}
-                        helperText={helperText}
-                      />
-                    )
-                  }}
-                </OverriddenObjectProperty>
+                  variant="boolean"
+                />
                 <OverriddenObjectProperty
-                  title="Light Level"
+                  title="Light"
+                  label="Has Light"
                   type={data}
-                  setting="lightLevel"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        lightLevel: overridden ? 0 : undefined
-                      }
-                    })
-                  }
+                  setting="hasLight"
+                  onChange={handleOnChange}
+                  defaultValue={false}
                   disabled={disabled}
-                >
-                  {{
-                    control: (controlled, value, helperText) => (
-                      <NumberTextField
-                        label="Light Level"
-                        value={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) => {
-                                console.log(newValue);
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    lightLevel: newValue
-                                  }
-                                });
-                              }
-                        }
-                        disabled={disabled || controlled}
-                        helperText={helperText}
-                      />
-                    )
-                  }}
-                </OverriddenObjectProperty>
+                  variant="boolean"
+                />
               </Box>
               <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
                 <Card
@@ -842,34 +550,18 @@ const ObjectSubCategoryView = () => {
                   title="Position"
                   type={data}
                   setting="placementPosition"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        placementPosition: overridden ? PLACEMENT_POSITION_CENTER : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={PLACEMENT_POSITION_CENTER}
                   disabled={disabled}
                 >
                   {{
-                    control: (controlled, value, helperText) => (
+                    control: ({ controlled, value, helperText, onChange }) => (
                       <Select
                         label="Placement Position"
                         disabled={disabled || controlled}
                         required
                         value={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    placementPosition: toPlacementPosition(newValue)
-                                  }
-                                })
-                        }
+                        onChange={onChange}
                         options={[
                           {
                             label: 'Center',
@@ -894,34 +586,18 @@ const ObjectSubCategoryView = () => {
                   title="Layer"
                   type={data}
                   setting="placementLayer"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        placementLayer: overridden ? PLACEMENT_LAYER_ON_GROUND : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={PLACEMENT_LAYER_ON_GROUND}
                   disabled={disabled}
                 >
                   {{
-                    control: (controlled, value, helperText) => (
+                    control: ({ controlled, value, helperText, onChange }) => (
                       <Select
                         label="Placement Layer"
                         disabled={disabled || controlled}
                         required
                         value={value}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    placementLayer: toPlacementLayer(newValue)
-                                  }
-                                })
-                        }
+                        onChange={onChange}
                         options={[
                           {
                             label: 'In Ground',
@@ -951,19 +627,13 @@ const ObjectSubCategoryView = () => {
                   type={data}
                   setting="spawningConditions"
                   controlStyle="multiple"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        spawningConditions: overridden ? [] : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
+                  defaultValue={[]}
                   sx={{ gridColumn: '1 / span 2' }}
                   disabled={disabled}
                 >
                   {{
-                    control: (controlled, value, helperText) => (
+                    control: ({ controlled, value, helperText }) => (
                       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
                           {(CONDITIONS as SpawningCondition[]).map((condition) => (
@@ -1010,29 +680,16 @@ const ObjectSubCategoryView = () => {
                     layout="inline"
                     type={data}
                     setting="requiredBelowObjectCategoryKeys"
-                    onOverrideChange={(overridden) =>
-                      handleOnChange({
-                        settings: {
-                          ...data.settings,
-                          requiredBelowObjectCategoryKeys: overridden ? [] : undefined
-                        }
-                      })
-                    }
+                    onChange={handleOnChange}
+                    defaultValue={[]}
                     disabled={disabled}
                   >
                     {{
-                      control: (controlled, value, helperText) => (
+                      control: ({ controlled, value, helperText, onChange }) => (
                         <MultiSelect
                           label="Object Category"
                           values={value}
-                          onChange={(values: string[]) =>
-                            handleOnChange({
-                              settings: {
-                                ...data.settings,
-                                requiredBelowObjectCategoryKeys: values.length === 0 ? undefined : values
-                              }
-                            })
-                          }
+                          onChange={onChange}
                           options={belowCategories.map((option) => ({
                             label: toTitleCaseFromKey(option.key),
                             value: option.key
@@ -1047,29 +704,16 @@ const ObjectSubCategoryView = () => {
                     layout="inline"
                     type={data}
                     setting="requiredBelowObjectSubCategoryKeys"
-                    onOverrideChange={(overridden) =>
-                      handleOnChange({
-                        settings: {
-                          ...data.settings,
-                          requiredBelowObjectSubCategoryKeys: overridden ? [] : undefined
-                        }
-                      })
-                    }
+                    onChange={handleOnChange}
+                    defaultValue={[]}
                     disabled={disabled}
                   >
                     {{
-                      control: (controlled, value, helperText) => (
+                      control: ({ controlled, value, helperText, onChange }) => (
                         <MultiSelect
                           label="Object Sub Category"
                           values={value}
-                          onChange={(values: string[]) =>
-                            handleOnChange({
-                              settings: {
-                                ...data.settings,
-                                requiredBelowObjectSubCategoryKeys: values.length === 0 ? undefined : values
-                              }
-                            })
-                          }
+                          onChange={onChange}
                           options={belowSubCategories.map((option) => ({
                             label: toTitleCaseFromKey(option.key),
                             value: option.key
@@ -1084,29 +728,16 @@ const ObjectSubCategoryView = () => {
                     layout="inline"
                     type={data}
                     setting="requiredBelowObjectKeys"
-                    onOverrideChange={(overridden) =>
-                      handleOnChange({
-                        settings: {
-                          ...data.settings,
-                          requiredBelowObjectKeys: overridden ? [] : undefined
-                        }
-                      })
-                    }
+                    onChange={handleOnChange}
+                    defaultValue={[]}
                     disabled={disabled}
                   >
                     {{
-                      control: (controlled, value, helperText) => (
+                      control: ({ controlled, value, helperText, onChange }) => (
                         <MultiSelect
                           label="Object"
                           values={value}
-                          onChange={(values: string[]) =>
-                            handleOnChange({
-                              settings: {
-                                ...data.settings,
-                                requiredBelowObjectKeys: values.length === 0 ? undefined : values
-                              }
-                            })
-                          }
+                          onChange={onChange}
                           options={belowObjects.map((option) => ({
                             label: option.name,
                             value: option.key
@@ -1125,29 +756,16 @@ const ObjectSubCategoryView = () => {
                     layout="inline"
                     type={data}
                     setting="requiredAdjacentObjectCategoryKeys"
-                    onOverrideChange={(overridden) =>
-                      handleOnChange({
-                        settings: {
-                          ...data.settings,
-                          requiredAdjacentObjectCategoryKeys: overridden ? [] : undefined
-                        }
-                      })
-                    }
+                    onChange={handleOnChange}
+                    defaultValue={[]}
                     disabled={disabled}
                   >
                     {{
-                      control: (controlled, value, helperText) => (
+                      control: ({ controlled, value, helperText, onChange }) => (
                         <MultiSelect
                           label="Object Category"
                           values={value}
-                          onChange={(values: string[]) =>
-                            handleOnChange({
-                              settings: {
-                                ...data.settings,
-                                requiredAdjacentObjectCategoryKeys: values.length === 0 ? undefined : values
-                              }
-                            })
-                          }
+                          onChange={onChange}
                           options={adjacentCategories.map((option) => ({
                             label: toTitleCaseFromKey(option.key),
                             value: option.key
@@ -1162,29 +780,16 @@ const ObjectSubCategoryView = () => {
                     layout="inline"
                     type={data}
                     setting="requiredAdjacentObjectSubCategoryKeys"
-                    onOverrideChange={(overridden) =>
-                      handleOnChange({
-                        settings: {
-                          ...data.settings,
-                          requiredAdjacentObjectSubCategoryKeys: overridden ? [] : undefined
-                        }
-                      })
-                    }
+                    onChange={handleOnChange}
+                    defaultValue={[]}
                     disabled={disabled}
                   >
                     {{
-                      control: (controlled, value, helperText) => (
+                      control: ({ controlled, value, helperText, onChange }) => (
                         <MultiSelect
                           label="Object Sub Category"
                           values={value}
-                          onChange={(values: string[]) =>
-                            handleOnChange({
-                              settings: {
-                                ...data.settings,
-                                requiredAdjacentObjectSubCategoryKeys: values.length === 0 ? undefined : values
-                              }
-                            })
-                          }
+                          onChange={onChange}
                           options={adjacentSubCategories.map((option) => ({
                             label: toTitleCaseFromKey(option.key),
                             value: option.key
@@ -1199,29 +804,16 @@ const ObjectSubCategoryView = () => {
                     layout="inline"
                     type={data}
                     setting="requiredAdjacentObjectKeys"
-                    onOverrideChange={(overridden) =>
-                      handleOnChange({
-                        settings: {
-                          ...data.settings,
-                          requiredAdjacentObjectKeys: overridden ? [] : undefined
-                        }
-                      })
-                    }
+                    onChange={handleOnChange}
+                    defaultValue={[]}
                     disabled={disabled}
                   >
                     {{
-                      control: (controlled, value, helperText) => (
+                      control: ({ controlled, value, helperText, onChange }) => (
                         <MultiSelect
                           label="Object"
                           values={value}
-                          onChange={(values: string[]) =>
-                            handleOnChange({
-                              settings: {
-                                ...data.settings,
-                                requiredAdjacentObjectKeys: values.length === 0 ? undefined : values
-                              }
-                            })
-                          }
+                          onChange={onChange}
                           options={adjacentObjects.map((option) => ({
                             label: option.name,
                             value: option.key

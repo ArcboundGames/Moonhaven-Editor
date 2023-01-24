@@ -67,7 +67,7 @@ const ItemsListCardFields = ({
               label="Amount"
               value={amount}
               min={1}
-              onChange={(value) => onChange(value)}
+              onChange={(value) => onChange(value ?? 1)}
               disabled={disabled}
               required
               wholeNumber

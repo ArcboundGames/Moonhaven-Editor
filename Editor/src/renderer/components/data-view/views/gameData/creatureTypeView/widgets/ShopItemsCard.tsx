@@ -120,7 +120,7 @@ const ShopItemsCard = ({ prices, disabled = true, itemsByKey, onChange }: ShopIt
                     onChange={(value) =>
                       onChange({
                         ...prices,
-                        [itemKey]: value
+                        [itemKey]: value ?? 0
                       })
                     }
                     min={1}

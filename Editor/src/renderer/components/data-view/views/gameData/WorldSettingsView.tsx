@@ -87,7 +87,7 @@ const WorldSettingsView = () => {
                           handleOnChange({
                             weather: {
                               ...data.weather,
-                              rainChance: value
+                              rainChance: value ?? 0
                             }
                           })
                         }

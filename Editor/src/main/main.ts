@@ -21,7 +21,6 @@ import { existsSync, readFileSync, writeFileSync } from 'fs';
 import sizeOf from 'image-size';
 import { join } from 'path';
 
-import scalePixelArt from 'scale-pixel-art';
 import { subscribeToFile, unsubscribeFromFile } from './file.util';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
@@ -95,14 +94,6 @@ ipcMain.handle('sizeOf', (_, fileName: string) => {
       };
 });
 
-ipcMain.handle('scaleImage', async (_, fileName: string, scale: number) => {
-  if (!existsSync(fileName)) {
-    return undefined;
-  }
-  const buffer = await scalePixelArt(readFileSync(fileName), scale);
-  return `data:image/png;base64,${buffer.toString('base64')}`;
-});
-
 ipcMain.handle('getImage', async (_, fileName: string) => {
   if (!existsSync(fileName)) {
     return undefined;
@@ -160,7 +151,8 @@ const createWindow = async () => {
     height: 900,
     icon: getAssetPath('icon.png'),
     webPreferences: {
-      preload: app.isPackaged ? join(__dirname, 'preload.js') : join(__dirname, '../../.erb/dll/preload.js')
+      preload: app.isPackaged ? join(__dirname, 'preload.js') : join(__dirname, '../../.erb/dll/preload.js'),
+      webSecurity: false
     }
   });
 

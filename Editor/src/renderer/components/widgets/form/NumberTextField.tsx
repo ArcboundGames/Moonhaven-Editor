@@ -10,7 +10,7 @@ import type { TextFieldProps } from '@mui/material/TextField';
 export type NumberTextFieldProps = Omit<TextFieldProps, 'label' | 'value' | 'onChange' | 'error'> & {
   label: string;
   value: number | undefined;
-  onChange?: (value: number) => void;
+  onChange?: (value: number | undefined) => void;
   error?: boolean;
   wholeNumber?: boolean;
   sx?: SxProps<Theme> | undefined;
@@ -94,8 +94,8 @@ const NumberTextField = ({
               setInternalValue(stringValue);
 
               const newValue = Number(stringValue);
-              if (!Number.isNaN(newValue) && Boolean(stringValue)) {
-                onChange(newValue);
+              if (!Number.isNaN(newValue) || stringValue === '') {
+                onChange(stringValue === '' ? undefined : newValue);
               }
             }
           : undefined

@@ -71,10 +71,7 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': [0],
     '@typescript-eslint/explicit-module-boundary-types': [0],
     '@typescript-eslint/no-duplicate-imports': 'error',
-    '@typescript-eslint/no-use-before-define': [
-      'error',
-      { functions: false, classes: true, variables: true }
-    ],
+    '@typescript-eslint/no-use-before-define': ['error', { functions: false, classes: true, variables: true }],
     '@typescript-eslint/no-for-in-array': 'error',
     'no-implied-eval': 'off',
     '@typescript-eslint/no-implied-eval': 'error',
@@ -87,6 +84,7 @@ module.exports = {
     'require-await': 'off',
     '@typescript-eslint/require-await': 'error',
     '@typescript-eslint/restrict-plus-operands': 'error',
-    '@typescript-eslint/unbound-method': 'error'
+    '@typescript-eslint/unbound-method': 'error',
+    quotes: ['error', 'single']
   }
 };

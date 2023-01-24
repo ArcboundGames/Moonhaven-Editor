@@ -3,7 +3,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 import type { IpcRendererEvent } from 'electron';
 import type { PathLike, PathOrFileDescriptor, WriteFileOptions } from 'fs';
 
-export type Channels = 'getDataFolder';
+export type Channels = 'getDataFolder' | 'onFileChange';
 
 contextBridge.exposeInMainWorld('api', {
   exists: (path: PathLike) => {
@@ -29,9 +29,6 @@ contextBridge.exposeInMainWorld('api', {
   },
   sizeOf: (fileName: string) => {
     return ipcRenderer.invoke('sizeOf', fileName);
-  },
-  scaleImage: (fileName: string, scale: number) => {
-    return ipcRenderer.invoke('scaleImage', fileName, scale);
   },
   getImage: (fileName: string) => {
     return ipcRenderer.invoke('getImage', fileName);

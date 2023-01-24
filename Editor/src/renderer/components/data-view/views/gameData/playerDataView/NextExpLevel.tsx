@@ -48,7 +48,7 @@ const NextLevelExpFields = ({ nextLevelExp, index, total, disabled, onChange, on
                 label="Exp"
                 value={nextLevelExp}
                 min={1}
-                onChange={(value) => onChange(value)}
+                onChange={(value) => onChange(value ?? 1)}
                 disabled={disabled}
                 required
                 wholeNumber

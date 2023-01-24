@@ -44,7 +44,7 @@ const SpriteImage = ({
 }: // onChange = () => {}
 SpriteImageProps) => {
   const [size, setSize] = useState<SizeState | undefined>(undefined);
-  const [dataUrl, setDataUrl] = useState<string | undefined>();
+  // const [dataUrl, setDataUrl] = useState<string | undefined>();
   const [showError, setShowError] = useState<boolean>(false);
 
   const path = useAppSelector(selectPath);
@@ -103,26 +103,6 @@ SpriteImageProps) => {
   // );
 
   useEffect(() => {
-    let alive = true;
-
-    async function scale() {
-      if (!imagePath) {
-        return;
-      }
-
-      const scaledImage = await window.api.scaleImage(imagePath, resizeFactor);
-      if (alive) {
-        setDataUrl(scaledImage);
-      }
-    }
-
-    scale();
-    return () => {
-      alive = false;
-    };
-  }, [imagePath, resizeFactor]);
-
-  useEffect(() => {
     if (showError) {
       return;
     }
@@ -130,7 +110,7 @@ SpriteImageProps) => {
     return () => clearTimeout(timer);
   }, [showError]);
 
-  if (!imagePath || !size || !dataUrl) {
+  if (!imagePath || !size || !imagePath) {
     if (!showError) {
       return null;
     }
@@ -149,6 +129,8 @@ SpriteImageProps) => {
   const adjustedImageWidth = size.width * resizeFactor;
   const adjustedImageHeight = size.height * resizeFactor;
 
+  console.log('imagePath', imagePath);
+
   return (
     <Box
       sx={{
@@ -164,9 +146,10 @@ SpriteImageProps) => {
           display: 'flex',
           height: adjustedHeight,
           width: adjustedWidth,
-          backgroundImage: `url(${dataUrl})`,
+          backgroundImage: `url(${imagePath})`,
           backgroundSize: `${adjustedImageWidth}px ${adjustedImageHeight}px`,
-          backgroundPosition: `${-1 * adjustedWidth * column}px ${-1 * adjustedHeight * row}px`
+          backgroundPosition: `${-1 * adjustedWidth * column}px ${-1 * adjustedHeight * row}px`,
+          imageRendering: 'pixelated'
         }}
       />
     </Box>

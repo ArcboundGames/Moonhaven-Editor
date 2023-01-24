@@ -1,6 +1,7 @@
 {
   "name": "sharedlibrary",
   "version": "1.0.0",
+  "license": "MIT",
   "description": "",
   "prettier": {
     "overrides": [

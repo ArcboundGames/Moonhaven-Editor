@@ -46,7 +46,6 @@ import {
 import useLocalization from '../../../hooks/useLocalization.hook';
 import { useUpdateLocalization } from '../../../hooks/useUpdateLocalization.hook';
 import DayBox from '../../../widgets/DayBox';
-import Checkbox from '../../../widgets/form/Checkbox';
 import NumberTextField from '../../../widgets/form/NumberTextField';
 import Select from '../../../widgets/form/Select';
 import TextField from '../../../widgets/form/TextField';
@@ -413,75 +412,29 @@ const CreatureTypeView = () => {
                 </Card>
                 <OverriddenCreaturePropertyCard
                   title="Dialogue"
+                  label="Has Dialogue"
                   type={data}
                   setting="hasDialogue"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        hasDialogue: overridden ? false : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
                   disabled={disabled}
+                  defaultValue={false}
+                  variant="boolean"
                 >
                   {{
-                    control: (controlled, value, helperText) => (
-                      <Checkbox
-                        label="Has Dialogue"
-                        checked={value}
-                        helperText={helperText}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    hasDialogue: newValue
-                                  }
-                                })
-                        }
-                        disabled={disabled || controlled}
-                      />
-                    ),
                     other: (value) => (value ? <Portrait dataKey={data.key ?? dataKey} errorStyle="inline" /> : null)
                   }}
                 </OverriddenCreaturePropertyCard>
                 <OverriddenCreaturePropertyCard
                   title="Combat"
+                  label="Has Health"
                   type={data}
                   setting="hasHealth"
-                  onOverrideChange={(overridden) =>
-                    handleOnChange({
-                      settings: {
-                        ...data.settings,
-                        hasHealth: overridden ? false : undefined
-                      }
-                    })
-                  }
+                  onChange={handleOnChange}
                   disabled={disabled}
+                  defaultValue={false}
+                  variant="boolean"
                 >
                   {{
-                    control: (controlled, value, helperText) => (
-                      <Checkbox
-                        label="Has Health"
-                        checked={value}
-                        helperText={helperText}
-                        onChange={
-                          controlled
-                            ? undefined
-                            : (newValue) =>
-                                handleOnChange({
-                                  settings: {
-                                    ...data.settings,
-                                    hasHealth: newValue
-                                  }
-                                })
-                        }
-                        disabled={disabled || controlled}
-                      />
-                    ),
                     other: (hasHealthValue) =>
                       hasHealthValue ? (
                         <FormBox>
@@ -507,40 +460,14 @@ const CreatureTypeView = () => {
                   <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
                     <OverriddenCreaturePropertyCard
                       title="Shopkeeper"
+                      label="Is Shopkeeper"
                       type={data}
                       setting="isShopkeeper"
-                      onOverrideChange={(overridden) =>
-                        handleOnChange({
-                          settings: {
-                            ...data.settings,
-                            isShopkeeper: overridden ? false : undefined
-                          }
-                        })
-                      }
+                      onChange={handleOnChange}
                       disabled={disabled}
-                    >
-                      {{
-                        control: (controlled, value, helperText) => (
-                          <Checkbox
-                            label="Is Shopkeeper"
-                            checked={value}
-                            helperText={helperText}
-                            onChange={
-                              controlled
-                                ? undefined
-                                : (newValue) =>
-                                    handleOnChange({
-                                      settings: {
-                                        ...data.settings,
-                                        isShopkeeper: newValue
-                                      }
-                                    })
-                            }
-                            disabled={disabled || controlled}
-                          />
-                        )
-                      }}
-                    </OverriddenCreaturePropertyCard>
+                      defaultValue={false}
+                      variant="boolean"
+                    />
                     <Card header="Loot">
                       <FormBox>
                         <Select
@@ -612,7 +539,7 @@ const CreatureTypeView = () => {
                           handleOnChange({
                             sprite: {
                               ...(data.sprite ?? createCreatureSprites()),
-                              width: value
+                              width: value ?? 1
                             }
                           })
                         }
@@ -631,7 +558,7 @@ const CreatureTypeView = () => {
                           handleOnChange({
                             sprite: {
                               ...(data.sprite ?? createCreatureSprites()),
-                              height: value
+                              height: value ?? 1
                             }
                           })
                         }
@@ -657,7 +584,7 @@ const CreatureTypeView = () => {
                               ...(data.sprite ?? createCreatureSprites()),
                               pivotOffset: {
                                 ...(data.sprite?.pivotOffset ?? createVector2()),
-                                x: value
+                                x: value ?? 0
                               }
                             }
                           })
@@ -678,7 +605,7 @@ const CreatureTypeView = () => {
                               ...(data.sprite ?? createCreatureSprites()),
                               pivotOffset: {
                                 ...(data.sprite?.pivotOffset ?? createVector2()),
-                                y: value
+                                y: value ?? 0
                               }
                             }
                           })

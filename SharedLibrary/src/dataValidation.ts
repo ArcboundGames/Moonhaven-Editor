@@ -191,7 +191,7 @@ import type {
   UiDataFile,
   WorldSettings
 } from './interface';
-import type { Assert } from './util/assert.util';
+import type { Assert, AssertNotEmpty, AssertNotNullish } from './util/assert.util';
 
 export function validateData(
   rawCreatureCategories: ProcessedRawCreatureCategory[] | null | undefined,
@@ -461,9 +461,9 @@ export function validateCreatureCategories(
 }
 
 export function validateCreatureCategory(rawCategory: ProcessedRawCreatureCategory) {
-  const { errors, assert } = createAssert();
+  const { errors, assertNotNullish } = createAssert();
 
-  assert(isNotNullish(rawCategory.key), 'No key');
+  assertNotNullish(rawCategory.key, 'No key');
 
   return errors;
 }
@@ -586,28 +586,26 @@ export function validateCreatureGeneralTab(
   },
   idsSeen: number[]
 ) {
-  const { errors, assert } = createAssert();
-  assert(isNotNullish(rawType.id) && rawType.id != 0, 'No id');
-  if (isNotNullish(rawType.id) && rawType.id != 0) {
+  const { errors, assert, assertNotNullish, assertNotEmpty } = createAssert();
+  if (assertNotNullish(rawType.id, 'No id') && assert(rawType.id != 0, 'Id cannot be 0')) {
     assert(!idsSeen.includes(rawType.id), `Duplicate id: ${rawType.id}`);
   }
 
-  assert(isNotNullish(rawType.key), 'No key');
-
-  if (isNotNullish(rawType.key) && localization) {
-    assert(isNotEmpty(getLocalizedValue(localization, localizationKeys, getLocalizationKey('creature', 'name', rawType.key))), 'No name');
+  if (assertNotNullish(rawType.key, 'No key') && localization) {
+    assertNotEmpty(getLocalizedValue(localization, localizationKeys, getLocalizationKey('creature', 'name', rawType.key)), 'No name');
   }
 
-  assert(isNotNullish(rawType.categoryKey), 'No category');
-  if (isNotNullish(rawType.categoryKey)) {
+  if (assertNotNullish(rawType.categoryKey, 'No category')) {
     const hasValidCategory = rawType.categoryKey in categoriesByKeys;
     assert(hasValidCategory, `Invalid category: ${rawType.categoryKey}`);
   }
 
   const hasDialogue = getCreatureSetting('hasDialogue', rawType, categoriesByKeys).value;
   if (hasDialogue) {
-    assert(isNotNullish(portraitSize.width) && isNotNullish(portraitSize.height), 'Creatures with dialogue must have a portrait');
-    if (isNotNullish(portraitSize.width) && isNotNullish(portraitSize.height)) {
+    if (
+      assertNotNullish(portraitSize.width, 'Creatures with dialogue must have portrait width') &&
+      assertNotNullish(portraitSize.height, 'Creatures with dialogue must have portrait height')
+    ) {
       assert(portraitSize.width === PORTRAIT_WIDTH, `Portrait width must be ${PORTRAIT_WIDTH} pixels, currently is ${portraitSize.width}`);
       assert(
         portraitSize.height === PORTRAIT_HEIGHT,
@@ -618,8 +616,7 @@ export function validateCreatureGeneralTab(
 
   const hasHealth = getCreatureSetting('hasHealth', rawType, categoriesByKeys).value;
   if (hasHealth) {
-    assert(isNotNullish(rawType.health), 'No health');
-    if (isNotNullish(rawType.health)) {
+    if (assertNotNullish(rawType.health, 'No health')) {
       assert(rawType.health > 0, 'Health must be greater than 0');
       assert(rawType.health % 1 === 0, 'Health must be a whole number');
     }
@@ -638,10 +635,9 @@ export function validateCreatureGeneralTab(
 }
 
 export function validateCreatureSpriteStageTab(rawType: ProcessedRawCreatureType, spriteCount: number) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
 
-  assert(isNotNullish(rawType.sprite), 'No sprite data');
-  if (isNotNullish(rawType.sprite)) {
+  if (assertNotNullish(rawType.sprite, 'No sprite data')) {
     assertCreatureSprite(assert, rawType.sprite, spriteCount);
   }
 
@@ -656,13 +652,12 @@ export function validateCreatureShopTab(
   localization: Localization | null | undefined,
   localizationKeys: string[]
 ) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
 
   const isShopkeeper = getCreatureSetting('isShopkeeper', rawType, categoriesByKeys).value;
   if (isShopkeeper) {
-    assert(isNotNullish(rawType.shop), `No shop data`);
-    if (isNotNullish(rawType.shop)) {
-      assertCreatureShop(assert, rawType.shop, itemsByKey, eventLogsByKey, localization, localizationKeys);
+    if (assertNotNullish(rawType.shop, 'No shop data')) {
+      assertCreatureShop(assert, assertNotNullish, rawType.shop, itemsByKey, eventLogsByKey, localization, localizationKeys);
     }
   }
 
@@ -670,7 +665,7 @@ export function validateCreatureShopTab(
 }
 
 export function validateCreatureBehaviorTab(rawType: ProcessedRawCreatureType) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
 
   assert(rawType.walkSpeed >= 0, 'Walk speed must be greater than or equal to 0');
   assert(rawType.walkSpeed <= 10, 'Walk speed must be less than or equal to 10');
@@ -705,7 +700,7 @@ export function validateCreatureBehaviorTab(rawType: ProcessedRawCreatureType) {
     }
 
     if (rawType.wanderUseCustomAnchor) {
-      assert(isNotNullish(rawType.wanderAnchor), 'No wander custom anchor');
+      assertNotNullish(rawType.wanderAnchor, 'No wander custom anchor');
     }
 
     if (rawType.attackUseStrafing) {
@@ -734,7 +729,7 @@ export function validateCreatureBehaviorTab(rawType: ProcessedRawCreatureType) {
 }
 
 export function validateCreatureSpawningTab(rawType: ProcessedRawCreatureType) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
 
   assert(rawType.spawnDistanceFromPlayers >= 0, 'Spawn distance from players must be greater than or equal to 0');
   assert(rawType.spawnDistanceFromPlayers <= 100, 'Spawn distance from players must be less than or equal to 100');
@@ -745,7 +740,7 @@ export function validateCreatureSpawningTab(rawType: ProcessedRawCreatureType) {
     assert(rawType.maxPopulation % 1 === 0, 'Max population must be a whole number');
   }
 
-  rawType.campSpawns.forEach((campSpawn, index) => assertCampSpawn(assert, campSpawn, `Camp spawn ${index}`));
+  rawType.campSpawns.forEach((campSpawn, index) => assertCampSpawn(assert, assertNotNullish, campSpawn, `Camp spawn ${index}`));
 
   return errors;
 }
@@ -809,14 +804,15 @@ export function checkCreatureConnections(
   return errors;
 }
 
-export function assertCampSpawn(assert: Assert, campSpawn: ProcessedRawCampSpawn, header: string) {
-  assert(isNotNullish(campSpawn.position), `${header}: No position`);
+export function assertCampSpawn(assert: Assert, assertNotNullish: AssertNotNullish, campSpawn: ProcessedRawCampSpawn, header: string) {
+  assertNotNullish(campSpawn.position, `${header}: No position`);
   assert(campSpawn.maxPopulation > 0, `${header}: Max population must be greater than 0`);
   assert(campSpawn.maxPopulation <= 250, `${header}: Max population must be less than or equal to 250`);
 }
 
 export function assertCreatureShop(
   assert: Assert,
+  assertNotNullish: AssertNotNullish,
   shop: ProcessedRawCreatureShop,
   itemsByKey: Record<string, ItemType>,
   eventLogsByKey: Record<string, EventLog>,
@@ -840,9 +836,11 @@ export function assertCreatureShop(
     for (let i = 0; i < shop.openTimes.length; i++) {
       const openTime = shop.openTimes[i];
       const closeTime = shop.closeTimes[i];
-      assert(isNotNullish(openTime), `${DAYS_OF_THE_WEEK[i].name} has no open time (set to -1 for closed)`);
-      assert(isNotNullish(closeTime), `${DAYS_OF_THE_WEEK[i].name} has no close time (set to -1 for closed)`);
-      if (!isNotNullish(openTime) || !isNotNullish(closeTime)) {
+
+      if (
+        !assertNotNullish(openTime, `${DAYS_OF_THE_WEEK[i].name} has no open time (set to -1 for closed)`) ||
+        !assertNotNullish(closeTime, `${DAYS_OF_THE_WEEK[i].name} has no close time (set to -1 for closed)`)
+      ) {
         continue;
       }
 
@@ -971,20 +969,18 @@ export function validateItemCategory(rawCategory: ProcessedRawItemCategory, skil
 }
 
 export function validateItemCategoryGeneralTab(rawCategory: ProcessedRawItemCategory) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish, assertNotEmpty } = createAssert();
 
-  assert(isNotNullish(rawCategory.key), 'No key');
+  assertNotNullish(rawCategory.key, 'No key');
 
-  assert(isNotEmpty(rawCategory.settings?.filledFromType), 'No filled from type');
-  if (isNotNullish(rawCategory.settings) && isNotEmpty(rawCategory.settings.filledFromType)) {
+  if (isNotNullish(rawCategory.settings) && assertNotEmpty(rawCategory.settings.filledFromType, 'No filled from type')) {
     assert(
       FILLED_FROM_TYPES.includes(rawCategory.settings.filledFromType),
       `Invalid filled from type: ${rawCategory.settings.filledFromType}`
     );
   }
 
-  assert(isNotEmpty(rawCategory.settings?.fishingItemType), 'No fishing item type');
-  if (isNotNullish(rawCategory.settings) && isNotEmpty(rawCategory.settings.fishingItemType)) {
+  if (isNotNullish(rawCategory.settings) && assertNotEmpty(rawCategory.settings.fishingItemType, 'No fishing item type')) {
     assert(
       FISHING_ITEM_TYPES.includes(rawCategory.settings.fishingItemType),
       `Invalid fishing item type: ${rawCategory.settings.fishingItemType}`
@@ -995,11 +991,9 @@ export function validateItemCategoryGeneralTab(rawCategory: ProcessedRawItemCate
 }
 
 export function validateItemCategoryCombatTab(rawCategory: ProcessedRawItemCategory, skillsByKey: Record<string, Skill>) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotEmpty } = createAssert();
 
-  assert(isNotNullish(rawCategory.settings?.weaponType), 'No weapon type');
-
-  if (isNotNullish(rawCategory.settings) && isNotNullish(rawCategory.settings.weaponType)) {
+  if (isNotNullish(rawCategory.settings) && assertNotEmpty(rawCategory.settings.weaponType, 'No weapon type')) {
     assert(WEAPON_TYPES.includes(rawCategory.settings.weaponType), `Invalid weapon type '${rawCategory.settings?.weaponType}'`);
     if (WEAPON_TYPES.includes(rawCategory.settings.weaponType) && rawCategory.settings.weaponType !== WEAPON_TYPE_NONE) {
       if (isNotNullish(rawCategory.settings.damagedIncreasedBySkillKey)) {
@@ -1126,41 +1120,37 @@ export function validateItemGeneralTab(
   localization: Localization | null | undefined,
   localizationKeys: string[]
 ): string[] {
-  const { errors, assert } = createAssert();
-  assert(isNotNullish(rawType.id) && rawType.id != 0, 'No id');
-  if (isNotNullish(rawType.id) && rawType.id != 0) {
+  const { errors, assert, assertNotNullish, assertNotEmpty } = createAssert();
+  if (assertNotNullish(rawType.id, 'No id') && assert(rawType.id != 0, 'Id cannot be 0')) {
     assert(!idsSeen.includes(rawType.id), `Duplicate id: ${rawType.id}`);
   }
 
-  assert(isNotNullish(rawType.key), 'No key');
+  assertNotNullish(rawType.key, 'No key');
 
   assert(rawType.maxStackSize >= 0, 'Max stack size cannot be negative');
   assert(rawType.maxStackSize % 1 === 0, 'Max stack size must be a whole number');
-  assert(isNotNullish(iconSize.width) && isNotNullish(iconSize.height), 'No icon');
-  if (isNotNullish(iconSize.width) && isNotNullish(iconSize.height)) {
+  if (assertNotNullish(iconSize.width, 'No icon width') && assertNotNullish(iconSize.height, 'No icon height')) {
     assert(iconSize.width === ICON_WIDTH, `Icon width must be ${ICON_WIDTH} pixels, currently is ${iconSize.width}`);
     assert(iconSize.height === ICON_HEIGHT, `Icon height must be ${ICON_HEIGHT} pixels, currently is ${iconSize.height}`);
   }
 
   if (isNotNullish(rawType.key) && localization) {
-    assert(isNotEmpty(getLocalizedValue(localization, localizationKeys, getLocalizationKey('item', 'name', rawType.key))), 'No name');
+    assertNotEmpty(getLocalizedValue(localization, localizationKeys, getLocalizationKey('item', 'name', rawType.key)), 'No name');
   }
 
-  assert(isNotNullish(rawType.sellPrice), 'No sell price');
-  if (isNotNullish(rawType.sellPrice)) {
+  if (assertNotNullish(rawType.sellPrice, 'No sell price')) {
     assert(rawType.sellPrice > 0, 'Sell price must be greater than 0');
     assert(rawType.sellPrice % 1 === 0, 'Sell price must be a whole number');
   }
 
-  assert(isNotNullish(rawType.categoryKey), 'No category');
-  if (isNotNullish(rawType.categoryKey)) {
+  if (assertNotNullish(rawType.categoryKey, 'No category')) {
     const hasValidCategory = rawType.categoryKey in categoriesByKeys;
     assert(hasValidCategory, `Invalid category: ${rawType.categoryKey}`);
   }
 
   const placeable = getItemSetting('placeable', rawType, categoriesByKeys).value;
   if (placeable) {
-    assert(isNotNullish(rawType.objectTypeKey), 'No object type key');
+    assertNotNullish(rawType.objectTypeKey, 'No object type key');
   }
 
   const hasDurability = getItemSetting('hasDurability', rawType, categoriesByKeys).value;
@@ -1180,8 +1170,7 @@ export function validateItemGeneralTab(
 
   const filledFromType = getItemSetting('filledFromType', rawType, categoriesByKeys).value;
   if (isNotNullish(filledFromType)) {
-    assert(FILLED_FROM_TYPES.includes(filledFromType), `Invalid filled from type: ${filledFromType}`);
-    if (FILLED_FROM_TYPES.includes(filledFromType)) {
+    if (assert(FILLED_FROM_TYPES.includes(filledFromType), `Invalid filled from type: ${filledFromType}`)) {
       switch (filledFromType) {
         case FILLED_FROM_TYPE_WATER:
           assert(
@@ -1190,7 +1179,7 @@ export function validateItemGeneralTab(
           );
           break;
         case FILLED_FROM_TYPE_SAND:
-          assert(isNotNullish(rawType.filledItemTypeKey), 'Items that can be filled with sand must have a filled item type');
+          assertNotNullish(rawType.filledItemTypeKey, 'Items that can be filled with sand must have a filled item type');
           break;
       }
     }
@@ -1207,18 +1196,20 @@ export function validateItemGeneralTab(
     assert(animationSpriteCount % 4 == 0, 'Item animations must have an equal number of animation frames for all 4 directions');
   }
 
-  const hasLight = getItemSetting('hasLight', rawType, categoriesByKeys).value;
-  if (hasLight) {
-    assert(isNotNullish(rawType.lightPosition), 'No light position');
-    if (isNotNullish(rawType.lightPosition)) {
-      assert(
-        rawType.lightPosition.x >= 0 && rawType.lightPosition.x < ICON_WIDTH,
-        `Light position x value must be between 0 and ${ICON_WIDTH - 1} (inclusive)`
-      );
-      assert(
-        rawType.lightPosition.y >= 0 && rawType.lightPosition.y < ICON_HEIGHT,
-        `Light position y value must be between 0 and ${ICON_HEIGHT - 1} (inclusive)`
-      );
+  const hasLight = getObjectSetting('hasLight', rawType, categoriesByKeys).value;
+  if (hasLight && assertNotNullish(rawType.lightLevel, 'No light level')) {
+    assert(rawType.lightLevel >= 1 && rawType.lightLevel < 20, 'Light level must be between 1 and 20');
+    if (rawType.lightLevel >= 1) {
+      if (assertNotNullish(rawType.lightPosition, 'No light position')) {
+        assert(
+          rawType.lightPosition.x >= 0 && rawType.lightPosition.x < ICON_WIDTH,
+          `Light position x value must be between 0 and ${ICON_WIDTH - 1} (inclusive)`
+        );
+        assert(
+          rawType.lightPosition.y >= 0 && rawType.lightPosition.y < ICON_HEIGHT,
+          `Light position y value must be between 0 and ${ICON_HEIGHT - 1} (inclusive)`
+        );
+      }
     }
   }
 
@@ -1263,28 +1254,24 @@ export function validateItemCombatTab(
 }
 
 export function validateItemFishingTab(rawType: ProcessedRawItemType, categoriesByKeys: Record<string, ItemCategory>): string[] {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
   const fishingItemType = getItemSetting('fishingItemType', rawType, categoriesByKeys).value;
   if (isNotNullish(fishingItemType)) {
     if (fishingItemType === FISHING_ITEM_TYPE_POLE) {
-      assert(isNotNullish(rawType.fishingPoleAnchorPointsNorth), 'No fishing pole north facing anchor points');
-      if (isNotNullish(rawType.fishingPoleAnchorPointsNorth)) {
-        assertFishingPoleAnchorPoints(assert, rawType.fishingPoleAnchorPointsNorth, 'north');
+      if (assertNotNullish(rawType.fishingPoleAnchorPointsNorth, 'No fishing pole north facing anchor points')) {
+        assertFishingPoleAnchorPoints(assert, assertNotNullish, rawType.fishingPoleAnchorPointsNorth, 'north');
       }
 
-      assert(isNotNullish(rawType.fishingPoleAnchorPointsEast), 'No fishing pole east facing anchor points');
-      if (isNotNullish(rawType.fishingPoleAnchorPointsEast)) {
-        assertFishingPoleAnchorPoints(assert, rawType.fishingPoleAnchorPointsEast, 'east');
+      if (assertNotNullish(rawType.fishingPoleAnchorPointsEast, 'No fishing pole east facing anchor points')) {
+        assertFishingPoleAnchorPoints(assert, assertNotNullish, rawType.fishingPoleAnchorPointsEast, 'east');
       }
 
-      assert(isNotNullish(rawType.fishingPoleAnchorPointsSouth), 'No fishing pole south facing anchor points');
-      if (isNotNullish(rawType.fishingPoleAnchorPointsSouth)) {
-        assertFishingPoleAnchorPoints(assert, rawType.fishingPoleAnchorPointsSouth, 'south');
+      if (assertNotNullish(rawType.fishingPoleAnchorPointsSouth, 'No fishing pole south facing anchor points')) {
+        assertFishingPoleAnchorPoints(assert, assertNotNullish, rawType.fishingPoleAnchorPointsSouth, 'south');
       }
 
-      assert(isNotNullish(rawType.fishingPoleAnchorPointsWest), 'No fishing pole west facing anchor points');
-      if (isNotNullish(rawType.fishingPoleAnchorPointsWest)) {
-        assertFishingPoleAnchorPoints(assert, rawType.fishingPoleAnchorPointsWest, 'west');
+      if (assertNotNullish(rawType.fishingPoleAnchorPointsWest, 'No fishing pole west facing anchor points')) {
+        assertFishingPoleAnchorPoints(assert, assertNotNullish, rawType.fishingPoleAnchorPointsWest, 'west');
       }
     } else if (fishingItemType === FISHING_ITEM_TYPE_FISH) {
       assert(rawType.fishExperience >= 1, 'Fishing experience must be greater than 0');
@@ -1297,11 +1284,11 @@ export function validateItemFishingTab(rawType: ProcessedRawItemType, categories
 
 export function assertFishingPoleAnchorPoints(
   assert: Assert,
+  assertNotNullish: AssertNotNullish,
   points: FishingPoleAnchorPoints,
   direction: 'north' | 'east' | 'south' | 'west'
 ) {
-  assert(isNotNullish(points.idle), `No fishing pole ${direction} facing idle anchor point`);
-  if (isNotNullish(points.idle)) {
+  if (assertNotNullish(points.idle, `No fishing pole ${direction} facing idle anchor point`)) {
     assert(
       points.idle.x >= 0 && points.idle.x < PLAYER_SPRITE_WIDTH,
       `Fishing pole ${direction} facing idle anchor point x value must be between 0 and ${PLAYER_SPRITE_WIDTH - 1} (inclusive)`
@@ -1312,8 +1299,7 @@ export function assertFishingPoleAnchorPoints(
     );
   }
 
-  assert(isNotNullish(points.casting), `No fishing pole ${direction} facing casting anchor point`);
-  if (isNotNullish(points.casting)) {
+  if (assertNotNullish(points.casting, `No fishing pole ${direction} facing casting anchor point`)) {
     assert(
       points.casting.x >= 0 && points.casting.x < PLAYER_SPRITE_WIDTH,
       `Fishing pole ${direction} facing casting anchor point x value must be between 0 and ${PLAYER_SPRITE_WIDTH - 1} (inclusive)`
@@ -1324,8 +1310,7 @@ export function assertFishingPoleAnchorPoints(
     );
   }
 
-  assert(isNotNullish(points.pulling), `No fishing pole ${direction} facing pulling anchor point`);
-  if (isNotNullish(points.pulling)) {
+  if (assertNotNullish(points.pulling, `No fishing pole ${direction} facing pulling anchor point`)) {
     assert(
       points.pulling.x >= 0 && points.pulling.x < PLAYER_SPRITE_WIDTH,
       `Fishing pole ${direction} facing pulling anchor point x value must be between 0 and ${PLAYER_SPRITE_WIDTH - 1} (inclusive)`
@@ -1491,14 +1476,13 @@ export function checkItemGeneralConnections(
   itemCategoriesByKey: Record<string, ItemCategory>,
   objectsByKey: Record<string, ObjectType>
 ) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
 
   const placeable = getItemSetting('placeable', type, itemCategoriesByKey).value;
   const requiredObjectCategoryKey = getItemSetting('requiredObjectCategoryKey', type, itemCategoriesByKey).value;
   if (placeable && isNotNullish(type.objectTypeKey)) {
     const objectType = objectsByKey[type.objectTypeKey];
-    assert(isNotNullish(objectType), `Object to place: No object with key ${type.objectTypeKey} exists`);
-    if (isNotNullish(objectType) && requiredObjectCategoryKey) {
+    if (assertNotNullish(objectType, `Object to place: No object with key ${type.objectTypeKey} exists`) && requiredObjectCategoryKey) {
       assert(objectType.categoryKey == requiredObjectCategoryKey, `Must have an object in the ${requiredObjectCategoryKey} category`);
     }
   }
@@ -1671,18 +1655,16 @@ export function validateLootTables(
 }
 
 export function validateLootTable(rawLootTable: ProcessedRawLootTable, itemTypesByKey: Record<string, ItemType>) {
-  const { errors, assert } = createAssert();
-  assert(isNotNullish(rawLootTable.key), 'No key');
+  const { errors, assert, assertNotNullish } = createAssert();
+  assertNotNullish(rawLootTable.key, 'No key');
 
-  assert(isNotNullish(rawLootTable.defaultGroup), 'No default group');
-  if (isNotNullish(rawLootTable.defaultGroup)) {
-    assertLootTableComponentGroup(assert, rawLootTable.defaultGroup, -1, itemTypesByKey);
+  if (assertNotNullish(rawLootTable.defaultGroup, 'No default group')) {
+    assertLootTableComponentGroup(assert, assertNotNullish, rawLootTable.defaultGroup, -1, itemTypesByKey);
   }
 
-  assert(isNotNullish(rawLootTable.groups), 'No groups');
-  if (isNotNullish(rawLootTable.groups)) {
+  if (assertNotNullish(rawLootTable.groups, 'No groups')) {
     for (let index = 0; index < rawLootTable.groups.length; index++) {
-      assertLootTableComponentGroup(assert, rawLootTable.groups[index], index + 1, itemTypesByKey);
+      assertLootTableComponentGroup(assert, assertNotNullish, rawLootTable.groups[index], index + 1, itemTypesByKey);
     }
   }
 
@@ -1691,6 +1673,7 @@ export function validateLootTable(rawLootTable: ProcessedRawLootTable, itemTypes
 
 export function assertLootTableComponentGroup(
   assert: Assert,
+  assertNotNullish: AssertNotNullish,
   group: ProcessedRawLootTableComponentGroup,
   groupIndex: number,
   itemTypesByKey: Record<string, ItemType>
@@ -1699,23 +1682,25 @@ export function assertLootTableComponentGroup(
   assert(group.probability <= 100 && group.probability >= 0, `${header}: Probability must be between 0 and 100 inclusive`);
   assert(group.probability % 1 === 0, `${header}: Probability must be a whole number`);
 
-  assert(isNotNullish(group.components) && group.components.length != 0, `${header}: No components`);
-  if (isNotNullish(group.components)) {
+  if (
+    assertNotNullish(group.components, `${header}: No components`) &&
+    assert(group.components.length != 0, `${header}: There must be at least one component`)
+  ) {
     for (let index = 0; index < group.components.length; index++) {
-      assertLootTableComponent(assert, group.components[index], index + 1, itemTypesByKey, `${header},`);
+      assertLootTableComponent(assert, assertNotNullish, group.components[index], index + 1, itemTypesByKey, `${header},`);
     }
   }
 }
 
 export function assertLootTableComponent(
   assert: Assert,
+  assertNotNullish: AssertNotNullish,
   component: LootTableComponent,
   index: number,
   itemTypes: Record<string, ItemType>,
   header: string
 ) {
-  assert(isNotNullish(component.typeKey), `${header} Component ${index}: No item type key`);
-  if (isNotNullish(component.typeKey)) {
+  if (assertNotNullish(component.typeKey, `${header} Component ${index}: No item type key`)) {
     assert(component.typeKey in itemTypes, `${header} Component ${index}: No item with key ${component.typeKey} exists`);
   }
   assert(component.min >= 0, `${header} Component ${index}: Min cannot be negative`);
@@ -1784,9 +1769,9 @@ export function validateCraftingRecipeCategories(
 }
 
 export function validateCraftingRecipeCategory(rawCategory: ProcessedRawCraftingRecipeCategory) {
-  const { errors, assert } = createAssert();
+  const { errors, assertNotNullish } = createAssert();
 
-  assert(isNotNullish(rawCategory.key), 'No key');
+  assertNotNullish(rawCategory.key, 'No key');
 
   return errors;
 }
@@ -1862,8 +1847,8 @@ export function validateCraftingRecipe(
   itemTypesByKey: Record<string, ItemType>,
   workstationKeys: string[]
 ) {
-  const { errors, assert } = createAssert();
-  assert(isNotNullish(rawRecipe.key), 'No key');
+  const { errors, assert, assertNotNullish } = createAssert();
+  assertNotNullish(rawRecipe.key, 'No key');
 
   assert(rawRecipe.craftingTime > 0, 'Crafting time must be greater than 0');
   assert(rawRecipe.craftingTime % 1 === 0, 'Crafting time must be a whole number');
@@ -1872,10 +1857,8 @@ export function validateCraftingRecipe(
   assert(rawRecipe.amount % 1 === 0, 'Amount must be a whole number');
 
   if (isNotNullish(rawRecipe.requiredSkillKey)) {
-    assert(rawRecipe.requiredSkillKey in skillsByKey, `No skill with key '${rawRecipe.requiredSkillKey}' exists`);
-    if (rawRecipe.requiredSkillKey in skillsByKey) {
-      assert(isNotNullish(rawRecipe.requiredSkillLevelKey), 'No skill level');
-      if (isNotNullish(rawRecipe.requiredSkillLevelKey)) {
+    if (assert(rawRecipe.requiredSkillKey in skillsByKey, `No skill with key '${rawRecipe.requiredSkillKey}' exists`)) {
+      if (assertNotNullish(rawRecipe.requiredSkillLevelKey, 'No skill level')) {
         const skill = skillsByKey[rawRecipe.requiredSkillKey];
         assert(
           isNotNullish(skill.levels.find((skillLevel) => skillLevel.key === rawRecipe.requiredSkillLevelKey)),
@@ -1885,8 +1868,7 @@ export function validateCraftingRecipe(
     }
   }
 
-  assert(isNotNullish(rawRecipe.itemTypeKey), 'No item type');
-  if (isNotNullish(rawRecipe.itemTypeKey)) {
+  if (assertNotNullish(rawRecipe.itemTypeKey, 'No item type')) {
     assert(rawRecipe.itemTypeKey in itemTypesByKey, `No item with key '${rawRecipe.itemTypeKey}' exists`);
   }
 
@@ -1897,8 +1879,7 @@ export function validateCraftingRecipe(
     }
   }
 
-  assert(isNotNullish(rawRecipe.categoryKey), 'No category');
-  if (isNotNullish(rawRecipe.categoryKey)) {
+  if (assertNotNullish(rawRecipe.categoryKey, 'No category')) {
     assert(rawRecipe.categoryKey in craftingRecipeCategoriesByKey, `Invalid category: ${rawRecipe.categoryKey}`);
   }
 
@@ -1906,8 +1887,10 @@ export function validateCraftingRecipe(
     assert(workstationKeys.includes(rawRecipe.workstation), `Invalid workstation (object): ${rawRecipe.workstation}`);
   }
 
-  assert(isNotNullish(rawRecipe.ingredients) && Object.keys(rawRecipe.ingredients).length > 0, 'No ingredients');
-  if (isNotNullish(rawRecipe.ingredients)) {
+  if (
+    assertNotNullish(rawRecipe.ingredients, 'No ingredients') &&
+    assert(Object.keys(rawRecipe.ingredients).length > 0, 'There must be at least 1 ingredient')
+  ) {
     for (const ingredientKey of Object.keys(rawRecipe.ingredients)) {
       assertIngredient(assert, ingredientKey, rawRecipe.ingredients[ingredientKey], itemTypesByKey);
     }
@@ -1994,27 +1977,24 @@ export function validateObjectCategory(rawCategory: ProcessedRawObjectCategory) 
 }
 
 export function validateObjectCategoryGeneralTab(rawCategory: ProcessedRawObjectCategory) {
-  const { errors, assert } = createAssert();
-  assert(isNotNullish(rawCategory.key), 'No key');
+  const { errors, assert, assertNotNullish } = createAssert();
+  assertNotNullish(rawCategory.key, 'No key');
 
   const lootType = rawCategory.settings?.lootType;
-  assert(isNotNullish(lootType), `No loot type`);
-  if (isNotNullish(lootType)) {
+  if (assertNotNullish(lootType, 'No loot type')) {
     assert(LOOT_TYPES.includes(lootType), `Invalid loot type: ${lootType}`);
   }
 
   const stagesType = rawCategory.settings?.stagesType;
-  assert(isNotNullish(stagesType), `No stages type`);
-  if (isNotNullish(stagesType)) {
+  if (assertNotNullish(stagesType, 'No stages type')) {
     assert(STAGES_TYPES.includes(stagesType), `Invalid stages type: ${stagesType}`);
   }
 
   const inventoryType = rawCategory.settings?.inventoryType;
   const isWorkstation = rawCategory.settings?.isWorkstation;
-  assert(isNotNullish(inventoryType), `No inventory type`);
-  if (isNotNullish(inventoryType)) {
+  if (assertNotNullish(inventoryType, 'No inventory type')) {
     assert(INVENTORY_TYPES.includes(inventoryType), `Invalid inventory type: ${inventoryType}`);
-    assert(!isWorkstation || inventoryType === INVENTORY_TYPE_SMALL, `Workstations must have small inventories`);
+    assert(!isWorkstation || inventoryType === INVENTORY_TYPE_SMALL, 'Workstations must have small inventories');
   }
 
   assert(
@@ -2022,26 +2002,19 @@ export function validateObjectCategoryGeneralTab(rawCategory: ProcessedRawObject
     `Loot type ${LOOT_TYPE_STAGE_DROP} requires stages`
   );
 
-  const lightLevel = rawCategory.settings?.lightLevel;
-  if (isNotNullish(lightLevel)) {
-    assert(lightLevel >= 0 && lightLevel < 20, 'Light level must be between 0 and 20');
-  }
-
   return errors;
 }
 
 export function validateObjectCategoryPlacementSpawningTab(rawCategory: ProcessedRawObjectCategory) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
 
   const placementPosition = rawCategory.settings?.placementPosition;
-  assert(isNotEmpty(placementPosition), `No placement position`);
-  if (isNotNullish(placementPosition)) {
+  if (assertNotNullish(placementPosition, 'No placement position')) {
     assert(PLACEMENT_POSITIONS.includes(placementPosition), `Invalid placement position: ${placementPosition}`);
   }
 
   const placementLayer = rawCategory.settings?.placementLayer;
-  assert(isNotEmpty(placementLayer), `No placement layer`);
-  if (isNotNullish(placementLayer)) {
+  if (assertNotNullish(placementLayer, 'No placement layer')) {
     assert(PLACEMENT_LAYERS.includes(placementLayer), `Invalid placement layer: ${placementLayer}`);
   }
 
@@ -2166,10 +2139,9 @@ export function validateObjectSubCategoryGeneralTab(
   rawSubCategory: ProcessedRawObjectSubCategory,
   categoriesByKey: Record<string, ObjectCategory>
 ) {
-  const { errors, assert } = createAssert();
-  assert(isNotNullish(rawSubCategory.key), 'No key');
-  assert(isNotEmpty(rawSubCategory.categoryKey), 'No category');
-  if (isNotEmpty(rawSubCategory.categoryKey)) {
+  const { errors, assert, assertNotNullish, assertNotEmpty } = createAssert();
+  assertNotNullish(rawSubCategory.key, 'No key');
+  if (assertNotEmpty(rawSubCategory.categoryKey, 'No category')) {
     assert(rawSubCategory.categoryKey in categoriesByKey, `Invalid category: ${rawSubCategory.categoryKey}`);
   }
 
@@ -2203,19 +2175,13 @@ export function validateObjectSubCategoryGeneralTab(
     {}
   );
   if (inventoryTypeControlledBy === 0) {
-    assert(isNotNullish(inventoryType), `No inventory type`);
-    if (isNotNullish(inventoryType)) {
+    if (assertNotNullish(inventoryType, 'No inventory type')) {
       assert(INVENTORY_TYPES.includes(inventoryType), `Invalid inventory type: ${inventoryType}`);
     }
   }
 
   if (inventoryTypeControlledBy === 0 || isWorkstationControlledBy === 0) {
-    assert(!isWorkstation || inventoryType === INVENTORY_TYPE_SMALL, `Workstations must have small inventories`);
-  }
-
-  const { value: lightLevel } = getObjectSetting('lightLevel', rawSubCategory, categoriesByKey, {});
-  if (isNotNullish(lightLevel)) {
-    assert(lightLevel >= 0 && lightLevel < 20, 'Light level must be between 0 and 20');
+    assert(!isWorkstation || inventoryType === INVENTORY_TYPE_SMALL, 'Workstations must have small inventories');
   }
 
   return errors;
@@ -2264,7 +2230,7 @@ export function validateObjectSubCategorySpriteRulesTab(
   rawSubCategory: ProcessedRawObjectSubCategory,
   categoriesByKey: Record<string, ObjectCategory>
 ) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
 
   const { value: lootType } = getObjectSetting('lootType', rawSubCategory, categoriesByKey, {});
   const { value: stagesType } = getObjectSetting('stagesType', rawSubCategory, categoriesByKey, {});
@@ -2275,7 +2241,7 @@ export function validateObjectSubCategorySpriteRulesTab(
   }
 
   if (lootType === LOOT_TYPE_STAGE_DROP || (isNotNullish(stagesType) && stagesType !== STAGES_TYPE_NONE)) {
-    assert(isNullish(rawSubCategory.rulesets), `Object sub categories with stages cannot have rulesets`);
+    assert(isNullish(rawSubCategory.rulesets), 'Object sub categories with stages cannot have rulesets');
   } else if (isNotNullish(rawSubCategory.rulesets)) {
     const { value: placementPosition } = getObjectSetting('placementPosition', rawSubCategory, categoriesByKey, {});
     const rulesetsProcessed = false;
@@ -2289,7 +2255,7 @@ export function validateObjectSubCategorySpriteRulesTab(
           `One sprite ruleset are required for ${rawSubCategory.key}`
         );
         if (isNotNullish(rawSubCategory.rulesets) && rawSubCategory.rulesets.length > 0) {
-          assertSubCategorySpriteRules(assert, 'Sprite rule', rawSubCategory.rulesets[0]);
+          assertSubCategorySpriteRules(assert, assertNotNullish, 'Sprite rule', rawSubCategory.rulesets[0]);
         }
       } else if (placementPosition === PLACEMENT_POSITION_EDGE) {
         assert(
@@ -2303,10 +2269,10 @@ export function validateObjectSubCategorySpriteRulesTab(
         );
         if (isNotNullish(rawSubCategory.rulesets)) {
           if (rawSubCategory.rulesets.length >= 1) {
-            assertSubCategorySpriteRules(assert, 'Front sprite rule', rawSubCategory.rulesets[0]);
+            assertSubCategorySpriteRules(assert, assertNotNullish, 'Front sprite rule', rawSubCategory.rulesets[0]);
           }
           if (rawSubCategory.rulesets.length >= 2) {
-            assertSubCategorySpriteRules(assert, 'Side sprite rule', rawSubCategory.rulesets[1]);
+            assertSubCategorySpriteRules(assert, assertNotNullish, 'Side sprite rule', rawSubCategory.rulesets[1]);
           }
         }
       }
@@ -2314,7 +2280,7 @@ export function validateObjectSubCategorySpriteRulesTab(
 
     if (!rulesetsProcessed) {
       if (isNotNullish(rawSubCategory.rulesets) && rawSubCategory.rulesets.length > 0) {
-        assertSubCategorySpriteRules(assert, 'Sprite rule', rawSubCategory.rulesets[0]);
+        assertSubCategorySpriteRules(assert, assertNotNullish, 'Sprite rule', rawSubCategory.rulesets[0]);
       }
     }
   }
@@ -2481,24 +2447,20 @@ export function validateObjectGeneralTab(
   localizationKeys: string[],
   idsSeen: number[]
 ) {
-  const { errors, assert } = createAssert();
-  assert(isNotNullish(rawType.id) && rawType.id != 0, 'No id');
-  if (isNotNullish(rawType.id) && rawType.id != 0) {
+  const { errors, assert, assertNotNullish, assertNotEmpty } = createAssert();
+  if (assertNotNullish(rawType.id, 'No id') && rawType.id != 0) {
     assert(!idsSeen.includes(rawType.id), `Duplicate id: ${rawType.id}`);
   }
-  assert(isNotEmpty(rawType.key), 'No key');
 
-  if (isNotNullish(rawType.key) && localization) {
-    assert(isNotEmpty(getLocalizedValue(localization, localizationKeys, getLocalizationKey('object', 'name', rawType.key))), 'No name');
+  if (assertNotNullish(rawType.key, 'No key') && localization) {
+    assertNotEmpty(getLocalizedValue(localization, localizationKeys, getLocalizationKey('object', 'name', rawType.key)), 'No name');
   }
 
-  assert(isNotNullish(rawType.categoryKey), 'No category');
-  if (isNotNullish(rawType.categoryKey)) {
+  if (assertNotNullish(rawType.categoryKey, 'No category')) {
     assert(rawType.categoryKey in categoriesByKey, `Invalid category: ${rawType.categoryKey}`);
     const availableSubCategories = subCategories.filter((subCategory) => subCategory.categoryKey === rawType.categoryKey);
     if (availableSubCategories.length > 0) {
-      assert(isNotNullish(rawType.subCategoryKey), 'No sub category');
-      if (isNotNullish(rawType.subCategoryKey)) {
+      if (assertNotNullish(rawType.subCategoryKey, 'No sub category')) {
         assert(
           isNotNullish(availableSubCategories.find((subCategory) => subCategory.key === rawType.subCategoryKey)),
           `Invalid sub category: ${rawType.subCategoryKey}`
@@ -2518,8 +2480,7 @@ export function validateObjectGeneralTab(
       assert(LOOT_TYPES.includes(lootType), `Invalid loot type: ${lootType}`);
     }
     if (lootType === LOOT_TYPE_DROP) {
-      assert(isNotNullish(rawType.lootTableKey), 'No loot table key');
-      if (isNotNullish(rawType.lootTableKey)) {
+      if (assertNotNullish(rawType.lootTableKey, 'No loot table key')) {
         assert(rawType.lootTableKey in lootTablesByKey, `No loot table with key ${rawType.lootTableKey} exists`);
       }
     }
@@ -2527,7 +2488,7 @@ export function validateObjectGeneralTab(
 
   const { value: hasHealth } = getObjectSetting('hasHealth', rawType, categoriesByKey, subCategoriesByKey);
   if (hasHealth) {
-    assert(rawType.health > 0, `Health must be greater than 0`);
+    assert(rawType.health > 0, 'Health must be greater than 0');
     assert(rawType.health % 1 === 0, 'Health must be a whole number');
   }
 
@@ -2550,14 +2511,13 @@ export function validateObjectGeneralTab(
     subCategoriesByKey
   );
   if (inventoryTypeControlledBy === 0) {
-    assert(isNotNullish(inventoryType), `No inventory type`);
-    if (isNotNullish(inventoryType)) {
+    if (assertNotNullish(inventoryType, 'No inventory type')) {
       assert(INVENTORY_TYPES.includes(inventoryType), `Invalid inventory type: ${inventoryType}`);
     }
   }
 
   if (inventoryTypeControlledBy === 0 || isWorkstationControlledBy === 0) {
-    assert(!isWorkstation || inventoryType === INVENTORY_TYPE_SMALL, `Workstations must have small inventories`);
+    assert(!isWorkstation || inventoryType === INVENTORY_TYPE_SMALL, 'Workstations must have small inventories');
   }
 
   const stagesType = getObjectSetting('stagesType', rawType, categoriesByKey, subCategoriesByKey).value;
@@ -2566,12 +2526,11 @@ export function validateObjectGeneralTab(
     assert(rawType.experience % 1 === 0, 'Experience must be a whole number');
   }
 
-  const lightLevel = getObjectSetting('lightLevel', rawType, categoriesByKey, subCategoriesByKey).value;
-  if (isNotNullish(lightLevel)) {
-    assert(lightLevel >= 0 && lightLevel < 20, 'Light level must be between 0 and 20');
-    if (lightLevel >= 0) {
-      assert(isNotNullish(rawType.lightPosition), 'No light position');
-      if (isNotNullish(rawType.lightPosition)) {
+  const hasLight = getObjectSetting('hasLight', rawType, categoriesByKey, subCategoriesByKey).value;
+  if (hasLight && assertNotNullish(rawType.lightLevel, 'No light level')) {
+    assert(rawType.lightLevel >= 1 && rawType.lightLevel < 20, 'Light level must be between 1 and 20');
+    if (rawType.lightLevel >= 1) {
+      if (assertNotNullish(rawType.lightPosition, 'No light position')) {
         assert(
           rawType.lightPosition.x >= 0 && rawType.lightPosition.x < rawType.sprite.width,
           `Light position x value must be between 0 and ${rawType.sprite.width - 1} (inclusive)`
@@ -2592,7 +2551,7 @@ export function validateObjectPlacementSpawningTab(
   categoriesByKey: Record<string, ObjectCategory>,
   subCategoriesByKey: Record<string, ObjectSubCategory>
 ) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
 
   const { value: placementPosition, controlledBy: placementPositionControlledBy } = getObjectSetting(
     'placementPosition',
@@ -2626,8 +2585,7 @@ export function validateObjectPlacementSpawningTab(
 
   const { value: stagesType } = getObjectSetting('stagesType', rawType, categoriesByKey, subCategoriesByKey);
   if (isNotNullish(stagesType) && (stagesType === STAGES_TYPE_GROWABLE || stagesType === STAGES_TYPE_GROWABLE_WITH_HEALTH)) {
-    assert(isNotNullish(rawType.season), 'No season');
-    if (isNotNullish(rawType.season)) {
+    if (assertNotNullish(rawType.season, 'No season')) {
       assert(rawType.season === ALL_SEASONS || SEASONS.includes(rawType.season), `Invalid season: ${rawType.season}`);
     }
   }
@@ -2643,9 +2601,9 @@ export function validateObjectSpriteStageTab(
   spriteCounts: Record<string, number>,
   accentSpriteCounts: Record<string, Record<string, number>>
 ) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
 
-  assert(isNotNullish(rawType.sprite), 'No sprite data');
+  assertNotNullish(rawType.sprite, 'No sprite data');
 
   const { value: canOpen = false } = getObjectSetting('canOpen', rawType, categoriesByKey, subCategoriesByKey);
   const { value: placementPosition = PLACEMENT_POSITION_CENTER } = getObjectSetting(
@@ -2699,8 +2657,7 @@ export function validateObjectSpriteStageTab(
     );
   }
 
-  assert(isNotNullish(rawType.worldSize), 'No world size');
-  if (isNotNullish(rawType.worldSize)) {
+  if (assertNotNullish(rawType.worldSize, 'No world size')) {
     assert(rawType.worldSize.x >= 1, 'World size width must be at least 1');
     assert(rawType.worldSize.x % 1 == 0, 'World size width must be a whole number');
     assert(rawType.worldSize.y >= 1, 'World size height must be at least 1');
@@ -2710,17 +2667,14 @@ export function validateObjectSpriteStageTab(
   if (isNotNullish(stagesType) && stagesType !== STAGES_TYPE_NONE) {
     assert(!canOpen, 'Objects that can open cannot have stages');
 
-    assert(STAGES_TYPES.includes(stagesType), `Invalid stages type: ${stagesType}`);
-
-    if (STAGES_TYPES.includes(stagesType) && isNotNullish(rawType.stages)) {
+    if (assert(STAGES_TYPES.includes(stagesType), `Invalid stages type: ${stagesType}`) && isNotNullish(rawType.stages)) {
       const { value: lootType } = getObjectSetting('lootType', rawType, categoriesByKey, subCategoriesByKey);
       for (let i = 0; i < rawType.stages.length; i++) {
         const stage = rawType.stages[i];
 
         if (isNotNullish(lootType)) {
           if (lootType === LOOT_TYPE_STAGE_DROP) {
-            assert(isNotNullish(stage.lootTableKey), `Stage ${i} has no loot table key`);
-            if (isNotNullish(stage.lootTableKey)) {
+            if (assertNotNullish(stage.lootTableKey, `Stage ${i} has no loot table key`)) {
               assert(stage.lootTableKey in lootTablesByKey, `Stage ${i} no loot table with key ${stage.lootTableKey} exists`);
             }
           }
@@ -2728,11 +2682,11 @@ export function validateObjectSpriteStageTab(
 
         switch (stagesType) {
           case STAGES_TYPE_GROWABLE_WITH_HEALTH:
-            assertGrowableStage(assert, stage, i + 1, rawType.stages.length);
+            assertGrowableStage(assert, assertNotNullish, stage, i + 1, rawType.stages.length);
             assertHealthStage(assert, stage, i + 1);
             break;
           case STAGES_TYPE_GROWABLE:
-            assertGrowableStage(assert, stage, i + 1, rawType.stages.length);
+            assertGrowableStage(assert, assertNotNullish, stage, i + 1, rawType.stages.length);
             break;
           case STAGES_TYPE_BREAKABLE:
             assertBreakableStage(assert, rawType, stage, i);
@@ -2815,9 +2769,9 @@ export function assertSpriteCounts(
 export function validatePhysicsTab(
   rawType: ProcessedRawObjectType | ProcessedRawObjectCategory | ProcessedRawObjectSubCategory | ProcessedRawCreatureType
 ) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
 
-  assertColliders(assert, rawType);
+  assertColliders(assert, assertNotNullish, rawType);
 
   return errors;
 }
@@ -2831,8 +2785,7 @@ export function assertObjectSprite(
   accentSpriteCounts: Record<string, number>,
   prefix: string
 ) {
-  assert(spriteCount > 0, `${prefix} No sprites`);
-  if (spriteCount > 0) {
+  if (assert(spriteCount > 0, `${prefix} No sprites`)) {
     if (isNotNullish(accentSpriteCounts)) {
       for (const accentType of ACCENT_TYPES) {
         assert(
@@ -2863,8 +2816,7 @@ export function assertObjectSprite(
   if (isNotNullish(objectSprite.sprites)) {
     for (const key of Object.keys(objectSprite.sprites)) {
       const keyAsNumber = Number(key);
-      assert(!Number.isNaN(keyAsNumber), `Sprite key '${key}' must be a number`);
-      if (!Number.isNaN(keyAsNumber)) {
+      if (assert(!Number.isNaN(keyAsNumber), `Sprite key '${key}' must be a number`)) {
         const individualObjectSprite = objectSprite.sprites[key];
         if (isNotNullish(individualObjectSprite)) {
           if (isNotNullish(individualObjectSprite.pivotOffset)) {
@@ -2889,13 +2841,19 @@ export function assertObjectSprite(
   }
 }
 
-export function assertGrowableStage(assert: Assert, stage: ProcessedRawObjectTypeStage, index: number, total: number) {
+export function assertGrowableStage(
+  assert: Assert,
+  assertNotNullish: AssertNotNullish,
+  stage: ProcessedRawObjectTypeStage,
+  index: number,
+  total: number
+) {
   if (!stage.pause && (index < total || (isNotNullish(stage.jumpToStage) && stage.jumpCondition === STAGE_JUMP_CONDITION_TIME))) {
     assert(stage.growthDays > 0, `Stage ${index}: Growth days must be greater than 0`);
     assert(stage.growthDays % 1 == 0, `Stage ${index}: Growth days must be a whole number`);
   }
   if (isNotNullish(stage.jumpToStage)) {
-    assert(isNotNullish(stage.jumpCondition), `Stage ${index}: No jump condition (required when jump to stage is set)`);
+    assertNotNullish(stage.jumpCondition, `Stage ${index}: No jump condition (required when jump to stage is set)`);
   }
   if (isNotNullish(stage.jumpCondition)) {
     assert(
@@ -2934,25 +2892,28 @@ export function assertSpawningConditions(assert: Assert, spawningConditions: str
   }
 }
 
-export function assertSubCategorySpriteRules(assert: Assert, name: string, spriteRules: ProcessedRawObjectSpriteRuleset | undefined) {
+export function assertSubCategorySpriteRules(
+  assert: Assert,
+  assertNotNullish: AssertNotNullish,
+  name: string,
+  spriteRules: ProcessedRawObjectSpriteRuleset | undefined
+) {
   if (isNotNullish(spriteRules)) {
     if (isNotNullish(spriteRules.rules) && spriteRules.rules.length > 0) {
       let ruleIndex = 1;
       for (const rule of spriteRules.rules) {
-        assert(
-          isNotNullish(rule) && isNotNullish(rule.sprites) && rule.sprites.length > 0,
-          `${name} ${ruleIndex}: There must be at least one sprite`
-        );
-        if (isNotNullish(rule) && isNotNullish(rule.sprites) && rule.sprites.length > 0) {
+        if (
+          assertNotNullish(rule.sprites, `${name} ${ruleIndex}: No sprites`) &&
+          assert(rule.sprites.length > 0, `${name} ${ruleIndex}: There must be at least one sprite`)
+        ) {
           for (const sprite of rule.sprites) {
             assert(sprite >= 0, `${name} ${ruleIndex}: Sprite index must be greater than 0`);
           }
         }
-        assert(
-          isNotNullish(rule.conditions) && Object.keys(rule.conditions).length > 0,
-          `${name} ${ruleIndex}: There must be at least one condition`
-        );
-        if (isNotNullish(rule.conditions)) {
+        if (
+          assertNotNullish(rule.conditions, `${name} ${ruleIndex}: No conditions`) &&
+          assert(Object.keys(rule.conditions).length > 0, `${name} ${ruleIndex}: There must be at least one condition`)
+        ) {
           for (const direction of Object.keys(rule.conditions)) {
             assert(SPRITE_RULE_DIRECTIONS.includes(direction), `${name} ${ruleIndex}: ${direction} is not a valid direction`);
           }
@@ -2965,46 +2926,56 @@ export function assertSubCategorySpriteRules(assert: Assert, name: string, sprit
 
 export function assertColliders(
   assert: Assert,
+  assertNotNullish: AssertNotNullish,
   type: ProcessedRawObjectType | ProcessedRawObjectCategory | ProcessedRawObjectSubCategory | ProcessedRawCreatureType
 ) {
   if (isNotNullish(type.colliders)) {
-    dataValidation.assertObjectColliders(assert, type.colliders, 'Generic collider');
+    dataValidation.assertObjectColliders(assert, assertNotNullish, type.colliders, 'Generic collider');
   }
   if (isNotNullish(type.sprite) && isNotNullish(type.sprite.sprites)) {
-    dataValidation.assertObjectSpriteColliders(assert, type.sprite.sprites);
+    dataValidation.assertObjectSpriteColliders(assert, assertNotNullish, type.sprite.sprites);
   }
 }
 
-export function assertObjectSpriteColliders(assert: Assert, sprites: Record<string, ProcessedRawSprite>) {
+export function assertObjectSpriteColliders(
+  assert: Assert,
+  assertNotNullish: AssertNotNullish,
+  sprites: Record<string, ProcessedRawSprite>
+) {
   for (const key of Object.keys(sprites)) {
     const colliders = sprites[key].colliders;
     if (isNotNullish(colliders)) {
-      dataValidation.assertObjectColliders(assert, colliders, `Sprite ${key} Collider`);
+      dataValidation.assertObjectColliders(assert, assertNotNullish, colliders, `Sprite ${key} Collider`);
     }
   }
 }
 
-export function assertObjectColliders(assert: Assert, colliders: ProcessedRawCollider[], type: string) {
+export function assertObjectColliders(assert: Assert, assertNotNullish: AssertNotNullish, colliders: ProcessedRawCollider[], type: string) {
   for (let i = 0; i < colliders.length; i++) {
-    dataValidation.assertObjectCollider(assert, colliders[i], type, i + 1);
+    dataValidation.assertObjectCollider(assert, assertNotNullish, colliders[i], type, i + 1);
   }
 }
 
-export function assertObjectCollider(assert: Assert, collider: ProcessedRawCollider, type: string, index: number) {
-  assert(isNotNullish(collider.type), `${type} ${index}: No collider type`);
-  if (isNotNullish(collider.type)) {
-    const isValidColliderType = COLLIDER_TYPES.includes(collider.type);
-    assert(
-      isValidColliderType,
-      `${type} ${index}: Invalid collider type: ${collider.type}. Only ${POLYGON_COLLIDER_TYPE} and ${BOX_COLLIDER_TYPE} are allowed`
-    );
-    if (isValidColliderType) {
+export function assertObjectCollider(
+  assert: Assert,
+  assertNotNullish: AssertNotNullish,
+  collider: ProcessedRawCollider,
+  type: string,
+  index: number
+) {
+  if (assertNotNullish(collider.type, `${type} ${index}: No collider type`)) {
+    if (
+      assert(
+        COLLIDER_TYPES.includes(collider.type),
+        `${type} ${index}: Invalid collider type: ${collider.type}. Only ${POLYGON_COLLIDER_TYPE} and ${BOX_COLLIDER_TYPE} are allowed`
+      )
+    ) {
       switch (collider.type) {
         case POLYGON_COLLIDER_TYPE:
           // dataValidation.assertPolygonCollider(assert, collider, type, index);
           break;
         case BOX_COLLIDER_TYPE:
-          dataValidation.assertBoxCollider(assert, collider, type, index);
+          dataValidation.assertBoxCollider(assertNotNullish, collider, type, index);
           break;
       }
     }
@@ -3013,11 +2984,10 @@ export function assertObjectCollider(assert: Assert, collider: ProcessedRawColli
 
 // export function assertPolygonCollider(assert: Assert, collider: Collider, type: string, index: number) {}
 
-export function assertBoxCollider(assert: Assert, collider: ProcessedRawCollider, type: string, index: number) {
-  assert(isNotNullish(collider), `${type} ${index}: Not configured`);
-  if (isNotNullish(collider)) {
-    assert(isNotNullish(collider.size), `${type} ${index}: No size`);
-    assert(isNotNullish(collider.offset), `${type} ${index}: No offset`);
+export function assertBoxCollider(assertNotNullish: AssertNotNullish, collider: ProcessedRawCollider, type: string, index: number) {
+  if (assertNotNullish(collider, `${type} ${index}: Not configured`)) {
+    assertNotNullish(collider.size, `${type} ${index}: No size`);
+    assertNotNullish(collider.offset, `${type} ${index}: No offset`);
   }
 }
 
@@ -3065,7 +3035,7 @@ export function checkObjectRequiredBelowSettings(
   objectSubCategoriesByKey: Record<string, ObjectSubCategory>,
   objectsByKey: Record<string, ObjectType>
 ) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
 
   let layerBelow: string | undefined;
   if (placementLayer === PLACEMENT_LAYER_ON_GROUND) {
@@ -3077,8 +3047,7 @@ export function checkObjectRequiredBelowSettings(
   if (isNotNullish(objectSettings.requiredBelowObjectCategoryKeys)) {
     for (const key of objectSettings.requiredBelowObjectCategoryKeys) {
       const category = objectCategoriesByKey[key];
-      assert(isNotNullish(category), `Invalid required below category ${key}`);
-      if (isNotNullish(category)) {
+      if (assertNotNullish(category, `Invalid required below category ${key}`)) {
         assert(
           category.settings?.placementLayer === layerBelow,
           `Required below category ${key} is in the wrong placement layer ${category.settings?.placementLayer}. Should be ${layerBelow}`
@@ -3090,8 +3059,7 @@ export function checkObjectRequiredBelowSettings(
   if (isNotNullish(objectSettings.requiredBelowObjectSubCategoryKeys)) {
     for (const key of objectSettings.requiredBelowObjectSubCategoryKeys) {
       const subCategory = objectSubCategoriesByKey[key];
-      assert(isNotNullish(subCategory), `Invalid required below sub category ${key}`);
-      if (isNotNullish(subCategory)) {
+      if (assertNotNullish(subCategory, `Invalid required below sub category ${key}`)) {
         const subCategoryPlacementLayer = getObjectSetting('placementLayer', subCategory, objectCategoriesByKey).value;
         assert(
           subCategoryPlacementLayer === layerBelow,
@@ -3104,8 +3072,7 @@ export function checkObjectRequiredBelowSettings(
   if (isNotNullish(objectSettings.requiredBelowObjectKeys)) {
     for (const key of objectSettings.requiredBelowObjectKeys) {
       const type = objectsByKey[key];
-      assert(isNotNullish(type), `Invalid required below object ${key}`);
-      if (isNotNullish(type)) {
+      if (assertNotNullish(type, `Invalid required below object ${key}`)) {
         const objectPlacementLayer = getObjectSetting('placementLayer', type, objectCategoriesByKey, objectSubCategoriesByKey).value;
         assert(
           objectPlacementLayer === layerBelow,
@@ -3125,13 +3092,12 @@ export function checkObjectRequiredAdjacentSettings(
   objectSubCategoriesByKey: Record<string, ObjectSubCategory>,
   objectsByKey: Record<string, ObjectType>
 ) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
 
   if (isNotNullish(objectSettings.requiredAdjacentObjectCategoryKeys)) {
     for (const key of objectSettings.requiredAdjacentObjectCategoryKeys) {
       const category = objectCategoriesByKey[key];
-      assert(isNotNullish(category), `Invalid required adjacent category ${key}`);
-      if (isNotNullish(category)) {
+      if (assertNotNullish(category, `Invalid required adjacent category ${key}`)) {
         assert(
           category.settings?.placementLayer === placementLayer,
           `Required adjacent category ${key} is in the wrong placement layer ${category.settings?.placementLayer}. Should be ${placementLayer}`
@@ -3143,8 +3109,7 @@ export function checkObjectRequiredAdjacentSettings(
   if (isNotNullish(objectSettings.requiredAdjacentObjectSubCategoryKeys)) {
     for (const key of objectSettings.requiredAdjacentObjectSubCategoryKeys) {
       const subCategory = objectSubCategoriesByKey[key];
-      assert(isNotNullish(subCategory), `Invalid required adjacent sub category ${key}`);
-      if (isNotNullish(subCategory)) {
+      if (assertNotNullish(subCategory, `Invalid required adjacent sub category ${key}`)) {
         const subCategoryPlacementLayer = getObjectSetting('placementLayer', subCategory, objectCategoriesByKey).value;
         assert(
           subCategoryPlacementLayer === placementLayer,
@@ -3157,8 +3122,7 @@ export function checkObjectRequiredAdjacentSettings(
   if (isNotNullish(objectSettings.requiredAdjacentObjectKeys)) {
     for (const key of objectSettings.requiredAdjacentObjectKeys) {
       const type = objectsByKey[key];
-      assert(isNotNullish(type), `Invalid required adjacent object ${key}`);
-      if (isNotNullish(type)) {
+      if (assertNotNullish(type, `Invalid required adjacent object ${key}`)) {
         const objectPlacementLayer = getObjectSetting('placementLayer', type, objectCategoriesByKey, objectSubCategoriesByKey).value;
         assert(
           objectPlacementLayer === placementLayer,
@@ -3351,22 +3315,20 @@ export function validateObjectDestructionMenu(
   localization: Localization | null | undefined,
   localizationKeys: string[]
 ): string[] {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
 
-  assert(isNotNullish(rawDestructionMenu), 'No destruction menu configuration');
-  if (isNotNullish(rawDestructionMenu)) {
-    assert(isNotNullish(rawDestructionMenu.diameter), `No diameter`);
-    if (isNotNullish(rawDestructionMenu.diameter)) {
-      assert(rawDestructionMenu.diameter > 0, `Diameter must be greater than 0`);
-      assert(rawDestructionMenu.diameter % 1 === 0, `Diameter must be a whole number`);
+  if (assertNotNullish(rawDestructionMenu, 'No destruction menu configuration')) {
+    if (assertNotNullish(rawDestructionMenu.diameter, 'No diameter')) {
+      assert(rawDestructionMenu.diameter > 0, 'Diameter must be greater than 0');
+      assert(rawDestructionMenu.diameter % 1 === 0, 'Diameter must be a whole number');
     }
 
-    assert(isNotNullish(rawDestructionMenu.buttons), 'No buttons');
-    if (isNotNullish(rawDestructionMenu.buttons)) {
+    if (assertNotNullish(rawDestructionMenu.buttons, 'No buttons')) {
       for (let i = 0; i < rawDestructionMenu.buttons.length; i++) {
         const button = rawDestructionMenu.buttons[i];
         assertDestructionMenuButton(
           assert,
+          assertNotNullish,
           button,
           objectsByKey,
           objectCategoriesByKey,
@@ -3384,6 +3346,7 @@ export function validateObjectDestructionMenu(
 
 export function assertDestructionMenuButton(
   assert: Assert,
+  assertNotNullish: AssertNotNullish,
   button: ProcessedRawDestructionMenuButton,
   objectsByKey: Record<string, ObjectType>,
   objectCategoriesByKey: Record<string, ObjectCategory>,
@@ -3410,17 +3373,18 @@ export function assertDestructionMenuButton(
       ((isNotNullish(button.objects.include) && button.objects.include.length > 0) ||
         (isNotNullish(button.objects.exclude) && button.objects.exclude.length > 0)));
 
-  assert(isNotNullish(button.placementLayer), `Button ${index}: No placement layer`);
-  if (isNotNullish(button.placementLayer)) {
-    assert(PLACEMENT_LAYERS.includes(button.placementLayer), `Button ${index}: Invalid placement layer: ${button.placementLayer}`);
-    if (hasConditions && PLACEMENT_LAYERS.includes(button.placementLayer)) {
+  if (assertNotNullish(button.placementLayer, `Button ${index}: No placement layer`)) {
+    if (
+      hasConditions &&
+      assert(PLACEMENT_LAYERS.includes(button.placementLayer), `Button ${index}: Invalid placement layer: ${button.placementLayer}`)
+    ) {
       if (isNotNullish(button.categories)) {
         assertDestructionMenuButtonConditions(
           assert,
           button.categories,
           button.placementLayer,
           `Button ${index}`,
-          `Category Conditions`,
+          'Category Conditions',
           objectCategoriesByKey,
           (category) => category.settings?.placementLayer
         );
@@ -3432,7 +3396,7 @@ export function assertDestructionMenuButton(
           button.subCategories,
           button.placementLayer,
           `Button ${index}`,
-          `Sub Category Conditions`,
+          'Sub Category Conditions',
           objectSubCategoriesByKey,
           (subCategory) => getObjectSetting('placementLayer', subCategory, objectCategoriesByKey, objectSubCategoriesByKey).value
         );
@@ -3444,7 +3408,7 @@ export function assertDestructionMenuButton(
           button.objects,
           button.placementLayer,
           `Button ${index}`,
-          `Object Conditions`,
+          'Object Conditions',
           objectsByKey,
           (type) => getObjectSetting('placementLayer', type, objectCategoriesByKey, objectSubCategoriesByKey).value
         );
@@ -3573,25 +3537,22 @@ export function validateDialogueTreeGeneralTab(
   eventLogsByKey: Record<string, EventLog>,
   idsSeen: number[]
 ) {
-  const { errors, assert } = createAssert();
-  assert(isNotNullish(rawType.id) && rawType.id != 0, 'No id');
-  if (isNotNullish(rawType.id) && rawType.id != 0) {
+  const { errors, assert, assertNotNullish } = createAssert();
+  if (assertNotNullish(rawType.id, 'No id') && assert(rawType.id != 0, 'No id')) {
     assert(!idsSeen.includes(rawType.id), `Duplicate id: ${rawType.id}`);
   }
-  assert(isNotNullish(rawType.key), 'No key');
+  assertNotNullish(rawType.key, 'No key');
 
-  assert(isNotNullish(rawType.creatureKey), 'No creature');
-  if (isNotNullish(rawType.creatureKey)) {
+  if (assertNotNullish(rawType.creatureKey, 'No creature')) {
     assert(rawType.creatureKey in creaturesByKey, `Invalid creature: ${rawType.creatureKey}`);
   }
 
-  assert(isNotNullish(rawType.priority), 'No priority');
-  if (isNotNullish(rawType.priority)) {
+  if (assertNotNullish(rawType.priority, 'No priority')) {
     assert(rawType.priority >= 0, 'Priority cannot be negative');
   }
 
   if (rawType.runOnlyOnce) {
-    assert(isNotNullish(rawType.completionEvent), 'No completion event');
+    assertNotNullish(rawType.completionEvent, 'No completion event');
   }
 
   if (isNotNullish(rawType.completionEvent)) {
@@ -3602,7 +3563,7 @@ export function validateDialogueTreeGeneralTab(
 }
 
 export function validateDialogueTreeConditionsTab(rawType: ProcessedRawDialogueTree) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
 
   if (isNotNullish(rawType.conditions)) {
     if (isNotNullish(rawType.conditions.days)) {
@@ -3619,13 +3580,11 @@ export function validateDialogueTreeConditionsTab(rawType: ProcessedRawDialogueT
       if (TIME_COMPARATORS.includes(rawType.conditions.timesComparator)) {
         switch (rawType.conditions.timesComparator) {
           case TIME_COMPARATOR_BEFORE:
-            assert(
-              isNotNullish(rawType.conditions.times) && (rawType.conditions.times?.length ?? 0) > 0,
-              `One time is required for ${TIME_COMPARATOR_BEFORE} comparator`
-            );
-            if (isNotNullish(rawType.conditions.times) && (rawType.conditions.times?.length ?? 0) > 0) {
-              assert(rawType.conditions.times.length == 1, `Only provide one times for ${TIME_COMPARATOR_BEFORE} comparator`);
-              if (rawType.conditions.times.length == 1) {
+            if (
+              assertNotNullish(rawType.conditions.times, `No time for ${TIME_COMPARATOR_BEFORE} comparator`) &&
+              assert((rawType.conditions.times?.length ?? 0) > 0, `One time is required for ${TIME_COMPARATOR_BEFORE} comparator`)
+            ) {
+              if (assert(rawType.conditions.times.length == 1, `Only provide one times for ${TIME_COMPARATOR_BEFORE} comparator`)) {
                 assert(
                   rawType.conditions.times[0] >= 0 && rawType.conditions.times[0] <= DAY_LENGTH,
                   `Invalid time '${rawType.conditions.times[0]}'. Time must be between 0 and ${DAY_LENGTH} (inclusive)`
@@ -3634,13 +3593,11 @@ export function validateDialogueTreeConditionsTab(rawType: ProcessedRawDialogueT
             }
             break;
           case TIME_COMPARATOR_AFTER:
-            assert(
-              isNotNullish(rawType.conditions.times) && (rawType.conditions.times?.length ?? 0) > 0,
-              `One time is required for ${TIME_COMPARATOR_AFTER} comparator`
-            );
-            if (isNotNullish(rawType.conditions.times) && (rawType.conditions.times?.length ?? 0) > 0) {
-              assert(rawType.conditions.times.length == 1, `Only provide one times for ${TIME_COMPARATOR_AFTER} comparator`);
-              if (rawType.conditions.times.length == 1) {
+            if (
+              assertNotNullish(rawType.conditions.times, `No time for ${TIME_COMPARATOR_AFTER} comparator`) &&
+              assert((rawType.conditions.times?.length ?? 0) > 0, `One time is required for ${TIME_COMPARATOR_AFTER} comparator`)
+            ) {
+              if (assert(rawType.conditions.times.length == 1, `Only provide one times for ${TIME_COMPARATOR_AFTER} comparator`)) {
                 assert(
                   rawType.conditions.times[0] >= 0 && rawType.conditions.times[0] <= DAY_LENGTH,
                   `Invalid time '${rawType.conditions.times[0]}'. Time must be between 0 and ${DAY_LENGTH} (inclusive)`
@@ -3649,13 +3606,11 @@ export function validateDialogueTreeConditionsTab(rawType: ProcessedRawDialogueT
             }
             break;
           case TIME_COMPARATOR_BETWEEN:
-            assert(
-              isNotNullish(rawType.conditions.times) && (rawType.conditions.times?.length ?? 0) > 1,
-              `Two times are required for ${TIME_COMPARATOR_BETWEEN} comparator`
-            );
-            if (isNotNullish(rawType.conditions.times) && (rawType.conditions.times?.length ?? 0) > 1) {
-              assert(rawType.conditions.times.length == 2, `Only provide two times for ${TIME_COMPARATOR_BETWEEN} comparator`);
-              if (rawType.conditions.times.length == 2) {
+            if (
+              assertNotNullish(rawType.conditions.times, `No time for ${TIME_COMPARATOR_BEFORE} TIME_COMPARATOR_BETWEEN`) &&
+              assert((rawType.conditions.times?.length ?? 0) > 1, `Two times are required for ${TIME_COMPARATOR_BETWEEN} comparator`)
+            ) {
+              if (assert(rawType.conditions.times.length == 2, `Only provide two times for ${TIME_COMPARATOR_BETWEEN} comparator`)) {
                 assert(
                   rawType.conditions.times[0] >= 0 && rawType.conditions.times[0] <= DAY_LENGTH,
                   `Invalid time 1 '${rawType.conditions.times[0]}'. Time 1 must be between 0 and ${DAY_LENGTH} (inclusive)`
@@ -3682,10 +3637,9 @@ export function validateDialogueTreeDialogueTab(
   localization: Localization | null | undefined,
   localizationKeys: string[]
 ) {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
 
-  assert(rawType.dialogues.length > 0, 'No dialogue');
-  if (rawType.dialogues.length > 0) {
+  if (assert(rawType.dialogues.length > 0, 'No dialogue')) {
     const dialoguesById: Record<number, ProcessedRawDialogue> = {};
 
     for (const dialogue of rawType.dialogues) {
@@ -3694,12 +3648,11 @@ export function validateDialogueTreeDialogueTab(
       }
     }
 
-    assert(isNotNullish(rawType.startingDialogueId), 'No starting dialogue');
-    if (isNotNullish(rawType.startingDialogueId)) {
+    if (assertNotNullish(rawType.startingDialogueId, 'No starting dialogue')) {
       assert(rawType.startingDialogueId in dialoguesById, `Starting dialogue: No dialogue with key '${rawType.startingDialogueId}'`);
     }
 
-    validateDialogues(assert, rawType.key, rawType.dialogues, dialoguesById, localization, localizationKeys);
+    validateDialogues(assert, assertNotNullish, rawType.key, rawType.dialogues, dialoguesById, localization, localizationKeys);
   }
 
   return errors;
@@ -3707,6 +3660,7 @@ export function validateDialogueTreeDialogueTab(
 
 export function validateDialogues(
   assert: Assert,
+  assertNotNullish: AssertNotNullish,
   dialogueTreeKey: string | undefined,
   dialogues: ProcessedRawDialogue[],
   dialoguesById: Record<number, ProcessedRawDialogue>,
@@ -3719,6 +3673,7 @@ export function validateDialogues(
     const dialogue = dialogues[i];
     validateDialogue(
       assert,
+      assertNotNullish,
       dialogueTreeKey,
       dialogue,
       dialoguesById,
@@ -3734,6 +3689,7 @@ export function validateDialogues(
 
 export function validateDialogue(
   assert: Assert,
+  assertNotNullish: AssertNotNullish,
   dialogueTreeKey: string | undefined,
   dialogue: ProcessedRawDialogue,
   dialoguesById: Record<number, ProcessedRawDialogue>,
@@ -3742,13 +3698,11 @@ export function validateDialogue(
   dialogueIdsSeen: number[],
   header: string
 ) {
-  assert(isNotNullish(dialogue.id) && dialogue.id != 0, `${header} No id`);
-  if (isNotNullish(dialogue.id) && dialogue.id != 0) {
+  if (assertNotNullish(dialogue.id, `${header} No id`) && assert(dialogue.id != 0, `${header} Id must be greater than 0`)) {
     assert(!dialogueIdsSeen.includes(dialogue.id), `${header} Duplicate id: ${dialogue.id}`);
   }
-  assert(isNotNullish(dialogue.key), `${header} No key`);
 
-  if (isNotNullish(dialogueTreeKey) && isNotNullish(dialogue.key) && localization) {
+  if (isNotNullish(dialogueTreeKey) && assertNotNullish(dialogue.key, `${header} No key`) && localization) {
     assert(
       isNotEmpty(
         getLocalizedValue(
@@ -3764,6 +3718,7 @@ export function validateDialogue(
   if (dialogue.responses.length > 0) {
     validateDialogueResponses(
       assert,
+      assertNotNullish,
       dialogueTreeKey,
       dialogue.key,
       dialogue.responses,
@@ -3783,6 +3738,7 @@ export function validateDialogue(
 
 export function validateDialogueResponses(
   assert: Assert,
+  assertNotNullish: AssertNotNullish,
   dialogueTreeKey: string | undefined,
   dialogueKey: string | undefined,
   responses: ProcessedRawDialogueResponse[],
@@ -3797,6 +3753,7 @@ export function validateDialogueResponses(
     const response = responses[i];
     validateDialogueResponse(
       assert,
+      assertNotNullish,
       dialogueTreeKey,
       dialogueKey,
       response,
@@ -3813,6 +3770,7 @@ export function validateDialogueResponses(
 
 export function validateDialogueResponse(
   assert: Assert,
+  assertNotNullish: AssertNotNullish,
   dialogueTreeKey: string | undefined,
   dialogueKey: string | undefined,
   response: ProcessedRawDialogueResponse,
@@ -3822,13 +3780,11 @@ export function validateDialogueResponse(
   responseIdsSeen: number[],
   header: string
 ) {
-  assert(isNotNullish(response.id) && response.id != 0, `${header} No id`);
-  if (isNotNullish(response.id) && response.id != 0) {
+  if (assertNotNullish(response.id, `${header} No id`) && assert(response.id != 0, `${header} Id cannot be 0`)) {
     assert(!responseIdsSeen.includes(response.id), `${header} Duplicate id: ${response.id}`);
   }
-  assert(isNotNullish(response.key), `${header} No key`);
 
-  if (isNotNullish(dialogueTreeKey) && isNotNullish(dialogueKey) && isNotNullish(response.key) && localization) {
+  if (isNotNullish(dialogueTreeKey) && isNotNullish(dialogueKey) && assertNotNullish(response.key, `${header} No key`) && localization) {
     assert(
       isNotEmpty(
         getLocalizedValue(
@@ -3906,15 +3862,13 @@ export function validateEventLog(
   localizationKeys: string[],
   idsSeen: number[]
 ): string[] {
-  const { errors, assert } = createAssert();
-  assert(isNotNullish(rawType.id) && rawType.id != 0, 'No id');
-  if (isNotNullish(rawType.id) && rawType.id != 0) {
+  const { errors, assert, assertNotNullish } = createAssert();
+
+  if (assertNotNullish(rawType.id, 'No id') && assert(rawType.id != 0, 'Id cannot be 0')) {
     assert(!idsSeen.includes(rawType.id), `Duplicate id: ${rawType.id}`);
   }
 
-  assert(isNotEmpty(rawType.key), 'No key');
-
-  if (isNotNullish(rawType.key) && localization) {
+  if (assertNotNullish(rawType.key, 'No key') && localization) {
     assert(
       isNotEmpty(getLocalizedValue(localization, localizationKeys, getLocalizationKey('event-log', 'flavor-text', rawType.key))),
       'No flavor text'
@@ -4007,15 +3961,14 @@ export function validateFishingZone(
   lootTablesByKey: Record<string, LootTable>,
   idsSeen: number[]
 ): string[] {
-  const { errors, assert } = createAssert();
-  assert(isNotNullish(rawFishingZone.id) && rawFishingZone.id != 0, 'No id');
-  if (isNotNullish(rawFishingZone.id) && rawFishingZone.id != 0) {
+  const { errors, assert, assertNotNullish, assertNotEmpty } = createAssert();
+
+  if (assertNotNullish(rawFishingZone.id, 'No id') && assert(rawFishingZone.id != 0, 'Id cannot be 0')) {
     assert(!idsSeen.includes(rawFishingZone.id), `Duplicate id: ${rawFishingZone.id}`);
   }
 
-  assert(isNotEmpty(rawFishingZone.key), 'No key');
-  assert(isNotEmpty(rawFishingZone.lootTableKey), 'No loot table key');
-  if (isNotNullish(rawFishingZone.lootTableKey)) {
+  assertNotEmpty(rawFishingZone.key, 'No key');
+  if (assertNotEmpty(rawFishingZone.lootTableKey, 'No loot table key')) {
     assert(rawFishingZone.lootTableKey in lootTablesByKey, `No loot table with key ${rawFishingZone.lootTableKey} exists`);
   }
 
@@ -4081,21 +4034,19 @@ export function validateSkill(
   localizationKeys: string[],
   idsSeen: number[]
 ): string[] {
-  const { errors, assert } = createAssert();
-  assert(isNotNullish(rawSkill.id) && rawSkill.id != 0, 'No id');
-  assert(isNotNullish(rawSkill.key), 'No key');
-  if (isNotNullish(rawSkill.id) && rawSkill.id != 0) {
+  const { errors, assert, assertNotNullish, assertNotEmpty } = createAssert();
+  if (assertNotNullish(rawSkill.id, 'No id') && assert(rawSkill.id != 0, 'Id cannot be 0')) {
     assert(!idsSeen.includes(rawSkill.id), `Duplicate id: ${rawSkill.id}`);
   }
 
-  if (isNotNullish(rawSkill.key) && localization) {
-    assert(isNotEmpty(getLocalizedValue(localization, localizationKeys, getLocalizationKey('skill', 'name', rawSkill.key))), 'No name');
+  if (assertNotNullish(rawSkill.key, 'No key') && localization) {
+    assertNotEmpty(getLocalizedValue(localization, localizationKeys, getLocalizationKey('skill', 'name', rawSkill.key)), 'No name');
   }
 
   assert(rawSkill.levels.length > 0, 'No levels');
   assert(rawSkill.levels.length <= 5, 'Too many levels. Skills can only have 5 levels');
   for (let i = 0; i < rawSkill.levels.length; i++) {
-    assertSkillLevel(assert, rawSkill.key, rawSkill.levels[i], localization, localizationKeys, i);
+    assertSkillLevel(assert, assertNotNullish, rawSkill.key, rawSkill.levels[i], localization, localizationKeys, i);
   }
 
   return errors;
@@ -4103,6 +4054,7 @@ export function validateSkill(
 
 export function assertSkillLevel(
   assert: Assert,
+  assertNotNullish: AssertNotNullish,
   skillKey: string | undefined,
   skillLevel: ProcessedRawSkillLevel,
   localization: Localization | null | undefined,
@@ -4110,9 +4062,8 @@ export function assertSkillLevel(
   index: number
 ) {
   const header = skillLevel.key ?? `Skill Level ${index}`;
-  assert(isNotNullish(skillLevel.key), `${header} No key`);
 
-  if (isNotNullish(skillKey) && isNotNullish(skillLevel.key) && localization) {
+  if (isNotNullish(skillKey) && assertNotNullish(skillLevel.key, `${header} No key`) && localization) {
     assert(
       isNotEmpty(
         getLocalizedValue(
@@ -4224,9 +4175,9 @@ export function validateLocalizationKeys(
 }
 
 export function validateLocalizationKey(key: string, index: number): string[] {
-  const { errors, assert } = createAssert();
+  const { errors, assertNotEmpty } = createAssert();
 
-  assert(isNotEmpty(key), `Key ${index} cannot be empty`);
+  assertNotEmpty(key, `Key ${index} cannot be empty`);
 
   return errors;
 }
@@ -4276,14 +4227,13 @@ export function validateLocalizations(
 }
 
 export function validateLocalization(localization: ProcessedRawLocalization, keys: string[]): string[] {
-  const { errors, assert } = createAssert();
-  assert(isNotEmpty(localization.key), 'No key');
-  assert(isNotEmpty(localization.name), 'No name');
+  const { errors, assert, assertNotEmpty } = createAssert();
+  assertNotEmpty(localization.key, 'No key');
+  assertNotEmpty(localization.name, 'No name');
 
   keys.forEach((key) => {
-    assert(key in localization.values, `No value for key '${key}'`);
-    if (key in localization.values) {
-      assert(isNotEmpty(localization.values[key]), `Value for key '${key}' is empty`);
+    if (assert(key in localization.values, `No value for key '${key}'`)) {
+      assertNotEmpty(localization.values[key], `Value for key '${key}' is empty`);
     }
   });
 
@@ -4385,17 +4335,15 @@ export function validateQuestGeneralTab(
   localizationKeys: string[],
   idsSeen: number[]
 ): string[] {
-  const { errors, assert } = createAssert();
-  assert(isNotNullish(quest.id), 'No id');
-  if (isNotNullish(quest.id)) {
+  const { errors, assert, assertNotNullish, assertNotEmpty } = createAssert();
+  if (assertNotNullish(quest.id, 'No id')) {
     assert(quest.id > 0 && quest.id % 1 === 0, 'Id must be a positive whole number greater than 0');
     assert(!idsSeen.includes(quest.id), `Duplicate id: ${quest.id}`);
   }
-  assert(isNotEmpty(quest.key), 'No key');
 
-  if (isNotNullish(quest.key) && localization) {
-    assert(isNotEmpty(getLocalizedValue(localization, localizationKeys, getLocalizationKey('quest', 'name', quest.key))), 'No name');
-    assert(isNotEmpty(getLocalizedValue(localization, localizationKeys, getLocalizationKey('quest', 'text', quest.key))), 'No text');
+  if (assertNotNullish(quest.key, 'No key') && localization) {
+    assertNotEmpty(getLocalizedValue(localization, localizationKeys, getLocalizationKey('quest', 'name', quest.key)), 'No name');
+    assertNotEmpty(getLocalizedValue(localization, localizationKeys, getLocalizationKey('quest', 'text', quest.key)), 'No text');
   }
 
   quest.prerequisiteEventKeys.forEach((eventKey) => {
@@ -4407,8 +4355,7 @@ export function validateQuestGeneralTab(
 
     switch (quest.source) {
       case QUEST_SOURCE_CREATURE:
-        assert(isNotEmpty(quest.sourceCreatureTypeKey), 'Source: No creature type key');
-        if (isNotEmpty(quest.sourceCreatureTypeKey)) {
+        if (assertNotEmpty(quest.sourceCreatureTypeKey, 'Source: No creature type key')) {
           assert(quest.sourceCreatureTypeKey in creaturesByKey, `Source: No creature with key ${quest.sourceCreatureTypeKey} exists`);
         }
         if (isNotEmpty(quest.sourceCreatureDialogueTreeKey)) {
@@ -4420,7 +4367,7 @@ export function validateQuestGeneralTab(
             const dialogueTree = dialogueTreesByKey[quest.sourceCreatureDialogueTreeKey];
             assert(
               dialogueTree.creatureKey === quest.sourceCreatureTypeKey,
-              `Source: Creature type key and dialogue tree creature key do not match`
+              'Source: Creature type key and dialogue tree creature key do not match'
             );
           }
         }
@@ -4430,14 +4377,12 @@ export function validateQuestGeneralTab(
     }
   }
 
-  assert(isNotEmpty(quest.completionTrigger), 'No completion trigger');
-  if (isNotEmpty(quest.completionTrigger)) {
+  if (assertNotEmpty(quest.completionTrigger, 'No completion trigger')) {
     assert(QUEST_COMPLETION_TRIGGERS.includes(quest.completionTrigger), `Invalid completion trigger '${quest.completionTrigger}'`);
 
     switch (quest.completionTrigger) {
       case QUEST_OBJECTIVE_TYPE_TALK_TO_CREATURE:
-        assert(isNotEmpty(quest.completionCreatureTypeKey), 'Completion Trigger: No creature type key');
-        if (isNotEmpty(quest.completionCreatureTypeKey)) {
+        if (assertNotEmpty(quest.completionCreatureTypeKey, 'Completion Trigger: No creature type key')) {
           assert(
             quest.completionCreatureTypeKey in creaturesByKey,
             `Completion Trigger: No creature with key ${quest.completionCreatureTypeKey} exists`
@@ -4452,7 +4397,7 @@ export function validateQuestGeneralTab(
             const dialogueTree = dialogueTreesByKey[quest.completionCreatureDialogueTreeKey];
             assert(
               dialogueTree.creatureKey === quest.completionCreatureTypeKey,
-              `Completion Trigger: Creature type key and dialogue tree creature key do not match`
+              'Completion Trigger: Creature type key and dialogue tree creature key do not match'
             );
           }
         }
@@ -4472,13 +4417,24 @@ export function validateQuestTasksTab(
   creaturesByKey: Record<string, CreatureType>,
   dialogueTreesByKey: Record<string, DialogueTree>
 ): string[] {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish, assertNotEmpty } = createAssert();
 
-  assert(quest.tasks.length > 0, `There must be at least one task`);
+  assert(quest.tasks.length > 0, 'There must be at least one task');
 
   const taskIdsSeen: number[] = [];
   quest.tasks.forEach((task, index) => {
-    assertQuestTask(assert, task, itemsByKey, craftingRecipesByKey, creaturesByKey, dialogueTreesByKey, taskIdsSeen, `Task ${index + 1}`);
+    assertQuestTask(
+      assert,
+      assertNotNullish,
+      assertNotEmpty,
+      task,
+      itemsByKey,
+      craftingRecipesByKey,
+      creaturesByKey,
+      dialogueTreesByKey,
+      taskIdsSeen,
+      `Task ${index + 1}`
+    );
 
     if (isNotNullish(task.id)) {
       taskIdsSeen.push(task.id);
@@ -4490,6 +4446,8 @@ export function validateQuestTasksTab(
 
 export function assertQuestTask(
   assert: Assert,
+  assertNotNullish: AssertNotNullish,
+  assertNotEmpty: AssertNotEmpty,
   task: ProcessedRawQuestTask,
   itemsByKey: Record<string, ItemType>,
   craftingRecipesByKey: Record<string, CraftingRecipe>,
@@ -4498,12 +4456,12 @@ export function assertQuestTask(
   idsSeen: number[],
   header: string
 ) {
-  assert(isNotNullish(task.id), `${header}: No id`);
-  if (isNotNullish(task.id)) {
+  if (assertNotNullish(task.id, `${header}: No id`)) {
     assert(task.id > 0 && task.id % 1 === 0, `${header}: Id must be a positive whole number greater than 0`);
     assert(!idsSeen.includes(task.id), `${header}: Duplicate id: ${task.id}`);
   }
-  assert(isNotEmpty(task.key), `${header}: No key`);
+
+  assertNotEmpty(task.key, `${header}: No key`);
 
   assert(task.objectives.length > 0, `${header}: There must be at least one objective`);
   assert(task.objectives.length <= 5, `${header}: There can only be a max of five objectives per task`);
@@ -4511,6 +4469,8 @@ export function assertQuestTask(
   task.objectives.forEach((objective, index) => {
     assertQuestObjective(
       assert,
+      assertNotNullish,
+      assertNotEmpty,
       objective,
       itemsByKey,
       craftingRecipesByKey,
@@ -4523,6 +4483,8 @@ export function assertQuestTask(
 
 export function assertQuestObjective(
   assert: Assert,
+  assertNotNullish: AssertNotNullish,
+  assertNotEmpty: AssertNotEmpty,
   objective: ProcessedRawQuestObjective,
   itemsByKey: Record<string, ItemType>,
   craftingRecipesByKey: Record<string, CraftingRecipe>,
@@ -4530,18 +4492,16 @@ export function assertQuestObjective(
   dialogueTreesByKey: Record<string, DialogueTree>,
   header: string
 ) {
-  assert(isNotEmpty(objective.objectiveType), `${header}: No objective type`);
-  if (isNotEmpty(objective.objectiveType)) {
+  if (assertNotEmpty(objective.objectiveType, `${header}: No objective type`)) {
     assert(QUEST_OBJECTIVE_TYPES.includes(objective.objectiveType), `${header}: Invalid objective type '${objective.objectiveType}'`);
 
     switch (objective.objectiveType) {
       case QUEST_OBJECTIVE_TYPE_GATHER:
-        assert(isNotEmpty(objective.itemTypeKey), `${header}: No item type key`);
-        if (isNotEmpty(objective.itemTypeKey)) {
+        if (assertNotEmpty(objective.itemTypeKey, `${header}: No item type key`)) {
           assert(objective.itemTypeKey in itemsByKey, `${header}: No item with key ${objective.itemTypeKey} exists`);
         }
-        assert(isNotNullish(objective.itemAmount), `${header}: No item amount`);
-        if (isNotNullish(objective.itemAmount)) {
+
+        if (assertNotNullish(objective.itemAmount, `${header}: No item amount`)) {
           assert(
             objective.itemAmount > 0 && objective.itemAmount % 1 == 0,
             `${header}: Item amount must be a positive whole number greater than 0`
@@ -4549,8 +4509,7 @@ export function assertQuestObjective(
         }
         break;
       case QUEST_OBJECTIVE_TYPE_CRAFT:
-        assert(isNotEmpty(objective.craftingRecipeKey), `${header}: No crafting recipe key`);
-        if (isNotEmpty(objective.craftingRecipeKey)) {
+        if (assertNotEmpty(objective.craftingRecipeKey, `${header}: No crafting recipe key`)) {
           assert(
             objective.craftingRecipeKey in craftingRecipesByKey,
             `${header}: No crafting recipe with key ${objective.craftingRecipeKey} exists`
@@ -4558,23 +4517,22 @@ export function assertQuestObjective(
         }
         break;
       case QUEST_OBJECTIVE_TYPE_DESTINATION:
-        assert(isNotNullish(objective.destinationPosition), `${header}: No destination position`);
-        if (isNotNullish(objective.destinationPosition)) {
-          assert(isNotNullish(objective.destinationPosition.x), `${header}: No destination position x coordinate`);
-          assert(isNotNullish(objective.destinationPosition.y), `${header}: No destination position y coordinate`);
+        if (assertNotNullish(objective.destinationPosition, `${header}: No destination position`)) {
+          assertNotNullish(objective.destinationPosition.x, `${header}: No destination position x coordinate`);
+          assertNotNullish(objective.destinationPosition.y, `${header}: No destination position y coordinate`);
         }
         break;
       case QUEST_OBJECTIVE_TYPE_TALK_TO_CREATURE:
-        assert(isNotEmpty(objective.creatureTypeKey), `${header}: No creature type key`);
-        if (isNotEmpty(objective.creatureTypeKey)) {
+        if (assertNotEmpty(objective.creatureTypeKey, `${header}: No creature type key`)) {
           assert(objective.creatureTypeKey in creaturesByKey, `${header}: No creature with key ${objective.creatureTypeKey} exists`);
         }
         if (isNotEmpty(objective.creatureDialogueTreeKey)) {
-          assert(
-            objective.creatureDialogueTreeKey in dialogueTreesByKey,
-            `${header}: No dialogue tree with key ${objective.creatureDialogueTreeKey} exists`
-          );
-          if (objective.creatureDialogueTreeKey in dialogueTreesByKey) {
+          if (
+            assert(
+              objective.creatureDialogueTreeKey in dialogueTreesByKey,
+              `${header}: No dialogue tree with key ${objective.creatureDialogueTreeKey} exists`
+            )
+          ) {
             const dialogueTree = dialogueTreesByKey[objective.creatureDialogueTreeKey];
             assert(
               dialogueTree.creatureKey === objective.creatureTypeKey,

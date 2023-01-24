@@ -25,19 +25,23 @@ jobs:
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
+        cache: yarn
+        cache-dependency-path: |
+          Editor/yarn.lock
+          Editor/release/app/yarn.lock
         node-version: ${{ matrix.node-version }}
 
     - name: Setup
       working-directory: ./Editor
       run: |
-        npm ci
+        yarn install --frozen-lockfile
 
     - name: Lint
       working-directory: ./Editor
       run: |
-        npm run lint
+        yarn lint
 
     - name: Build
       working-directory: ./Editor
       run: |
-        npm run build
+        yarn build
