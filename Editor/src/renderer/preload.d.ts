@@ -35,9 +35,9 @@ declare global {
     };
     electron: {
       ipcRenderer: {
-        sendMessage(channel: Channels, args: unknown[]): void;
-        on(channel: Channels, func: (...args: unknown[]) => void): (() => void) | undefined;
-        once(channel: Channels, func: (...args: unknown[]) => void): void;
+        sendMessage<T extends unknown[] = unknown[]>(channel: Channels, args: T): void;
+        on<T extends unknown[] = unknown[]>(channel: Channels, func: (...args: T) => void): (() => void) | undefined;
+        once<T extends unknown[] = unknown[]>(channel: Channels, func: (...args: T) => void): void;
         getDataFolder: () => void;
         subscribeToFile: (fileName: string) => void;
         unsubscribeFromFile: (fileName: string) => void;

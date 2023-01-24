@@ -745,13 +745,15 @@ const ObjectTypeView = () => {
                       other: (settingValue) =>
                         settingValue ? (
                           <>
-                            <NumberTextField
-                              key="light-level"
-                              label="Light Level"
-                              value={data.lightLevel}
-                              onChange={(newValue) => handleOnChange({ lightLevel: newValue })}
-                              disabled={disabled}
-                            />
+                            <FormBox>
+                              <NumberTextField
+                                key="light-level"
+                                label="Light Level"
+                                value={data.lightLevel}
+                                onChange={(newValue) => handleOnChange({ lightLevel: newValue })}
+                                disabled={disabled}
+                              />
+                            </FormBox>
                             <Box key="light-position">
                               <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
                                 <Vector2Field
@@ -1109,7 +1111,7 @@ const ObjectTypeView = () => {
                             handleOnChange({
                               sprite: {
                                 ...(data.sprite ?? createObjectSprites()),
-                                width: value
+                                width: value ?? 1
                               }
                             })
                           }
@@ -1128,7 +1130,7 @@ const ObjectTypeView = () => {
                             handleOnChange({
                               sprite: {
                                 ...(data.sprite ?? createObjectSprites()),
-                                height: value
+                                height: value ?? 1
                               }
                             })
                           }
@@ -1264,7 +1266,7 @@ const ObjectTypeView = () => {
                           onChange={(value) =>
                             handleOnChange({
                               worldSize: {
-                                x: value,
+                                x: value ?? 1,
                                 y: data.worldSize?.y ?? 1
                               }
                             })
@@ -1283,7 +1285,7 @@ const ObjectTypeView = () => {
                           onChange={(value) =>
                             handleOnChange({
                               worldSize: {
-                                y: value,
+                                y: value ?? 1,
                                 x: data.worldSize?.x ?? 1
                               }
                             })

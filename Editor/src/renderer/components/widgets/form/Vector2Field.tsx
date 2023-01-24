@@ -36,7 +36,7 @@ const Vector2Field = ({
           onChange
             ? (newValue) =>
                 onChange({
-                  x: newValue,
+                  x: newValue ?? 0,
                   y: value?.y ?? 0
                 })
             : undefined
@@ -61,7 +61,7 @@ const Vector2Field = ({
             ? (newValue) =>
                 onChange({
                   x: value?.x ?? 0,
-                  y: newValue
+                  y: newValue ?? 0
                 })
             : undefined
         }

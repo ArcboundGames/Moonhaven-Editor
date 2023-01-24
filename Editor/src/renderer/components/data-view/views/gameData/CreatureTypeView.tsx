@@ -539,7 +539,7 @@ const CreatureTypeView = () => {
                           handleOnChange({
                             sprite: {
                               ...(data.sprite ?? createCreatureSprites()),
-                              width: value
+                              width: value ?? 1
                             }
                           })
                         }
@@ -558,7 +558,7 @@ const CreatureTypeView = () => {
                           handleOnChange({
                             sprite: {
                               ...(data.sprite ?? createCreatureSprites()),
-                              height: value
+                              height: value ?? 1
                             }
                           })
                         }
@@ -584,7 +584,7 @@ const CreatureTypeView = () => {
                               ...(data.sprite ?? createCreatureSprites()),
                               pivotOffset: {
                                 ...(data.sprite?.pivotOffset ?? createVector2()),
-                                x: value
+                                x: value ?? 0
                               }
                             }
                           })
@@ -605,7 +605,7 @@ const CreatureTypeView = () => {
                               ...(data.sprite ?? createCreatureSprites()),
                               pivotOffset: {
                                 ...(data.sprite?.pivotOffset ?? createVector2()),
-                                y: value
+                                y: value ?? 0
                               }
                             }
                           })

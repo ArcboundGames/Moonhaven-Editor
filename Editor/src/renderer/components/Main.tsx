@@ -259,7 +259,7 @@ const Main = () => {
         localizationDataFilePath
       ];
 
-      window.electron.ipcRenderer.on('onFileChange', (file, data) => {
+      window.electron.ipcRenderer.on<[string, string]>('onFileChange', (file, data) => {
         if (!data || !files.includes(file)) {
           return;
         }

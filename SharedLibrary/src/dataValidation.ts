@@ -1196,17 +1196,20 @@ export function validateItemGeneralTab(
     assert(animationSpriteCount % 4 == 0, 'Item animations must have an equal number of animation frames for all 4 directions');
   }
 
-  const lightLevel = getItemSetting('lightLevel', rawType, categoriesByKeys).value;
-  if (isNotNullish(lightLevel)) {
-    if (assertNotNullish(rawType.lightPosition, 'No light position')) {
-      assert(
-        rawType.lightPosition.x >= 0 && rawType.lightPosition.x < ICON_WIDTH,
-        `Light position x value must be between 0 and ${ICON_WIDTH - 1} (inclusive)`
-      );
-      assert(
-        rawType.lightPosition.y >= 0 && rawType.lightPosition.y < ICON_HEIGHT,
-        `Light position y value must be between 0 and ${ICON_HEIGHT - 1} (inclusive)`
-      );
+  const hasLight = getObjectSetting('hasLight', rawType, categoriesByKeys).value;
+  if (hasLight && assertNotNullish(rawType.lightLevel, 'No light level')) {
+    assert(rawType.lightLevel >= 1 && rawType.lightLevel < 20, 'Light level must be between 1 and 20');
+    if (rawType.lightLevel >= 1) {
+      if (assertNotNullish(rawType.lightPosition, 'No light position')) {
+        assert(
+          rawType.lightPosition.x >= 0 && rawType.lightPosition.x < ICON_WIDTH,
+          `Light position x value must be between 0 and ${ICON_WIDTH - 1} (inclusive)`
+        );
+        assert(
+          rawType.lightPosition.y >= 0 && rawType.lightPosition.y < ICON_HEIGHT,
+          `Light position y value must be between 0 and ${ICON_HEIGHT - 1} (inclusive)`
+        );
+      }
     }
   }
 
@@ -2524,20 +2527,18 @@ export function validateObjectGeneralTab(
   }
 
   const hasLight = getObjectSetting('hasLight', rawType, categoriesByKey, subCategoriesByKey).value;
-  if (hasLight === true) {
-    if (assertNotNullish(rawType.lightLevel, 'No light level')) {
-      assert(rawType.lightLevel >= 1 && rawType.lightLevel < 20, 'Light level must be between 1 and 20');
-      if (rawType.lightLevel >= 1) {
-        if (assertNotNullish(rawType.lightPosition, 'No light position')) {
-          assert(
-            rawType.lightPosition.x >= 0 && rawType.lightPosition.x < rawType.sprite.width,
-            `Light position x value must be between 0 and ${rawType.sprite.width - 1} (inclusive)`
-          );
-          assert(
-            rawType.lightPosition.y >= 0 && rawType.lightPosition.y < rawType.sprite.height,
-            `Light position y value must be between 0 and ${rawType.sprite.height - 1} (inclusive)`
-          );
-        }
+  if (hasLight && assertNotNullish(rawType.lightLevel, 'No light level')) {
+    assert(rawType.lightLevel >= 1 && rawType.lightLevel < 20, 'Light level must be between 1 and 20');
+    if (rawType.lightLevel >= 1) {
+      if (assertNotNullish(rawType.lightPosition, 'No light position')) {
+        assert(
+          rawType.lightPosition.x >= 0 && rawType.lightPosition.x < rawType.sprite.width,
+          `Light position x value must be between 0 and ${rawType.sprite.width - 1} (inclusive)`
+        );
+        assert(
+          rawType.lightPosition.y >= 0 && rawType.lightPosition.y < rawType.sprite.height,
+          `Light position y value must be between 0 and ${rawType.sprite.height - 1} (inclusive)`
+        );
       }
     }
   }

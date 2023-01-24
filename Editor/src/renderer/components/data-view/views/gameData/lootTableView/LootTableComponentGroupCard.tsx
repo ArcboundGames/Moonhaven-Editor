@@ -85,7 +85,7 @@ const LootTableComponentGroupCard = ({
                     onChange={(value) =>
                       onChange({
                         ...group,
-                        probability: value
+                        probability: value ?? 0
                       })
                     }
                     disabled={disabled}

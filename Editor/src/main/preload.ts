@@ -3,7 +3,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 import type { IpcRendererEvent } from 'electron';
 import type { PathLike, PathOrFileDescriptor, WriteFileOptions } from 'fs';
 
-export type Channels = 'getDataFolder';
+export type Channels = 'getDataFolder' | 'onFileChange';
 
 contextBridge.exposeInMainWorld('api', {
   exists: (path: PathLike) => {

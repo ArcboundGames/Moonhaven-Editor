@@ -1519,7 +1519,7 @@ export function toProcessedRawObjectSettings(rawObjectSettings: RawObjectSetting
     inventoryType: fromNullish(rawObjectSettings.inventoryType),
     canOpen: fromNullish(rawObjectSettings.canOpen),
     changesSpritesWithSeason: fromNullish(rawObjectSettings.changesSpritesWithSeason),
-    hasLight: fromNullish(rawObjectSettings.hasLight)
+    hasLight: fromNullish(rawObjectSettings?.hasLight),
   };
 }
 

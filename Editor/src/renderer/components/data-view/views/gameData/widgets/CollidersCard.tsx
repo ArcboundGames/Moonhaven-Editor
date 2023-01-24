@@ -117,7 +117,7 @@ const ColliderFields = ({ index, collider, onChange, onDelete, disabled = false 
                 onChange={(value) =>
                   onChange({
                     size: {
-                      x: value,
+                      x: value ?? 0,
                       y: collider.size?.y ?? 0
                     }
                   })
@@ -137,7 +137,7 @@ const ColliderFields = ({ index, collider, onChange, onDelete, disabled = false 
                   onChange({
                     size: {
                       x: collider.size?.x ?? 0,
-                      y: value
+                      y: value ?? 0
                     }
                   })
                 }
@@ -159,7 +159,7 @@ const ColliderFields = ({ index, collider, onChange, onDelete, disabled = false 
                 onChange={(value) =>
                   onChange({
                     offset: {
-                      x: value,
+                      x: value ?? 0,
                       y: collider.offset?.y ?? 0
                     }
                   })
@@ -178,7 +178,7 @@ const ColliderFields = ({ index, collider, onChange, onDelete, disabled = false 
                   onChange({
                     offset: {
                       x: collider.offset?.x ?? 0,
-                      y: value
+                      y: value ?? 0
                     }
                   })
                 }

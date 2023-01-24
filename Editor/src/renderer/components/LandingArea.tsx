@@ -89,7 +89,7 @@ const LandingArea = () => {
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    window.electron.ipcRenderer.once('getDataFolder', async (filePath) => {
+    window.electron.ipcRenderer.once<[string]>('getDataFolder', async (filePath) => {
       if (filePath) {
         const loadResults = await Promise.all([
           loadFile(

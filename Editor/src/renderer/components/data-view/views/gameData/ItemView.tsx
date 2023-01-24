@@ -484,24 +484,35 @@ const ItemView = () => {
                   {{
                     other: (settingValue) =>
                       settingValue ? (
-                        <Box key="light-position">
-                          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-                            <Vector2Field
-                              value={data.lightPosition}
-                              helperText="Pixels"
+                        <>
+                          <FormBox>
+                            <NumberTextField
+                              key="light-level"
+                              label="Light Level"
+                              value={data.lightLevel}
+                              onChange={(newValue) => handleOnChange({ lightLevel: newValue })}
                               disabled={disabled}
-                              min={{
-                                x: 0,
-                                y: 0
-                              }}
-                              max={{
-                                x: ICON_WIDTH,
-                                y: ICON_HEIGHT
-                              }}
-                              onChange={(value) => handleOnChange({ lightPosition: value })}
                             />
+                          </FormBox>
+                          <Box key="light-position">
+                            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                              <Vector2Field
+                                value={data.lightPosition}
+                                helperText="Pixels"
+                                disabled={disabled}
+                                min={{
+                                  x: 0,
+                                  y: 0
+                                }}
+                                max={{
+                                  x: ICON_WIDTH,
+                                  y: ICON_HEIGHT
+                                }}
+                                onChange={(value) => handleOnChange({ lightPosition: value })}
+                              />
+                            </Box>
                           </Box>
-                        </Box>
+                        </>
                       ) : null
                   }}
                 </OverriddenItemPropertyCard>

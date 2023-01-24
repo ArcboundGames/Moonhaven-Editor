@@ -250,8 +250,8 @@ export interface ItemSettings {
   hasDurability?: boolean;
   isEdible?: boolean;
   filledFromType?: FilledFromType;
-  lightLevel?: number;
   fishingItemType?: FishingItemType;
+  hasLight?: boolean;
 
   // Projectile Launcher
   projectileItemCategoryKeys?: string[];
