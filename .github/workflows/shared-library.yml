@@ -25,17 +25,20 @@ jobs:
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
+        cache: yarn
         node-version: ${{ matrix.node-version }}
 
     - name: Setup
       working-directory: ./SharedLibrary
       run: |
-        npm ci
+        yarn install --frozen-lockfile
+  
     - name: Lint
       working-directory: ./SharedLibrary
       run: |
-        npm run lint
+        yarn lint
+
     - name: Test
       working-directory: ./SharedLibrary
       run: |
-        npm test
+        yarn test
