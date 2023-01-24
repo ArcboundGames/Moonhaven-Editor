@@ -8,7 +8,6 @@ import {
   PORTRAIT_DISPLAY_HEIGHT,
   PORTRAIT_DISPLAY_WIDTH,
   PORTRAIT_HEIGHT,
-  PORTRAIT_RESIZE_FACTOR,
   PORTRAIT_WIDTH
 } from '../../../../../SharedLibrary/src/constants';
 import { useAppSelector } from '../../hooks';
@@ -30,7 +29,6 @@ interface SizeState {
 
 const Portrait = ({ dataKey, errorMessage = 'Portrait not found', errorStyle = 'full' }: PortraitProps) => {
   const [size = { width: 0, height: 0 }, setSize] = useState<SizeState | undefined>(undefined);
-  const [dataUrl, setDataUrl] = useState<string | undefined>();
   const [showError, setShowError] = useState<boolean>(false);
 
   const path = useAppSelector(selectPath);
@@ -77,26 +75,6 @@ const Portrait = ({ dataKey, errorMessage = 'Portrait not found', errorStyle = '
   // );
 
   useEffect(() => {
-    let alive = true;
-
-    async function scale() {
-      if (!imagePath) {
-        return;
-      }
-
-      const scaledImage = await window.api.scaleImage(imagePath, PORTRAIT_RESIZE_FACTOR);
-      if (alive) {
-        setDataUrl(scaledImage);
-      }
-    }
-
-    scale();
-    return () => {
-      alive = false;
-    };
-  }, [imagePath]);
-
-  useEffect(() => {
     if (showError) {
       return;
     }
@@ -104,7 +82,7 @@ const Portrait = ({ dataKey, errorMessage = 'Portrait not found', errorStyle = '
     return () => clearTimeout(timer);
   }, [showError]);
 
-  if (!imagePath || !size || !dataUrl) {
+  if (!imagePath || !size || !imagePath) {
     if (!showError) {
       return null;
     }
@@ -132,8 +110,9 @@ const Portrait = ({ dataKey, errorMessage = 'Portrait not found', errorStyle = '
           display: 'flex',
           height: PORTRAIT_DISPLAY_HEIGHT,
           width: PORTRAIT_DISPLAY_WIDTH,
-          backgroundImage: `url(${dataUrl})`,
-          backgroundSize: `${PORTRAIT_DISPLAY_WIDTH}px ${PORTRAIT_DISPLAY_HEIGHT}px`
+          backgroundImage: `url(${imagePath})`,
+          backgroundSize: `${PORTRAIT_DISPLAY_WIDTH}px ${PORTRAIT_DISPLAY_HEIGHT}px`,
+          imageRendering: 'pixelated'
         }}
       />
     </Box>

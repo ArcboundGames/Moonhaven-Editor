@@ -30,7 +30,6 @@ declare global {
         options?: WriteFileOptions | undefined
       ) => Promise<void>;
       sizeOf: (path: string) => Promise<ISizeCalculationResult>;
-      scaleImage: (path: string, scale: number) => Promise<string | undefined>;
       getImage: (path: string) => Promise<string | undefined>;
       join: (...paths: string[]) => Promise<string>;
     };

@@ -1196,8 +1196,8 @@ export function validateItemGeneralTab(
     assert(animationSpriteCount % 4 == 0, 'Item animations must have an equal number of animation frames for all 4 directions');
   }
 
-  const hasLight = getItemSetting('hasLight', rawType, categoriesByKeys).value;
-  if (hasLight) {
+  const lightLevel = getItemSetting('lightLevel', rawType, categoriesByKeys).value;
+  if (isNotNullish(lightLevel)) {
     if (assertNotNullish(rawType.lightPosition, 'No light position')) {
       assert(
         rawType.lightPosition.x >= 0 && rawType.lightPosition.x < ICON_WIDTH,

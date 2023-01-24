@@ -30,9 +30,6 @@ contextBridge.exposeInMainWorld('api', {
   sizeOf: (fileName: string) => {
     return ipcRenderer.invoke('sizeOf', fileName);
   },
-  scaleImage: (fileName: string, scale: number) => {
-    return ipcRenderer.invoke('scaleImage', fileName, scale);
-  },
   getImage: (fileName: string) => {
     return ipcRenderer.invoke('getImage', fileName);
   },
