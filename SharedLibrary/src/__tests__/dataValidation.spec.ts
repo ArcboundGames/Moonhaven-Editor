@@ -2,10 +2,11 @@ import * as dataValidation from '../dataValidation';
 import { createAssert } from '../util/assert.util';
 
 import type { ProcessedRawCollider, ProcessedRawObjectCategory, ProcessedRawSprite } from '../interface';
-import type { Assert } from '../util/assert.util';
+import type { Assert, AssertNotNullish } from '../util/assert.util';
 
 describe('dataValidation', () => {
   let assert: Assert;
+  let assertNotNullish: AssertNotNullish;
   let errors: string[];
   let objectCategory: ProcessedRawObjectCategory;
 
@@ -14,6 +15,7 @@ describe('dataValidation', () => {
 
     errors = assertSetup.errors;
     assert = assertSetup.assert;
+    assertNotNullish = assertSetup.assertNotNullish;
 
     objectCategory = {
       sprite: {}
@@ -50,11 +52,11 @@ describe('dataValidation', () => {
       ];
       objectCategory.colliders = colliders;
 
-      dataValidation.assertColliders(assert, objectCategory);
+      dataValidation.assertColliders(assert, assertNotNullish, objectCategory);
 
       expect(assertObjectSpriteColliders).toHaveBeenCalledTimes(0);
       expect(assertObjectColliders).toHaveBeenCalledTimes(1);
-      expect(assertObjectColliders).toHaveBeenLastCalledWith(assert, colliders, 'Generic collider');
+      expect(assertObjectColliders).toHaveBeenLastCalledWith(assert, assertNotNullish, colliders, 'Generic collider');
 
       expect(errors.length).toBe(0);
     });
@@ -63,10 +65,10 @@ describe('dataValidation', () => {
       const spriteColliders = {};
       objectCategory.sprite = { sprites: spriteColliders };
 
-      dataValidation.assertColliders(assert, objectCategory);
+      dataValidation.assertColliders(assert, assertNotNullish, objectCategory);
 
       expect(assertObjectSpriteColliders).toHaveBeenCalledTimes(1);
-      expect(assertObjectSpriteColliders).toHaveBeenLastCalledWith(assert, spriteColliders);
+      expect(assertObjectSpriteColliders).toHaveBeenLastCalledWith(assert, assertNotNullish, spriteColliders);
       expect(assertObjectColliders).toHaveBeenCalledTimes(0);
 
       expect(errors.length).toBe(0);
@@ -88,19 +90,19 @@ describe('dataValidation', () => {
       const spriteColliders = {};
       objectCategory.sprite = { sprites: spriteColliders };
 
-      dataValidation.assertColliders(assert, objectCategory);
+      dataValidation.assertColliders(assert, assertNotNullish, objectCategory);
 
       expect(assertObjectSpriteColliders).toHaveBeenCalledTimes(1);
-      expect(assertObjectSpriteColliders).toHaveBeenLastCalledWith(assert, spriteColliders);
+      expect(assertObjectSpriteColliders).toHaveBeenLastCalledWith(assert, assertNotNullish, spriteColliders);
 
       expect(assertObjectColliders).toHaveBeenCalledTimes(1);
-      expect(assertObjectColliders).toHaveBeenLastCalledWith(assert, colliders, 'Generic collider');
+      expect(assertObjectColliders).toHaveBeenLastCalledWith(assert, assertNotNullish, colliders, 'Generic collider');
 
       expect(errors.length).toBe(0);
     });
 
     test('no colliders', () => {
-      dataValidation.assertColliders(assert, objectCategory);
+      dataValidation.assertColliders(assert, assertNotNullish, objectCategory);
 
       expect(assertObjectSpriteColliders).toHaveBeenCalledTimes(0);
       expect(assertObjectColliders).toHaveBeenCalledTimes(0);
@@ -147,11 +149,11 @@ describe('dataValidation', () => {
         }
       };
 
-      dataValidation.assertObjectSpriteColliders(assert, spriteColliders);
+      dataValidation.assertObjectSpriteColliders(assert, assertNotNullish, spriteColliders);
 
       expect(assertObjectColliders).toHaveBeenCalledTimes(2);
-      expect(assertObjectColliders).toHaveBeenNthCalledWith(1, assert, sprite5Colliders, 'Sprite 5 Collider');
-      expect(assertObjectColliders).toHaveBeenNthCalledWith(2, assert, sprite13Colliders, 'Sprite 13 Collider');
+      expect(assertObjectColliders).toHaveBeenNthCalledWith(1, assert, assertNotNullish, sprite5Colliders, 'Sprite 5 Collider');
+      expect(assertObjectColliders).toHaveBeenNthCalledWith(2, assert, assertNotNullish, sprite13Colliders, 'Sprite 13 Collider');
 
       expect(errors.length).toBe(0);
     });
@@ -159,7 +161,7 @@ describe('dataValidation', () => {
     test('no sprite colliders', () => {
       const spriteColliders = {};
 
-      dataValidation.assertObjectSpriteColliders(assert, spriteColliders);
+      dataValidation.assertObjectSpriteColliders(assert, assertNotNullish, spriteColliders);
 
       expect(assertObjectColliders).toHaveBeenCalledTimes(0);
 
@@ -179,22 +181,22 @@ describe('dataValidation', () => {
 
     test('polygon collider', () => {
       const objectCollider: ProcessedRawCollider = { type: 'POLYGON', isTrigger: false, usedByComposite: false };
-      dataValidation.assertObjectCollider(assert, objectCollider, 'Collider', 1);
+      dataValidation.assertObjectCollider(assert, assertNotNullish, objectCollider, 'Collider', 1);
       expect(errors.length).toBe(0);
       expect(assertBoxCollider).toHaveBeenCalledTimes(0);
     });
 
     test('box collider', () => {
       const objectCollider: ProcessedRawCollider = { type: 'BOX', isTrigger: false, usedByComposite: false };
-      dataValidation.assertObjectCollider(assert, objectCollider, 'Collider', 1);
+      dataValidation.assertObjectCollider(assert, assertNotNullish, objectCollider, 'Collider', 1);
       expect(errors.length).toBe(0);
       expect(assertBoxCollider).toHaveBeenCalledTimes(1);
-      expect(assertBoxCollider).toHaveBeenLastCalledWith(assert, objectCollider, 'Collider', 1);
+      expect(assertBoxCollider).toHaveBeenLastCalledWith(assertNotNullish, objectCollider, 'Collider', 1);
     });
 
     test('no type', () => {
       const objectCollider: ProcessedRawCollider = { isTrigger: false, usedByComposite: false };
-      dataValidation.assertObjectCollider(assert, objectCollider, 'Collider', 1);
+      dataValidation.assertObjectCollider(assert, assertNotNullish, objectCollider, 'Collider', 1);
       expect(errors.length).toBe(1);
       expect(errors[0]).toBe('Collider 1: No collider type');
       expect(assertBoxCollider).toHaveBeenCalledTimes(0);
@@ -202,7 +204,7 @@ describe('dataValidation', () => {
 
     test('bad type', () => {
       const objectCollider: ProcessedRawCollider = { type: 'BAD_TYPE', isTrigger: false, usedByComposite: false };
-      dataValidation.assertObjectCollider(assert, objectCollider, 'Collider', 1);
+      dataValidation.assertObjectCollider(assert, assertNotNullish, objectCollider, 'Collider', 1);
       expect(errors.length).toBe(1);
       expect(errors[0]).toBe('Collider 1: Invalid collider type: BAD_TYPE. Only POLYGON and BOX are allowed');
       expect(assertBoxCollider).toHaveBeenCalledTimes(0);
@@ -224,7 +226,7 @@ describe('dataValidation', () => {
         }
       };
 
-      dataValidation.assertBoxCollider(assert, collider, 'Collider', 1);
+      dataValidation.assertBoxCollider(assertNotNullish, collider, 'Collider', 1);
 
       expect(errors.length).toBe(0);
     });
@@ -239,7 +241,7 @@ describe('dataValidation', () => {
         }
       };
 
-      dataValidation.assertBoxCollider(assert, collider, 'Collider', 1);
+      dataValidation.assertBoxCollider(assertNotNullish, collider, 'Collider', 1);
 
       expect(errors.length).toBe(1);
       expect(errors[0]).toBe('Collider 1: No size');
@@ -255,7 +257,7 @@ describe('dataValidation', () => {
         }
       };
 
-      dataValidation.assertBoxCollider(assert, collider, 'Collider', 1);
+      dataValidation.assertBoxCollider(assertNotNullish, collider, 'Collider', 1);
 
       expect(errors.length).toBe(1);
       expect(errors[0]).toBe('Collider 1: No offset');
@@ -267,7 +269,7 @@ describe('dataValidation', () => {
         usedByComposite: false
       };
 
-      dataValidation.assertBoxCollider(assert, collider, 'Collider', 1);
+      dataValidation.assertBoxCollider(assertNotNullish, collider, 'Collider', 1);
 
       expect(errors.length).toBe(2);
       expect(errors[0]).toBe('Collider 1: No size');
