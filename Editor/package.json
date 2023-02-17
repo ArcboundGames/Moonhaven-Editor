@@ -114,8 +114,8 @@
     }
   },
   "dependencies": {
-    "@emotion/react": "11.10.5",
-    "@emotion/styled": "11.10.5",
+    "@emotion/react": "11.10.6",
+    "@emotion/styled": "11.10.6",
     "@mui/icons-material": "5.10.16",
     "@mui/material": "5.10.17",
     "@mui/system": "5.11.5",
