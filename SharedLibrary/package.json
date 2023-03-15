@@ -28,7 +28,7 @@
     "lint": "cross-env NODE_ENV=development eslint . --cache --ext .ts"
   },
   "devDependencies": {
-    "@types/jest": "29.4.1",
+    "@types/jest": "29.4.2",
     "@typescript-eslint/eslint-plugin": "5.55.0",
     "@typescript-eslint/parser": "5.55.0",
     "cross-env": "7.0.3",
