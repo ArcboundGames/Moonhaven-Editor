@@ -146,7 +146,7 @@ SpriteImageProps) => {
           display: 'flex',
           height: adjustedHeight,
           width: adjustedWidth,
-          backgroundImage: `url(${imagePath})`,
+          backgroundImage: `url(file://${imagePath})`,
           backgroundSize: `${adjustedImageWidth}px ${adjustedImageHeight}px`,
           backgroundPosition: `${-1 * adjustedWidth * column}px ${-1 * adjustedHeight * row}px`,
           imageRendering: 'pixelated'
