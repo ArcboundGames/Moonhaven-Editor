@@ -1,6 +1,7 @@
 import {
   ACCENT_TYPES,
   ALL_SEASONS,
+  AUTO_BOX_COLLIDER_TYPE,
   BOX_COLLIDER_TYPE,
   COLLIDER_TYPES,
   CONDITIONS,
@@ -2972,7 +2973,8 @@ export function assertObjectCollider(
     ) {
       switch (collider.type) {
         case POLYGON_COLLIDER_TYPE:
-          // dataValidation.assertPolygonCollider(assert, collider, type, index);
+          break;
+        case AUTO_BOX_COLLIDER_TYPE:
           break;
         case BOX_COLLIDER_TYPE:
           dataValidation.assertBoxCollider(assertNotNullish, collider, type, index);
@@ -2981,8 +2983,6 @@ export function assertObjectCollider(
     }
   }
 }
-
-// export function assertPolygonCollider(assert: Assert, collider: Collider, type: string, index: number) {}
 
 export function assertBoxCollider(assertNotNullish: AssertNotNullish, collider: ProcessedRawCollider, type: string, index: number) {
   if (assertNotNullish(collider, `${type} ${index}: Not configured`)) {
@@ -3262,7 +3262,7 @@ export function validateStartingStats(rawPlayerData: ProcessedRawPlayerData) {
 export function validateStartingItems(startingItems: Record<string, number>, itemsByKey: Record<string, ItemType>) {
   const { errors, assert } = createAssert();
 
-  Object.keys(startingItems).forEach((itemTypeKey, index) => {
+  Object.keys(startingItems ?? []).forEach((itemTypeKey, index) => {
     const header = `Starting Item ${index + 1}`;
     if (isNotEmpty(itemTypeKey)) {
       assert(itemTypeKey in itemsByKey, `${header}: No item with key ${itemTypeKey} exists`);

@@ -431,7 +431,7 @@ export interface Sprite {
 
 export type RawCollider = DeepNullish<ProcessedRawCollider>;
 
-export type ColliderType = 'POLYGON' | 'BOX';
+export type ColliderType = 'POLYGON' | 'AUTO_BOX' | 'BOX';
 
 export interface ProcessedRawCollider extends Omit<Collider, 'type'> {
   type?: string;

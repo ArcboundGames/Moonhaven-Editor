@@ -186,6 +186,13 @@ describe('dataValidation', () => {
       expect(assertBoxCollider).toHaveBeenCalledTimes(0);
     });
 
+    test('autobox collider', () => {
+      const objectCollider: ProcessedRawCollider = { type: 'AUTO_BOX', isTrigger: false, usedByComposite: false };
+      dataValidation.assertObjectCollider(assert, assertNotNullish, objectCollider, 'Collider', 1);
+      expect(errors.length).toBe(0);
+      expect(assertBoxCollider).toHaveBeenCalledTimes(0);
+    });
+
     test('box collider', () => {
       const objectCollider: ProcessedRawCollider = { type: 'BOX', isTrigger: false, usedByComposite: false };
       dataValidation.assertObjectCollider(assert, assertNotNullish, objectCollider, 'Collider', 1);

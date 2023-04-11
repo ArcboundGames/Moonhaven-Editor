@@ -11,7 +11,11 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { BOX_COLLIDER_TYPE, POLYGON_COLLIDER_TYPE } from '../../../../../../../../SharedLibrary/src/constants';
+import {
+  AUTO_BOX_COLLIDER_TYPE,
+  BOX_COLLIDER_TYPE,
+  POLYGON_COLLIDER_TYPE
+} from '../../../../../../../../SharedLibrary/src/constants';
 import { isNotNullish, isNullish } from '../../../../../../../../SharedLibrary/src/util/null.util';
 import Checkbox from '../../../../widgets/form/Checkbox';
 import NumberTextField from '../../../../widgets/form/NumberTextField';
@@ -73,6 +77,10 @@ const ColliderFields = ({ index, collider, onChange, onDelete, disabled = false 
                 value: BOX_COLLIDER_TYPE
               },
               {
+                label: 'Auto Box',
+                value: AUTO_BOX_COLLIDER_TYPE
+              },
+              {
                 label: 'Polygon',
                 value: POLYGON_COLLIDER_TYPE
               }
@@ -91,7 +99,7 @@ const ColliderFields = ({ index, collider, onChange, onDelete, disabled = false 
             disabled={disabled}
           />
           <Checkbox
-            label="Used By Compositet"
+            label="Used By Composite"
             checked={Boolean(collider.usedByComposite)}
             onChange={(value) =>
               onChange({
@@ -237,25 +245,17 @@ function isCollidersProps(props: CollidersCardProps): props is GeneralCollidersC
 
 function createPolygonCollider(): Collider {
   return {
-    type: 'POLYGON',
+    type: POLYGON_COLLIDER_TYPE,
     isTrigger: false,
     usedByComposite: false
   };
 }
 
-function createBoxCollider(): Collider {
+function createAutoBoxCollider(): Collider {
   return {
-    type: 'BOX',
+    type: AUTO_BOX_COLLIDER_TYPE,
     isTrigger: false,
-    usedByComposite: false,
-    size: {
-      y: 1,
-      x: 1
-    },
-    offset: {
-      x: 0,
-      y: 0
-    }
+    usedByComposite: false
   };
 }
 
@@ -307,7 +307,7 @@ const CollidersCard = React.memo((props: CollidersCardProps) => {
           ...colliders,
           [`${spriteToAdd - 1}`]: {
             ...colliders?.[`${spriteToAdd - 1}`],
-            colliders: [createBoxCollider()]
+            colliders: [createAutoBoxCollider()]
           }
         });
       }
@@ -419,7 +419,7 @@ const CollidersCard = React.memo((props: CollidersCardProps) => {
                               ...(sprites ?? {}),
                               [spriteKey]: {
                                 ...sprite,
-                                colliders: [...(sprite.colliders ?? []), createBoxCollider()]
+                                colliders: [...(sprite.colliders ?? []), createAutoBoxCollider()]
                               }
                             });
                           }}
