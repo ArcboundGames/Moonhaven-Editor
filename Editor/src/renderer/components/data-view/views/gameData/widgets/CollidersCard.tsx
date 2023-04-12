@@ -110,7 +110,7 @@ const ColliderFields = ({ index, collider, onChange, onDelete, disabled = false 
           />
         </Box>
       </Box>
-      {collider.type === 'BOX' ? (
+      {collider.type === BOX_COLLIDER_TYPE ? (
         <Box>
           <Typography gutterBottom variant="subtitle2" component="div" sx={{ marginTop: 2 }}>
             Size
@@ -197,6 +197,22 @@ const ColliderFields = ({ index, collider, onChange, onDelete, disabled = false 
             </FormBox>
           </Box>
         </Box>
+      ) : null}
+      {collider.type === AUTO_BOX_COLLIDER_TYPE ? (
+        <FormBox>
+          <NumberTextField
+            label="Padding"
+            helperText="Pixels"
+            value={collider.padding}
+            min={0}
+            onChange={(value) =>
+              onChange({
+                padding: value ?? 0
+              })
+            }
+            disabled={disabled}
+          />
+        </FormBox>
       ) : null}
       <Dialog
         open={deleting}

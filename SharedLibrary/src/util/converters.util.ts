@@ -719,7 +719,8 @@ export function toProcessedRawObjectCollider(rawObjectCollider: RawCollider | un
     usedByComposite: fromNullish(rawObjectCollider?.usedByComposite) ?? false,
     type: fromNullish(rawObjectCollider?.type),
     size: toVector2(rawObjectCollider?.size),
-    offset: toVector2(rawObjectCollider?.offset)
+    offset: toVector2(rawObjectCollider?.offset),
+    padding: fromNullish(rawObjectCollider?.padding) ?? 0
   };
 }
 

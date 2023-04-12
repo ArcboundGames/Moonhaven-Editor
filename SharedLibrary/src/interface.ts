@@ -443,6 +443,7 @@ export interface Collider {
   type?: ColliderType;
   offset?: Vector2;
   size?: Vector2;
+  padding?: number;
 }
 
 export type RawObjectTypeStage = DeepNullish<ProcessedRawObjectTypeStage>;
