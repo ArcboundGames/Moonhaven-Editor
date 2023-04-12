@@ -1,5 +1,6 @@
 import {
   ALL_SEASONS,
+  AUTO_BOX_COLLIDER_TYPE,
   BOX_COLLIDER_TYPE,
   DAYS_IN_A_WEEK,
   FALL,
@@ -716,7 +717,9 @@ export function toProcessedRawObjectCollider(rawObjectCollider: RawCollider | un
     ...rawObjectCollider,
     isTrigger: fromNullish(rawObjectCollider?.isTrigger) ?? false,
     usedByComposite: fromNullish(rawObjectCollider?.usedByComposite) ?? false,
-    type: fromNullish(rawObjectCollider?.type)
+    type: fromNullish(rawObjectCollider?.type),
+    size: toVector2(rawObjectCollider?.size),
+    offset: toVector2(rawObjectCollider?.offset)
   };
 }
 
@@ -1300,6 +1303,7 @@ export function toColliderType(rawColliderType: string | undefined): ColliderTyp
   let colliderType: ColliderType | undefined = undefined;
   switch (rawColliderType) {
     case POLYGON_COLLIDER_TYPE:
+    case AUTO_BOX_COLLIDER_TYPE:
     case BOX_COLLIDER_TYPE:
       colliderType = rawColliderType;
       break;

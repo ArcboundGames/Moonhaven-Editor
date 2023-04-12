@@ -11,12 +11,17 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import React, { useCallback, useMemo, useState } from 'react';
 
-import { BOX_COLLIDER_TYPE, POLYGON_COLLIDER_TYPE } from '../../../../../../../../SharedLibrary/src/constants';
+import {
+  AUTO_BOX_COLLIDER_TYPE,
+  BOX_COLLIDER_TYPE,
+  POLYGON_COLLIDER_TYPE
+} from '../../../../../../../../SharedLibrary/src/constants';
 import { isNotNullish, isNullish } from '../../../../../../../../SharedLibrary/src/util/null.util';
 import Checkbox from '../../../../widgets/form/Checkbox';
 import NumberTextField from '../../../../widgets/form/NumberTextField';
 import Select from '../../../../widgets/form/Select';
 import Card from '../../../../widgets/layout/Card';
+import FormBox from '../../../../widgets/layout/FormBox';
 
 import type { Collider, Sprite } from '../../../../../../../../SharedLibrary/src/interface';
 
@@ -72,6 +77,10 @@ const ColliderFields = ({ index, collider, onChange, onDelete, disabled = false 
                 value: BOX_COLLIDER_TYPE
               },
               {
+                label: 'Auto Box',
+                value: AUTO_BOX_COLLIDER_TYPE
+              },
+              {
                 label: 'Polygon',
                 value: POLYGON_COLLIDER_TYPE
               }
@@ -101,6 +110,94 @@ const ColliderFields = ({ index, collider, onChange, onDelete, disabled = false 
           />
         </Box>
       </Box>
+      {collider.type === 'BOX' ? (
+        <Box>
+          <Typography gutterBottom variant="subtitle2" component="div" sx={{ marginTop: 2 }}>
+            Size
+          </Typography>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+            <FormBox>
+              <NumberTextField
+                label="X"
+                helperText="Pixels"
+                value={collider.size?.x}
+                min={1}
+                onChange={(value) =>
+                  onChange({
+                    size: {
+                      x: value ?? 0,
+                      y: collider.size?.y ?? 0
+                    }
+                  })
+                }
+                disabled={disabled}
+                required
+                error={collider.size === undefined}
+              />
+            </FormBox>
+            <FormBox>
+              <NumberTextField
+                label="Y"
+                helperText="Pixels"
+                value={collider.size?.y}
+                min={1}
+                onChange={(value) =>
+                  onChange({
+                    size: {
+                      x: collider.size?.x ?? 0,
+                      y: value ?? 0
+                    }
+                  })
+                }
+                disabled={disabled}
+                required
+                error={collider.size === undefined}
+              />
+            </FormBox>
+          </Box>
+          <Typography gutterBottom variant="subtitle2" component="div" sx={{ marginTop: 2 }}>
+            Offset
+          </Typography>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+            <FormBox>
+              <NumberTextField
+                label="X"
+                helperText="Pixels"
+                value={collider.offset?.x}
+                onChange={(value) =>
+                  onChange({
+                    offset: {
+                      x: value ?? 0,
+                      y: collider.offset?.y ?? 0
+                    }
+                  })
+                }
+                disabled={disabled}
+                required
+                error={collider.offset === undefined}
+              />
+            </FormBox>
+            <FormBox>
+              <NumberTextField
+                label="Y"
+                helperText="Pixels"
+                value={collider.offset?.y}
+                onChange={(value) =>
+                  onChange({
+                    offset: {
+                      x: collider.offset?.x ?? 0,
+                      y: value ?? 0
+                    }
+                  })
+                }
+                disabled={disabled}
+                required
+                error={collider.offset === undefined}
+              />
+            </FormBox>
+          </Box>
+        </Box>
+      ) : null}
       <Dialog
         open={deleting}
         onClose={handleOnClose}
@@ -154,9 +251,9 @@ function createPolygonCollider(): Collider {
   };
 }
 
-function createBoxCollider(): Collider {
+function createAutoBoxCollider(): Collider {
   return {
-    type: BOX_COLLIDER_TYPE,
+    type: AUTO_BOX_COLLIDER_TYPE,
     isTrigger: false,
     usedByComposite: false
   };
@@ -210,7 +307,7 @@ const CollidersCard = React.memo((props: CollidersCardProps) => {
           ...colliders,
           [`${spriteToAdd - 1}`]: {
             ...colliders?.[`${spriteToAdd - 1}`],
-            colliders: [createBoxCollider()]
+            colliders: [createAutoBoxCollider()]
           }
         });
       }
@@ -322,7 +419,7 @@ const CollidersCard = React.memo((props: CollidersCardProps) => {
                               ...(sprites ?? {}),
                               [spriteKey]: {
                                 ...sprite,
-                                colliders: [...(sprite.colliders ?? []), createBoxCollider()]
+                                colliders: [...(sprite.colliders ?? []), createAutoBoxCollider()]
                               }
                             });
                           }}
