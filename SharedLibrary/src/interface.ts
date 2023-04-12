@@ -431,7 +431,7 @@ export interface Sprite {
 
 export type RawCollider = DeepNullish<ProcessedRawCollider>;
 
-export type ColliderType = 'POLYGON' | 'AUTO_BOX' | 'BOX';
+export type ColliderType = 'POLYGON' | 'BOX';
 
 export interface ProcessedRawCollider extends Omit<Collider, 'type'> {
   type?: string;
@@ -441,8 +441,6 @@ export interface Collider {
   isTrigger: boolean;
   usedByComposite: boolean;
   type?: ColliderType;
-  offset?: Vector2;
-  size?: Vector2;
 }
 
 export type RawObjectTypeStage = DeepNullish<ProcessedRawObjectTypeStage>;

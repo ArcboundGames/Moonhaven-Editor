@@ -170,35 +170,16 @@ describe('dataValidation', () => {
   });
 
   describe('assertObjectColliders', () => {
-    let assertBoxCollider: jest.SpyInstance;
-    beforeEach(() => {
-      assertBoxCollider = jest.spyOn(dataValidation, 'assertBoxCollider').mockReturnValue();
-    });
-
-    afterEach(() => {
-      assertBoxCollider.mockRestore();
-    });
-
     test('polygon collider', () => {
       const objectCollider: ProcessedRawCollider = { type: 'POLYGON', isTrigger: false, usedByComposite: false };
       dataValidation.assertObjectCollider(assert, assertNotNullish, objectCollider, 'Collider', 1);
       expect(errors.length).toBe(0);
-      expect(assertBoxCollider).toHaveBeenCalledTimes(0);
-    });
-
-    test('autobox collider', () => {
-      const objectCollider: ProcessedRawCollider = { type: 'AUTO_BOX', isTrigger: false, usedByComposite: false };
-      dataValidation.assertObjectCollider(assert, assertNotNullish, objectCollider, 'Collider', 1);
-      expect(errors.length).toBe(0);
-      expect(assertBoxCollider).toHaveBeenCalledTimes(0);
     });
 
     test('box collider', () => {
       const objectCollider: ProcessedRawCollider = { type: 'BOX', isTrigger: false, usedByComposite: false };
       dataValidation.assertObjectCollider(assert, assertNotNullish, objectCollider, 'Collider', 1);
       expect(errors.length).toBe(0);
-      expect(assertBoxCollider).toHaveBeenCalledTimes(1);
-      expect(assertBoxCollider).toHaveBeenLastCalledWith(assertNotNullish, objectCollider, 'Collider', 1);
     });
 
     test('no type', () => {
@@ -206,7 +187,6 @@ describe('dataValidation', () => {
       dataValidation.assertObjectCollider(assert, assertNotNullish, objectCollider, 'Collider', 1);
       expect(errors.length).toBe(1);
       expect(errors[0]).toBe('Collider 1: No collider type');
-      expect(assertBoxCollider).toHaveBeenCalledTimes(0);
     });
 
     test('bad type', () => {
@@ -214,73 +194,6 @@ describe('dataValidation', () => {
       dataValidation.assertObjectCollider(assert, assertNotNullish, objectCollider, 'Collider', 1);
       expect(errors.length).toBe(1);
       expect(errors[0]).toBe('Collider 1: Invalid collider type: BAD_TYPE. Only POLYGON and BOX are allowed');
-      expect(assertBoxCollider).toHaveBeenCalledTimes(0);
-    });
-  });
-
-  describe('assertBoxCollider', () => {
-    test('valid', () => {
-      const collider = {
-        isTrigger: false,
-        usedByComposite: false,
-        size: {
-          x: 0,
-          y: 0
-        },
-        offset: {
-          x: 0,
-          y: 0
-        }
-      };
-
-      dataValidation.assertBoxCollider(assertNotNullish, collider, 'Collider', 1);
-
-      expect(errors.length).toBe(0);
-    });
-
-    test('no size', () => {
-      const collider = {
-        isTrigger: false,
-        usedByComposite: false,
-        offset: {
-          x: 0,
-          y: 0
-        }
-      };
-
-      dataValidation.assertBoxCollider(assertNotNullish, collider, 'Collider', 1);
-
-      expect(errors.length).toBe(1);
-      expect(errors[0]).toBe('Collider 1: No size');
-    });
-
-    test('no offset', () => {
-      const collider: ProcessedRawCollider = {
-        isTrigger: false,
-        usedByComposite: false,
-        size: {
-          x: 0,
-          y: 0
-        }
-      };
-
-      dataValidation.assertBoxCollider(assertNotNullish, collider, 'Collider', 1);
-
-      expect(errors.length).toBe(1);
-      expect(errors[0]).toBe('Collider 1: No offset');
-    });
-
-    test('no offset or size', () => {
-      const collider = {
-        isTrigger: false,
-        usedByComposite: false
-      };
-
-      dataValidation.assertBoxCollider(assertNotNullish, collider, 'Collider', 1);
-
-      expect(errors.length).toBe(2);
-      expect(errors[0]).toBe('Collider 1: No size');
-      expect(errors[1]).toBe('Collider 1: No offset');
     });
   });
 });

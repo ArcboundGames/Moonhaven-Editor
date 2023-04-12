@@ -73,9 +73,8 @@ export const ERROR_SECTION_QUESTS = 'quests';
  * Collider Types
  */
 export const POLYGON_COLLIDER_TYPE = 'POLYGON';
-export const AUTO_BOX_COLLIDER_TYPE = 'AUTO_BOX';
 export const BOX_COLLIDER_TYPE = 'BOX';
-export const COLLIDER_TYPES = [POLYGON_COLLIDER_TYPE, AUTO_BOX_COLLIDER_TYPE, BOX_COLLIDER_TYPE];
+export const COLLIDER_TYPES = [POLYGON_COLLIDER_TYPE, BOX_COLLIDER_TYPE];
 
 /**
  * Loot Types
