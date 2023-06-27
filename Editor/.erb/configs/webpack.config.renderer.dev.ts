@@ -30,7 +30,7 @@ if (
   !skipDLLs &&
   !(fs.existsSync(webpackPaths.dllPath) && fs.existsSync(manifest))
 ) {
-  console.log(
+  console.info(
     chalk.black.bgYellow.bold(
       'The DLL files are missing. Sit back while we build them for you with "npm run build-dll"'
     )
@@ -181,7 +181,7 @@ const configuration: webpack.Configuration = {
       verbose: true,
     },
     setupMiddlewares(middlewares) {
-      console.log('Starting preload.js builder...');
+      console.info('Starting preload.js builder...');
       const preloadProcess = spawn('npm', ['run', 'start:preload'], {
         shell: true,
         stdio: 'inherit',
@@ -189,7 +189,7 @@ const configuration: webpack.Configuration = {
         .on('close', (code: number) => process.exit(code!))
         .on('error', (spawnError) => console.error(spawnError));
 
-      console.log('Starting Main Process...');
+      console.info('Starting Main Process...');
       let args = ['run', 'start:main'];
       if (process.env.MAIN_ARGS) {
         args = args.concat(

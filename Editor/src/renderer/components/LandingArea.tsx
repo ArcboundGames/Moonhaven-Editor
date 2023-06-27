@@ -66,7 +66,6 @@ const LandingArea = () => {
 
   const loadFile = useCallback(
     async (filePath: string, errorName: string, callback: (rawData: string) => void) => {
-      console.log('loading file', filePath);
       const exists = await window.api.exists(filePath);
       if (!exists) {
         setError(`${errorName} file not found`);

@@ -73,7 +73,7 @@ ipcMain.handle(
         }
       | BufferEncoding
   ) => {
-    console.log(file);
+    console.info(file);
     return readFileSync(file, options);
   }
 );

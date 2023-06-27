@@ -33,6 +33,7 @@ import {
   QUEST_OBJECTIVE_TYPE_DESTINATION,
   QUEST_OBJECTIVE_TYPE_GATHER,
   QUEST_OBJECTIVE_TYPE_TALK_TO_CREATURE,
+  QUEST_SOURCE_AUTO_START,
   QUEST_SOURCE_CREATURE,
   SPRING,
   SPRITE_RULE_DIRECTION_DOWN,
@@ -1481,6 +1482,7 @@ export function toQuestSource(rawQuestSource: string | undefined): QuestSource |
   let questSource: QuestSource | undefined = undefined;
   switch (rawQuestSource) {
     case QUEST_SOURCE_CREATURE:
+    case QUEST_SOURCE_AUTO_START:
       questSource = rawQuestSource;
       break;
     default:
