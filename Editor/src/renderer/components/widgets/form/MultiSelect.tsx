@@ -70,7 +70,9 @@ const MultiSelect = ({
       required={required}
       sx={sx}
     >
-      <InputLabel id={labelId}>{label}</InputLabel>
+      <InputLabel id={labelId} shrink>
+        {label}
+      </InputLabel>
       <MuiSelect
         labelId={labelId}
         id={id}
@@ -84,13 +86,17 @@ const MultiSelect = ({
             : undefined
         }
         input={<OutlinedInput id={inputId} label={label} />}
-        renderValue={(selected) => (
-          <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
-            {selected.map((value) => (
-              <Chip key={value} label={toTitleCaseFromKey(value)} sx={{ m: '2px' }} />
-            ))}
-          </Box>
-        )}
+        renderValue={(selected) =>
+          selected.length === 0 ? (
+            <em>None</em>
+          ) : (
+            <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+              {selected.map((value) => (
+                <Chip key={value} label={toTitleCaseFromKey(value)} sx={{ m: '2px' }} />
+              ))}
+            </Box>
+          )
+        }
         MenuProps={{
           PaperProps: {
             style: {
@@ -99,6 +105,8 @@ const MultiSelect = ({
             }
           }
         }}
+        displayEmpty
+        notched
       >
         {values?.map((value) =>
           !optionValues.includes(value) ? (

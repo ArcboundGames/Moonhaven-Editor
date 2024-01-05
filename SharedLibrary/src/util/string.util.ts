@@ -1,4 +1,8 @@
-import { isNotNullish } from './null.util';
+import { isNotNullish, isNullish } from './null.util';
+
+export function isEmpty(value: string | null | undefined): value is string {
+  return isNullish(value) || value === '';
+}
 
 export function isNotEmpty(value: string | null | undefined): value is string {
   return isNotNullish(value) && value !== '';
