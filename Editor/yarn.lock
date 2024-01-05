@@ -2521,10 +2521,10 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/path-browserify@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@types/path-browserify/-/path-browserify-1.0.0.tgz#294ec6e88b6b0d340a3897b7120e5b393f16690e"
-  integrity sha512-XMCcyhSvxcch8b7rZAtFAaierBYdeHXVvg2iYnxOV0MCQHmPuRRmGZPFDRzPayxcGiiSL1Te9UIO+f3cuj0tfw==
+"@types/path-browserify@1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@types/path-browserify/-/path-browserify-1.0.2.tgz#14b62d4371316016f254b9cca5c10e60ef33dcc0"
+  integrity sha512-ZkC5IUqqIFPXx3ASTTybTzmQdwHwe2C0u3eL75ldQ6T9E9IWFJodn6hIfbZGab73DfyiHN4Xw15gNxUq2FbvBA==
 
 "@types/plist@^3.0.1":
   version "3.0.2"
