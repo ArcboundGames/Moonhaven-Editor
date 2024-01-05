@@ -2,7 +2,7 @@ export function log(...data: unknown[]) {
   try {
     unityLog(dataToString(...data));
   } catch {
-    console.log(...data);
+    console.info(...data);
   }
 }
 

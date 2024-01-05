@@ -129,8 +129,6 @@ SpriteImageProps) => {
   const adjustedImageWidth = size.width * resizeFactor;
   const adjustedImageHeight = size.height * resizeFactor;
 
-  console.log('imagePath', imagePath);
-
   return (
     <Box
       sx={{

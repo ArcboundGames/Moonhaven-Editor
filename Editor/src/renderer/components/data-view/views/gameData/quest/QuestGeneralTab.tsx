@@ -9,7 +9,8 @@ import TextField from '../../../../widgets/form/TextField';
 import {
   QUEST_COMPLETION_TRIGGER_AUTO_COMPLETE,
   QUEST_COMPLETION_TRIGGER_TALK_TO_CREATURE,
-  QUEST_SOURCE_CREATURE
+  QUEST_SOURCE_CREATURE,
+  QUEST_SOURCE_AUTO_START
 } from '../../../../../../../../SharedLibrary/src/constants';
 import CreatureSelect from '../../../../widgets/form/creature/CreatureSelect';
 import DialogueTreeSelect from '../../../../widgets/form/dialogueTree/DialogueTreeSelect';
@@ -101,6 +102,7 @@ const QuestGeneralTab = ({
                 label="Source"
                 disabled={disabled}
                 value={data.source}
+                required
                 onChange={(value) => {
                   if (value === data.source) {
                     return;
@@ -114,6 +116,10 @@ const QuestGeneralTab = ({
                   {
                     label: 'Creature',
                     value: QUEST_SOURCE_CREATURE
+                  },
+                  {
+                    label: 'Auto Start',
+                    value: QUEST_SOURCE_AUTO_START
                   }
                 ]}
               />

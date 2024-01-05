@@ -1,5 +1,7 @@
 import type {
   ALL_SEASONS,
+  COLLIDER_TYPES,
+  CONDITIONS,
   CRAFTING_RECIPES_DATA_FILE,
   CREATURES_DATA_FILE,
   DIALOGUE_DATA_FILE,
@@ -24,15 +26,29 @@ import type {
   ERROR_SECTION_SKILLS,
   ERROR_SECTION_UI_OBJECT_DESTRUCTION_MENU,
   EVENTS_DATA_FILE,
+  FILLED_FROM_TYPES,
   FISHING_DATA_FILE,
+  FISHING_ITEM_TYPES,
+  INVENTORY_TYPES,
   ITEMS_DATA_FILE,
   LOCALIZATION_DATA_FILE,
   LOOT_TABLES_DATA_FILE,
+  LOOT_TYPES,
   OBJECTS_DATA_FILE,
+  PLACEMENT_LAYERS,
+  PLACEMENT_POSITIONS,
   PLAYER_DATA_FILE,
   QUESTS_DATA_FILE,
+  QUEST_COMPLETION_TRIGGERS,
+  QUEST_OBJECTIVE_TYPES,
+  QUEST_SOURCES,
+  SEASONS,
   SKILLS_DATA_FILE,
+  SPRITE_RULE_DIRECTIONS,
+  STAGES_TYPES,
+  TIME_COMPARATORS,
   UI_DATA_FILE,
+  WEAPON_TYPES,
   WORLD_DATA_FILE
 } from './constants';
 
@@ -221,9 +237,9 @@ export interface ItemCategory {
   settings?: ItemSettings;
 }
 
-export type WeaponType = 'NONE' | 'POINT' | 'ARC' | 'PROJECTILE_LAUNCHER' | 'PROJECTILE';
-export type FilledFromType = 'NONE' | 'WATER' | 'SAND';
-export type FishingItemType = 'NONE' | 'POLE' | 'LURE' | 'FISH';
+export type WeaponType = (typeof WEAPON_TYPES)[number];
+export type FilledFromType = (typeof FILLED_FROM_TYPES)[number];
+export type FishingItemType = (typeof FISHING_ITEM_TYPES)[number];
 
 export type RawItemSettings = DeepNullish<ProcessedRawItemSettings>;
 
@@ -341,7 +357,7 @@ export interface ProcessedRawObjectSpriteRule extends Omit<ObjectSpriteRule, 'co
   conditions?: Record<string, boolean>;
 }
 
-export type ObjectSpriteRulePosition = 'UP' | 'UP_RIGHT' | 'RIGHT' | 'DOWN_RIGHT' | 'DOWN' | 'DOWN_LEFT' | 'LEFT' | 'UP_LEFT';
+export type ObjectSpriteRulePosition = (typeof SPRITE_RULE_DIRECTIONS)[number];
 
 export interface ObjectSpriteRule {
   sprites?: number[];
@@ -364,13 +380,13 @@ export interface ProcessedRawObjectType extends Omit<ObjectType, 'key' | 'settin
   season?: string;
 }
 
-export type StagesType = 'NONE' | 'GROWABLE' | 'GROWABLE_WITH_HEALTH' | 'BREAKABLE';
-export type LootType = 'NONE' | 'DROP' | 'STAGE_DROP';
-export type PlacementPosition = 'CENTER' | 'EDGE';
-export type PlacementLayer = 'IN_GROUND' | 'ON_GROUND' | 'IN_AIR';
-export type SpawningCondition = 'FARMLAND' | 'GRASSLAND' | 'INSIDE';
+export type StagesType = (typeof STAGES_TYPES)[number];
+export type LootType = (typeof LOOT_TYPES)[number];
+export type PlacementPosition = (typeof PLACEMENT_POSITIONS)[number];
+export type PlacementLayer = (typeof PLACEMENT_LAYERS)[number];
+export type SpawningCondition = (typeof CONDITIONS)[number];
 export type AccentType = SpawningCondition;
-export type InventoryType = 'NONE' | 'SMALL' | 'LARGE';
+export type InventoryType = (typeof INVENTORY_TYPES)[number];
 
 export interface LocalizedObjectType extends ObjectType {
   name: string;
@@ -431,7 +447,7 @@ export interface Sprite {
 
 export type RawCollider = DeepNullish<ProcessedRawCollider>;
 
-export type ColliderType = 'POLYGON' | 'AUTO_BOX' | 'BOX';
+export type ColliderType = (typeof COLLIDER_TYPES)[number];
 
 export interface ProcessedRawCollider extends Omit<Collider, 'type'> {
   type?: string;
@@ -831,7 +847,7 @@ export interface DialogueTree {
   completionEvent?: string;
 }
 
-export type TimeComparator = 'BEFORE' | 'AFTER' | 'BETWEEN';
+export type TimeComparator = (typeof TIME_COMPARATORS)[number];
 
 export type RawDialogueConditions = DeepNullish<ProcessedRawDialogueConditions>;
 
@@ -875,7 +891,7 @@ export interface DialogueResponse {
   nextDialogId?: number;
 }
 
-export type Season = 'SPRING' | 'SUMMER' | 'FALL' | 'WINTER';
+export type Season = (typeof SEASONS)[number];
 
 /**
  * Player Data
@@ -1049,9 +1065,9 @@ export interface Localization {
 /**
  * Quests
  */
-export type QuestObjectiveType = 'GATHER' | 'CRAFT' | 'DESTINATION' | 'TALK_TO_CREATURE';
-export type QuestSource = 'CREATURE';
-export type QuestCompletionTrigger = 'AUTO_COMPLETE' | 'TALK_TO_CREATURE';
+export type QuestObjectiveType = (typeof QUEST_OBJECTIVE_TYPES)[number];
+export type QuestSource = (typeof QUEST_SOURCES)[number];
+export type QuestCompletionTrigger = (typeof QUEST_COMPLETION_TRIGGERS)[number];
 
 export interface QuestDataFile {
   quests?: (RawQuest | null | undefined)[] | null | undefined;
