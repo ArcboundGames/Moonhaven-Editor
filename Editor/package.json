@@ -153,7 +153,7 @@
     "browserslist-config-erb": "0.0.3",
     "chalk": "4.1.2",
     "concurrently": "7.6.0",
-    "core-js": "3.30.2",
+    "core-js": "3.35.0",
     "cross-env": "7.0.3",
     "css-loader": "6.8.1",
     "css-minimizer-webpack-plugin": "4.2.2",
