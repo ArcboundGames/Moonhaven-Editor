@@ -11406,10 +11406,10 @@ wide-align@^1.1.5:
   dependencies:
     string-width "^1.0.2 || 2 || 3 || 4"
 
-wikiapi@1.19.4:
-  version "1.19.4"
-  resolved "https://registry.yarnpkg.com/wikiapi/-/wikiapi-1.19.4.tgz#55b9394e4f65e1682f49462c41e9aa87d54eeb09"
-  integrity sha512-gh6M026re+FxkQS6DEjTTii/zs3VGvCT8HYkIG17NsNGPW9hiZT8uWovU/uu0JUKZ3OXdy+JD94Jk4ko++AZ8Q==
+wikiapi@1.19.5:
+  version "1.19.5"
+  resolved "https://registry.yarnpkg.com/wikiapi/-/wikiapi-1.19.5.tgz#f2e7b8ac5e77944562b5fdfbae16bae334fa0c77"
+  integrity sha512-Hwzsa71of11/i4ZKNxgdM0oyIVa7lbL0lVbhZQOoTqJVeDHtrIwBuWFueB+6tNDGz7gl2bD9PF8OuqtcqQlDtA==
   dependencies:
     cejs latest
 
