@@ -130,6 +130,7 @@ import { isNotEmpty } from './util/string.util';
 
 import type {
   AllErrors,
+  ColliderType,
   CraftingRecipe,
   CraftingRecipeCategory,
   CreatureCategory,
@@ -137,15 +138,20 @@ import type {
   DestructionMenuButtonConditions,
   DialogueTree,
   EventLog,
+  FilledFromType,
+  FishingItemType,
   FishingPoleAnchorPoints,
   FishingZone,
+  InventoryType,
   ItemCategory,
   ItemType,
   Localization,
   LootTable,
   LootTableComponent,
+  LootType,
   ObjectCategory,
   ObjectSettings,
+  ObjectSpriteRulePosition,
   ObjectSubCategory,
   ObjectType,
   PlacementLayer,
@@ -187,9 +193,16 @@ import type {
   ProcessedRawUiDataFile,
   ProcessedRawWorldSettings,
   Quest,
+  QuestCompletionTrigger,
+  QuestObjectiveType,
+  Season,
   Skill,
+  SpawningCondition,
+  StageJumpCondition,
   StagesType,
+  TimeComparator,
   UiDataFile,
+  WeaponType,
   WorldSettings
 } from './interface';
 import type { Assert, AssertNotEmpty, AssertNotNullish } from './util/assert.util';
@@ -901,7 +914,7 @@ export function assertCreatureSprite(assert: Assert, creatureSprite: ProcessedRa
 
           if (isNotNullish(individualObjectSprite.placementLayer)) {
             assert(
-              PLACEMENT_LAYERS.includes(individualObjectSprite.placementLayer),
+              PLACEMENT_LAYERS.includes(individualObjectSprite.placementLayer as PlacementLayer),
               `Sprite ${keyAsNumber + 1} Invalid placement layer: ${individualObjectSprite.placementLayer}`
             );
           }
@@ -976,14 +989,14 @@ export function validateItemCategoryGeneralTab(rawCategory: ProcessedRawItemCate
 
   if (isNotNullish(rawCategory.settings) && assertNotEmpty(rawCategory.settings.filledFromType, 'No filled from type')) {
     assert(
-      FILLED_FROM_TYPES.includes(rawCategory.settings.filledFromType),
+      FILLED_FROM_TYPES.includes(rawCategory.settings.filledFromType as FilledFromType),
       `Invalid filled from type: ${rawCategory.settings.filledFromType}`
     );
   }
 
   if (isNotNullish(rawCategory.settings) && assertNotEmpty(rawCategory.settings.fishingItemType, 'No fishing item type')) {
     assert(
-      FISHING_ITEM_TYPES.includes(rawCategory.settings.fishingItemType),
+      FISHING_ITEM_TYPES.includes(rawCategory.settings.fishingItemType as FishingItemType),
       `Invalid fishing item type: ${rawCategory.settings.fishingItemType}`
     );
   }
@@ -995,8 +1008,11 @@ export function validateItemCategoryCombatTab(rawCategory: ProcessedRawItemCateg
   const { errors, assert, assertNotEmpty } = createAssert();
 
   if (isNotNullish(rawCategory.settings) && assertNotEmpty(rawCategory.settings.weaponType, 'No weapon type')) {
-    assert(WEAPON_TYPES.includes(rawCategory.settings.weaponType), `Invalid weapon type '${rawCategory.settings?.weaponType}'`);
-    if (WEAPON_TYPES.includes(rawCategory.settings.weaponType) && rawCategory.settings.weaponType !== WEAPON_TYPE_NONE) {
+    assert(
+      WEAPON_TYPES.includes(rawCategory.settings.weaponType as WeaponType),
+      `Invalid weapon type '${rawCategory.settings?.weaponType}'`
+    );
+    if (WEAPON_TYPES.includes(rawCategory.settings.weaponType as WeaponType) && rawCategory.settings.weaponType !== WEAPON_TYPE_NONE) {
       if (isNotNullish(rawCategory.settings.damagedIncreasedBySkillKey)) {
         assert(
           rawCategory.settings.damagedIncreasedBySkillKey in skillsByKey,
@@ -1983,18 +1999,18 @@ export function validateObjectCategoryGeneralTab(rawCategory: ProcessedRawObject
 
   const lootType = rawCategory.settings?.lootType;
   if (assertNotNullish(lootType, 'No loot type')) {
-    assert(LOOT_TYPES.includes(lootType), `Invalid loot type: ${lootType}`);
+    assert(LOOT_TYPES.includes(lootType as LootType), `Invalid loot type: ${lootType}`);
   }
 
   const stagesType = rawCategory.settings?.stagesType;
   if (assertNotNullish(stagesType, 'No stages type')) {
-    assert(STAGES_TYPES.includes(stagesType), `Invalid stages type: ${stagesType}`);
+    assert(STAGES_TYPES.includes(stagesType as StagesType), `Invalid stages type: ${stagesType}`);
   }
 
   const inventoryType = rawCategory.settings?.inventoryType;
   const isWorkstation = rawCategory.settings?.isWorkstation;
   if (assertNotNullish(inventoryType, 'No inventory type')) {
-    assert(INVENTORY_TYPES.includes(inventoryType), `Invalid inventory type: ${inventoryType}`);
+    assert(INVENTORY_TYPES.includes(inventoryType as InventoryType), `Invalid inventory type: ${inventoryType}`);
     assert(!isWorkstation || inventoryType === INVENTORY_TYPE_SMALL, 'Workstations must have small inventories');
   }
 
@@ -2011,12 +2027,12 @@ export function validateObjectCategoryPlacementSpawningTab(rawCategory: Processe
 
   const placementPosition = rawCategory.settings?.placementPosition;
   if (assertNotNullish(placementPosition, 'No placement position')) {
-    assert(PLACEMENT_POSITIONS.includes(placementPosition), `Invalid placement position: ${placementPosition}`);
+    assert(PLACEMENT_POSITIONS.includes(placementPosition as PlacementPosition), `Invalid placement position: ${placementPosition}`);
   }
 
   const placementLayer = rawCategory.settings?.placementLayer;
   if (assertNotNullish(placementLayer, 'No placement layer')) {
-    assert(PLACEMENT_LAYERS.includes(placementLayer), `Invalid placement layer: ${placementLayer}`);
+    assert(PLACEMENT_LAYERS.includes(placementLayer as PlacementLayer), `Invalid placement layer: ${placementLayer}`);
   }
 
   const spawningConditions = rawCategory.settings?.spawningConditions;
@@ -2587,7 +2603,7 @@ export function validateObjectPlacementSpawningTab(
   const { value: stagesType } = getObjectSetting('stagesType', rawType, categoriesByKey, subCategoriesByKey);
   if (isNotNullish(stagesType) && (stagesType === STAGES_TYPE_GROWABLE || stagesType === STAGES_TYPE_GROWABLE_WITH_HEALTH)) {
     if (assertNotNullish(rawType.season, 'No season')) {
-      assert(rawType.season === ALL_SEASONS || SEASONS.includes(rawType.season), `Invalid season: ${rawType.season}`);
+      assert(rawType.season === ALL_SEASONS || SEASONS.includes(rawType.season as Season), `Invalid season: ${rawType.season}`);
     }
   }
 
@@ -2832,7 +2848,7 @@ export function assertObjectSprite(
 
           if (isNotNullish(individualObjectSprite.placementLayer)) {
             assert(
-              PLACEMENT_LAYERS.includes(individualObjectSprite.placementLayer),
+              PLACEMENT_LAYERS.includes(individualObjectSprite.placementLayer as PlacementLayer),
               `Sprite ${keyAsNumber + 1} Invalid placement layer: ${individualObjectSprite.placementLayer}`
             );
           }
@@ -2858,7 +2874,7 @@ export function assertGrowableStage(
   }
   if (isNotNullish(stage.jumpCondition)) {
     assert(
-      STAGE_JUMP_CONDITIONS.includes(stage.jumpCondition),
+      STAGE_JUMP_CONDITIONS.includes(stage.jumpCondition as StageJumpCondition),
       `Stage ${index}: Invalid jump condition: ${stage.jumpCondition}. Only ${STAGE_JUMP_CONDITION_TIME} and ${STAGE_JUMP_CONDITION_HARVEST} are allowed`
     );
     if (stage.jumpCondition === STAGE_JUMP_CONDITION_HARVEST) {
@@ -2888,7 +2904,7 @@ export function assertBreakableStage(assert: Assert, type: ProcessedRawObjectTyp
 export function assertSpawningConditions(assert: Assert, spawningConditions: string[] | undefined) {
   if (isNotNullish(spawningConditions) && spawningConditions.length > 0) {
     for (const condition of spawningConditions) {
-      assert(CONDITIONS.includes(condition), `Invalid spawning condition: ${condition}`);
+      assert(CONDITIONS.includes(condition as SpawningCondition), `Invalid spawning condition: ${condition}`);
     }
   }
 }
@@ -2916,7 +2932,10 @@ export function assertSubCategorySpriteRules(
           assert(Object.keys(rule.conditions).length > 0, `${name} ${ruleIndex}: There must be at least one condition`)
         ) {
           for (const direction of Object.keys(rule.conditions)) {
-            assert(SPRITE_RULE_DIRECTIONS.includes(direction), `${name} ${ruleIndex}: ${direction} is not a valid direction`);
+            assert(
+              SPRITE_RULE_DIRECTIONS.includes(direction as ObjectSpriteRulePosition),
+              `${name} ${ruleIndex}: ${direction} is not a valid direction`
+            );
           }
         }
         ruleIndex++;
@@ -2967,7 +2986,7 @@ export function assertObjectCollider(
   if (assertNotNullish(collider.type, `${type} ${index}: No collider type`)) {
     if (
       assert(
-        COLLIDER_TYPES.includes(collider.type),
+        COLLIDER_TYPES.includes(collider.type as ColliderType),
         `${type} ${index}: Invalid collider type: ${collider.type}. Only ${POLYGON_COLLIDER_TYPE} and ${BOX_COLLIDER_TYPE} are allowed`
       )
     ) {
@@ -3376,7 +3395,10 @@ export function assertDestructionMenuButton(
   if (assertNotNullish(button.placementLayer, `Button ${index}: No placement layer`)) {
     if (
       hasConditions &&
-      assert(PLACEMENT_LAYERS.includes(button.placementLayer), `Button ${index}: Invalid placement layer: ${button.placementLayer}`)
+      assert(
+        PLACEMENT_LAYERS.includes(button.placementLayer as PlacementLayer),
+        `Button ${index}: Invalid placement layer: ${button.placementLayer}`
+      )
     ) {
       if (isNotNullish(button.categories)) {
         assertDestructionMenuButtonConditions(
@@ -3574,10 +3596,10 @@ export function validateDialogueTreeConditionsTab(rawType: ProcessedRawDialogueT
 
     if (isNotNullish(rawType.conditions.timesComparator)) {
       assert(
-        TIME_COMPARATORS.includes(rawType.conditions.timesComparator),
+        TIME_COMPARATORS.includes(rawType.conditions.timesComparator as TimeComparator),
         `Invalid times comparator '${rawType.conditions.timesComparator}'`
       );
-      if (TIME_COMPARATORS.includes(rawType.conditions.timesComparator)) {
+      if (TIME_COMPARATORS.includes(rawType.conditions.timesComparator as TimeComparator)) {
         switch (rawType.conditions.timesComparator) {
           case TIME_COMPARATOR_BEFORE:
             if (
@@ -4378,7 +4400,10 @@ export function validateQuestGeneralTab(
   }
 
   if (assertNotEmpty(quest.completionTrigger, 'No completion trigger')) {
-    assert(QUEST_COMPLETION_TRIGGERS.includes(quest.completionTrigger), `Invalid completion trigger '${quest.completionTrigger}'`);
+    assert(
+      QUEST_COMPLETION_TRIGGERS.includes(quest.completionTrigger as QuestCompletionTrigger),
+      `Invalid completion trigger '${quest.completionTrigger}'`
+    );
 
     switch (quest.completionTrigger) {
       case QUEST_OBJECTIVE_TYPE_TALK_TO_CREATURE:
@@ -4493,7 +4518,10 @@ export function assertQuestObjective(
   header: string
 ) {
   if (assertNotEmpty(objective.objectiveType, `${header}: No objective type`)) {
-    assert(QUEST_OBJECTIVE_TYPES.includes(objective.objectiveType), `${header}: Invalid objective type '${objective.objectiveType}'`);
+    assert(
+      QUEST_OBJECTIVE_TYPES.includes(objective.objectiveType as QuestObjectiveType),
+      `${header}: Invalid objective type '${objective.objectiveType}'`
+    );
 
     switch (objective.objectiveType) {
       case QUEST_OBJECTIVE_TYPE_GATHER:

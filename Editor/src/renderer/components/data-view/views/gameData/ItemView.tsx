@@ -1,7 +1,11 @@
+import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import Box from '@mui/material/Box';
+import MuiLink from '@mui/material/Link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
+import useLocalizedRecipesByItemType from 'renderer/components/hooks/crafting-recipes/useLocalizedRecipesByItemType';
+import useRecipePrice from 'renderer/components/hooks/crafting-recipes/useRecipePrice';
 import {
   FILLED_FROM_TYPE_NONE,
   FILLED_FROM_TYPE_SAND,
@@ -50,15 +54,15 @@ import {
   validateItemGeneralTab
 } from '../../../../util/validate.util';
 import { useUpdateLocalization } from '../../../hooks/useUpdateLocalization.hook';
-import ItemSelect from '../../../widgets/form/item/ItemSelect';
+import SpriteImage from '../../../widgets/SpriteImage';
+import TabPanel from '../../../widgets/TabPanel';
 import NumberTextField from '../../../widgets/form/NumberTextField';
 import Select from '../../../widgets/form/Select';
 import TextField from '../../../widgets/form/TextField';
 import Vector2Field from '../../../widgets/form/Vector2Field';
+import ItemSelect from '../../../widgets/form/item/ItemSelect';
 import Card from '../../../widgets/layout/Card';
 import FormBox from '../../../widgets/layout/FormBox';
-import SpriteImage from '../../../widgets/SpriteImage';
-import TabPanel from '../../../widgets/TabPanel';
 import Tabs from '../../../widgets/tabs/Tabs';
 import DataViewer from '../../DataViewer';
 import ItemViewCombatTab from './itemView/ItemViewCombatTab';
@@ -122,6 +126,10 @@ const ItemView = () => {
     () => getProjectileData(categories, itemCategoriesByKey, items),
     [categories, itemCategoriesByKey, items]
   );
+
+  const craftingRecipes = useLocalizedRecipesByItemType(item?.key);
+
+  const suggestedPrice = useRecipePrice(craftingRecipes, itemsByKey);
 
   const {
     damagableObjectCategoryKeys,
@@ -539,18 +547,44 @@ const ItemView = () => {
                     </Card>
                     <Card header="Economy">
                       <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(1, 1fr)' }}>
-                        <FormBox>
-                          <NumberTextField
-                            label="Sell Price"
-                            helperText="Gold"
-                            value={data.sellPrice ?? ''}
-                            onChange={(value) => handleOnChange({ sellPrice: value })}
-                            required
-                            error={data.sellPrice <= 0}
-                            disabled={disabled}
-                            wholeNumber
-                          />
-                        </FormBox>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          <FormBox>
+                            <NumberTextField
+                              label="Sell Price"
+                              helperText="Gold"
+                              value={data.sellPrice ?? ''}
+                              onChange={(value) => handleOnChange({ sellPrice: value })}
+                              required
+                              error={data.sellPrice <= 0}
+                              disabled={disabled}
+                              wholeNumber
+                            />
+                          </FormBox>
+                          {craftingRecipes.length ? (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              {suggestedPrice > 0 ? (
+                                <Box key="suggestedPrice" sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                  <div>Suggested Price: {suggestedPrice}</div>
+                                  {(item?.sellPrice ?? 0) < suggestedPrice ? (
+                                    <ReportProblemIcon color="warning" titleAccess="Sell price below suggested price" />
+                                  ) : null}
+                                </Box>
+                              ) : null}
+                              <div>
+                                Recipes:
+                                <Box component="ul" sx={{ marginTop: 1, marginBottom: 0 }}>
+                                  {craftingRecipes.map((craftingRecipe, index) => (
+                                    <li key={index}>
+                                      <MuiLink component={Link} to={`/crafting-recipe/${craftingRecipe.key}`}>
+                                        {craftingRecipe.name}
+                                      </MuiLink>
+                                    </li>
+                                  ))}
+                                </Box>
+                              </div>
+                            </Box>
+                          ) : null}
+                        </Box>
                       </Box>
                     </Card>
                     <Card header="Farming">
@@ -651,7 +685,7 @@ const ItemView = () => {
                                 <NumberTextField
                                   label="Hunger Increase"
                                   value={data.hungerIncrease}
-                                  min={1}
+                                  min={0}
                                   onChange={(value) => handleOnChange({ hungerIncrease: value })}
                                   required
                                   disabled={disabled}
@@ -662,7 +696,7 @@ const ItemView = () => {
                                 <NumberTextField
                                   label="Thirst Increase"
                                   value={data.thirstIncrease}
-                                  min={1}
+                                  min={0}
                                   onChange={(value) => handleOnChange({ thirstIncrease: value })}
                                   required
                                   disabled={disabled}
@@ -673,7 +707,7 @@ const ItemView = () => {
                                 <NumberTextField
                                   label="Energy Increase"
                                   value={data.energyIncrease}
-                                  min={1}
+                                  min={0}
                                   onChange={(value) => handleOnChange({ energyIncrease: value })}
                                   required
                                   disabled={disabled}

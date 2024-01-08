@@ -6,8 +6,6 @@ import {
   toProcessedRawCraftingRecipe,
   toProcessedRawCraftingRecipeCategory
 } from '../../../../../SharedLibrary/src/util/converters.util';
-import { getLocalizationKey, getLocalizedValue } from '../../../../../SharedLibrary/src/util/localization.util';
-import { isNotEmpty } from '../../../../../SharedLibrary/src/util/string.util';
 import {
   validateCraftingRecipeCategories as validateDataCraftingRecipeCategories,
   validateCraftingRecipes as validateDataCraftingRecipes
@@ -20,8 +18,6 @@ import type {
   CraftingRecipeCategory,
   CraftingRecipeDataFile,
   ItemType,
-  Localization,
-  LocalizedCraftingRecipe,
   Skill
 } from '../../../../../SharedLibrary/src/interface';
 
@@ -30,8 +26,6 @@ export interface CraftingRecipesState {
   rawData: string;
   craftingRecipes: CraftingRecipe[];
   craftingRecipesByKey: Record<string, CraftingRecipe>;
-  localizedCraftingRecipes: LocalizedCraftingRecipe[];
-  localizedCraftingRecipesByKey: Record<string, LocalizedCraftingRecipe>;
   craftingRecipeCategories: CraftingRecipeCategory[];
   craftingRecipeCategoriesByKey: Record<string, CraftingRecipeCategory>;
   errors: {
@@ -46,8 +40,6 @@ const initialState: CraftingRecipesState = {
   rawData: '',
   craftingRecipes: [],
   craftingRecipesByKey: {},
-  localizedCraftingRecipes: [],
-  localizedCraftingRecipesByKey: {},
   craftingRecipeCategories: [],
   craftingRecipeCategoriesByKey: {},
   errors: {
@@ -174,43 +166,6 @@ export const craftingRecipesSlice = createSlice({
         craftingRecipeCategoriesByKey,
         rawData: action.payload
       };
-    },
-    localizeCraftingRecipes: (
-      state,
-      action: PayloadAction<{
-        localization: Localization | null;
-        localizationKeys: string[];
-      }>
-    ) => {
-      const { localization, localizationKeys } = action.payload;
-      if (!localization) {
-        return state;
-      }
-
-      const localizedCraftingRecipes: LocalizedCraftingRecipe[] = state.craftingRecipes.map((craftingRecipe) => {
-        const craftingRecipeName = getLocalizedValue(
-          localization,
-          localizationKeys,
-          getLocalizationKey('item', 'name', craftingRecipe.itemTypeKey)
-        );
-
-        return {
-          ...craftingRecipe,
-          name: isNotEmpty(craftingRecipeName) ? craftingRecipeName : craftingRecipe.itemTypeKey ?? craftingRecipe.key
-        };
-      });
-      localizedCraftingRecipes.sort((a, b) => a.name.localeCompare(b.name));
-
-      const localizedCraftingRecipesByKey: Record<string, LocalizedCraftingRecipe> = {};
-      localizedCraftingRecipes.forEach((craftingRecipe) => {
-        localizedCraftingRecipesByKey[craftingRecipe.key] = craftingRecipe;
-      });
-
-      return {
-        ...state,
-        localizedCraftingRecipes,
-        localizedCraftingRecipesByKey
-      };
     }
   }
 });
@@ -223,8 +178,7 @@ export const {
   updateCraftingRecipeCategories,
   validateCraftingRecipeCategories,
   setSelectedCraftingRecipeCategory,
-  clearCraftingRecipeSelections,
-  localizeCraftingRecipes
+  clearCraftingRecipeSelections
 } = craftingRecipesSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
@@ -233,11 +187,6 @@ export const selectRawCraftingRecipeData = (state: RootState) => state.craftingR
 export const selectCraftingRecipes = (state: RootState) => state.craftingRecipes.craftingRecipes;
 
 export const selectCraftingRecipesByKey = (state: RootState) => state.craftingRecipes.craftingRecipesByKey;
-
-export const selectCraftingRecipesSortedWithName = (state: RootState) => state.craftingRecipes.localizedCraftingRecipes;
-
-export const selectCraftingRecipesByKeyWithName = (state: RootState) =>
-  state.craftingRecipes.localizedCraftingRecipesByKey;
 
 export const selectCraftingRecipe = (key?: string) => (state: RootState) =>
   key ? state.craftingRecipes.craftingRecipesByKey?.[key] : undefined;

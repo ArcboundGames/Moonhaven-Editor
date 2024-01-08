@@ -1,75 +1,38 @@
-import { useEffect, useMemo } from 'react';
 import Box from '@mui/system/Box';
+import { useEffect, useMemo } from 'react';
 
-import Menu from './Menu';
-import LandingArea from './LandingArea';
-import DataView from './data-view/DataView';
-import { useAppDispatch, useAppSelector } from '../hooks';
-import { selectLoaded, selectPath } from '../store/slices/data';
 import {
-  OBJECTS_DATA_FILE,
-  DATA_FILE_EXTENSION,
-  ITEMS_DATA_FILE,
   CRAFTING_RECIPES_DATA_FILE,
-  LOOT_TABLES_DATA_FILE,
-  UI_DATA_FILE,
   CREATURES_DATA_FILE,
+  DATA_FILE_EXTENSION,
   DIALOGUE_DATA_FILE,
-  WORLD_DATA_FILE,
-  PLAYER_DATA_FILE,
   FISHING_DATA_FILE,
-  SKILLS_DATA_FILE,
+  ITEMS_DATA_FILE,
   LOCALIZATION_DATA_FILE,
-  QUESTS_DATA_FILE
+  LOOT_TABLES_DATA_FILE,
+  OBJECTS_DATA_FILE,
+  PLAYER_DATA_FILE,
+  QUESTS_DATA_FILE,
+  SKILLS_DATA_FILE,
+  UI_DATA_FILE,
+  WORLD_DATA_FILE
 } from '../../../../SharedLibrary/src/constants';
-import {
-  loadObjectData,
-  selectObjectTypes,
-  selectObjectTypesByKey,
-  validateObjectCategories,
-  validateObjectSubCategories,
-  validateObjects,
-  selectObjectCategories,
-  selectObjectSubCategories,
-  selectObjectCategoriesByKey,
-  selectObjectSubCategoriesByKey,
-  selectSpritesVersion,
-  localizeObjects
-} from '../store/slices/objects';
-import {
-  loadItemData,
-  selectIconsVersion,
-  selectItemCategories,
-  selectItemCategoriesByKey,
-  selectItemTypes,
-  selectItemTypesByKey,
-  localizeItems,
-  validateItemCategories,
-  validateItems
-} from '../store/slices/items';
-import {
-  loadLootTableData,
-  selectLootTables,
-  selectLootTablesByKey,
-  validateLootTables
-} from '../store/slices/lootTables';
+import { getDamagableData, getProjectileData } from '../../../../SharedLibrary/src/util/combat.util';
+import { getEnglishLocalization } from '../../../../SharedLibrary/src/util/localization.util';
+import { getObjectSetting } from '../../../../SharedLibrary/src/util/objectType.util';
+import { useAppDispatch, useAppSelector } from '../hooks';
 import {
   loadCraftingRecipeData,
   selectCraftingRecipeCategories,
   selectCraftingRecipeCategoriesByKey,
   selectCraftingRecipes,
-  validateCraftingRecipes,
-  validateCraftingRecipeCategories,
   selectCraftingRecipesByKey,
-  localizeCraftingRecipes
+  validateCraftingRecipeCategories,
+  validateCraftingRecipes
 } from '../store/slices/craftingRecipes';
-import ErrorBoundary from './ErrorBoundary';
-import { getDamagableData, getProjectileData } from '../../../../SharedLibrary/src/util/combat.util';
-import { getObjectSetting } from '../../../../SharedLibrary/src/util/objectType.util';
-import { loadUiData, selectUiSection, validateObjectDestructionMenu } from '../store/slices/ui';
 import {
-  localizeCreatures,
   loadCreatureData,
+  localizeCreatures,
   selectCreatureCategories,
   selectCreatureCategoriesByKey,
   selectCreatureTypes,
@@ -77,17 +40,26 @@ import {
   validateCreatureCategories,
   validateCreatures
 } from '../store/slices/creatures';
+import { selectLoaded, selectPath } from '../store/slices/data';
 import {
   loadDialogueData,
   selectDialogueTrees,
   selectDialogueTreesByKey,
   validateDialogueTrees
 } from '../store/slices/dialogue';
-import { loadPlayerData, selectPlayerData, validatePlayerData } from '../store/slices/player';
 import { selectEventLogs, selectEventLogsByKey, validateEventLogs } from '../store/slices/eventLogs';
-import { loadWorldSettingsData, selectWorldSettings, validateWorldSettings } from '../store/slices/world';
 import { loadFishingData, selectFishingZones, validateFishingZones } from '../store/slices/fishing';
-import { localizeSkills, loadSkillData, selectSkills, selectSkillsByKey, validateSkills } from '../store/slices/skills';
+import {
+  loadItemData,
+  localizeItems,
+  selectIconsVersion,
+  selectItemCategories,
+  selectItemCategoriesByKey,
+  selectItemTypes,
+  selectItemTypesByKey,
+  validateItemCategories,
+  validateItems
+} from '../store/slices/items';
 import {
   loadLocalizationData,
   selectLocalizationKeys,
@@ -95,8 +67,35 @@ import {
   validateLocalizationKeys,
   validateLocalizations
 } from '../store/slices/localizations';
-import { getEnglishLocalization } from '../../../../SharedLibrary/src/util/localization.util';
+import {
+  loadLootTableData,
+  selectLootTables,
+  selectLootTablesByKey,
+  validateLootTables
+} from '../store/slices/lootTables';
+import {
+  loadObjectData,
+  localizeObjects,
+  selectObjectCategories,
+  selectObjectCategoriesByKey,
+  selectObjectSubCategories,
+  selectObjectSubCategoriesByKey,
+  selectObjectTypes,
+  selectObjectTypesByKey,
+  selectSpritesVersion,
+  validateObjectCategories,
+  validateObjectSubCategories,
+  validateObjects
+} from '../store/slices/objects';
+import { loadPlayerData, selectPlayerData, validatePlayerData } from '../store/slices/player';
 import { loadQuestData, localizeQuests, selectQuests, validateQuests } from '../store/slices/quests';
+import { loadSkillData, localizeSkills, selectSkills, selectSkillsByKey, validateSkills } from '../store/slices/skills';
+import { loadUiData, selectUiSection, validateObjectDestructionMenu } from '../store/slices/ui';
+import { loadWorldSettingsData, selectWorldSettings, validateWorldSettings } from '../store/slices/world';
+import ErrorBoundary from './ErrorBoundary';
+import LandingArea from './LandingArea';
+import Menu from './Menu';
+import DataView from './data-view/DataView';
 
 const Main = () => {
   const dispatch = useAppDispatch();
@@ -360,12 +359,6 @@ const Main = () => {
     );
     dispatch(
       localizeQuests({
-        localization,
-        localizationKeys
-      })
-    );
-    dispatch(
-      localizeCraftingRecipes({
         localization,
         localizationKeys
       })

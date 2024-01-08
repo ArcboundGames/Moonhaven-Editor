@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
-import { useAppSelector } from '../../../../hooks';
-import { selectCraftingRecipesSortedWithName } from '../../../../store/slices/craftingRecipes';
+import useSortedLocalizedRecipes from 'renderer/components/hooks/crafting-recipes/useSortedLocalizedRecipes';
 import Select from '../Select';
 
 import type { LocalizedCraftingRecipe } from '../../../../../../../SharedLibrary/src/interface';
@@ -22,7 +21,7 @@ export interface CraftingRecipeRequiredSelectProps extends Omit<RequiredSelectPr
 type CraftingRecipeSelectProps = CraftingRecipeNotRequiredSelectProps | CraftingRecipeRequiredSelectProps;
 
 const CraftingRecipeSelect = ({ craftingRecipes, ...selectProps }: CraftingRecipeSelectProps) => {
-  const allCraftingRecipes = useAppSelector(selectCraftingRecipesSortedWithName);
+  const allCraftingRecipes = useSortedLocalizedRecipes();
 
   const finalCraftingRecipes = useMemo(() => {
     if (craftingRecipes) {

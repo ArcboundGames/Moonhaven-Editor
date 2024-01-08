@@ -1,7 +1,10 @@
 import type {
+  ACCENT_TYPE_FARMLAND,
+  ACCENT_TYPE_GRASSLAND,
+  ACCENT_TYPE_INSIDE,
   ALL_SEASONS,
-  COLLIDER_TYPES,
-  CONDITIONS,
+  AUTO_BOX_COLLIDER_TYPE,
+  BOX_COLLIDER_TYPE,
   CRAFTING_RECIPES_DATA_FILE,
   CREATURES_DATA_FILE,
   DIALOGUE_DATA_FILE,
@@ -26,29 +29,71 @@ import type {
   ERROR_SECTION_SKILLS,
   ERROR_SECTION_UI_OBJECT_DESTRUCTION_MENU,
   EVENTS_DATA_FILE,
-  FILLED_FROM_TYPES,
+  FALL,
+  FARMLAND_CONDITION,
+  FILLED_FROM_TYPE_NONE,
+  FILLED_FROM_TYPE_SAND,
+  FILLED_FROM_TYPE_WATER,
   FISHING_DATA_FILE,
-  FISHING_ITEM_TYPES,
-  INVENTORY_TYPES,
+  FISHING_ITEM_TYPE_FISH,
+  FISHING_ITEM_TYPE_LURE,
+  FISHING_ITEM_TYPE_NONE,
+  FISHING_ITEM_TYPE_POLE,
+  GRASSLAND_CONDITION,
+  INSIDE_CONDITION,
+  INVENTORY_TYPE_LARGE,
+  INVENTORY_TYPE_NONE,
+  INVENTORY_TYPE_SMALL,
   ITEMS_DATA_FILE,
   LOCALIZATION_DATA_FILE,
   LOOT_TABLES_DATA_FILE,
-  LOOT_TYPES,
+  LOOT_TYPE_DROP,
+  LOOT_TYPE_NONE,
+  LOOT_TYPE_STAGE_DROP,
   OBJECTS_DATA_FILE,
-  PLACEMENT_LAYERS,
-  PLACEMENT_POSITIONS,
+  PLACEMENT_LAYER_IN_AIR,
+  PLACEMENT_LAYER_IN_GROUND,
+  PLACEMENT_LAYER_ON_GROUND,
+  PLACEMENT_POSITION_CENTER,
+  PLACEMENT_POSITION_EDGE,
   PLAYER_DATA_FILE,
+  POLYGON_COLLIDER_TYPE,
   QUESTS_DATA_FILE,
-  QUEST_COMPLETION_TRIGGERS,
-  QUEST_OBJECTIVE_TYPES,
-  QUEST_SOURCES,
-  SEASONS,
+  QUEST_COMPLETION_TRIGGER_AUTO_COMPLETE,
+  QUEST_COMPLETION_TRIGGER_TALK_TO_CREATURE,
+  QUEST_OBJECTIVE_TYPE_CRAFT,
+  QUEST_OBJECTIVE_TYPE_DESTINATION,
+  QUEST_OBJECTIVE_TYPE_GATHER,
+  QUEST_OBJECTIVE_TYPE_TALK_TO_CREATURE,
+  QUEST_SOURCE_AUTO_START,
+  QUEST_SOURCE_CREATURE,
   SKILLS_DATA_FILE,
-  SPRITE_RULE_DIRECTIONS,
-  STAGES_TYPES,
-  TIME_COMPARATORS,
+  SPRING,
+  SPRITE_RULE_DIRECTION_DOWN,
+  SPRITE_RULE_DIRECTION_DOWN_LEFT,
+  SPRITE_RULE_DIRECTION_DOWN_RIGHT,
+  SPRITE_RULE_DIRECTION_LEFT,
+  SPRITE_RULE_DIRECTION_RIGHT,
+  SPRITE_RULE_DIRECTION_UP,
+  SPRITE_RULE_DIRECTION_UP_LEFT,
+  SPRITE_RULE_DIRECTION_UP_RIGHT,
+  STAGES_TYPE_BREAKABLE,
+  STAGES_TYPE_GROWABLE,
+  STAGES_TYPE_GROWABLE_WITH_HEALTH,
+  STAGES_TYPE_NONE,
+  STAGE_JUMP_CONDITION_HARVEST,
+  STAGE_JUMP_CONDITION_TIME,
+  SUMMER,
+  TIME_COMPARATOR_AFTER,
+  TIME_COMPARATOR_BEFORE,
+  TIME_COMPARATOR_BETWEEN,
   UI_DATA_FILE,
-  WEAPON_TYPES,
+  WEAPON_TYPE_ARC,
+  WEAPON_TYPE_NONE,
+  WEAPON_TYPE_POINT,
+  WEAPON_TYPE_PROJECTILE,
+  WEAPON_TYPE_PROJECTILE_LAUNCHER,
+  WINTER,
   WORLD_DATA_FILE
 } from './constants';
 
@@ -237,9 +282,18 @@ export interface ItemCategory {
   settings?: ItemSettings;
 }
 
-export type WeaponType = (typeof WEAPON_TYPES)[number];
-export type FilledFromType = (typeof FILLED_FROM_TYPES)[number];
-export type FishingItemType = (typeof FISHING_ITEM_TYPES)[number];
+export type WeaponType =
+  | typeof WEAPON_TYPE_NONE
+  | typeof WEAPON_TYPE_POINT
+  | typeof WEAPON_TYPE_ARC
+  | typeof WEAPON_TYPE_PROJECTILE_LAUNCHER
+  | typeof WEAPON_TYPE_PROJECTILE;
+export type FilledFromType = typeof FILLED_FROM_TYPE_NONE | typeof FILLED_FROM_TYPE_WATER | typeof FILLED_FROM_TYPE_SAND;
+export type FishingItemType =
+  | typeof FISHING_ITEM_TYPE_NONE
+  | typeof FISHING_ITEM_TYPE_POLE
+  | typeof FISHING_ITEM_TYPE_LURE
+  | typeof FISHING_ITEM_TYPE_FISH;
 
 export type RawItemSettings = DeepNullish<ProcessedRawItemSettings>;
 
@@ -357,7 +411,15 @@ export interface ProcessedRawObjectSpriteRule extends Omit<ObjectSpriteRule, 'co
   conditions?: Record<string, boolean>;
 }
 
-export type ObjectSpriteRulePosition = (typeof SPRITE_RULE_DIRECTIONS)[number];
+export type ObjectSpriteRulePosition =
+  | typeof SPRITE_RULE_DIRECTION_UP
+  | typeof SPRITE_RULE_DIRECTION_UP_RIGHT
+  | typeof SPRITE_RULE_DIRECTION_RIGHT
+  | typeof SPRITE_RULE_DIRECTION_DOWN_RIGHT
+  | typeof SPRITE_RULE_DIRECTION_DOWN
+  | typeof SPRITE_RULE_DIRECTION_DOWN_LEFT
+  | typeof SPRITE_RULE_DIRECTION_LEFT
+  | typeof SPRITE_RULE_DIRECTION_UP_LEFT;
 
 export interface ObjectSpriteRule {
   sprites?: number[];
@@ -380,13 +442,17 @@ export interface ProcessedRawObjectType extends Omit<ObjectType, 'key' | 'settin
   season?: string;
 }
 
-export type StagesType = (typeof STAGES_TYPES)[number];
-export type LootType = (typeof LOOT_TYPES)[number];
-export type PlacementPosition = (typeof PLACEMENT_POSITIONS)[number];
-export type PlacementLayer = (typeof PLACEMENT_LAYERS)[number];
-export type SpawningCondition = (typeof CONDITIONS)[number];
-export type AccentType = SpawningCondition;
-export type InventoryType = (typeof INVENTORY_TYPES)[number];
+export type StagesType =
+  | typeof STAGES_TYPE_NONE
+  | typeof STAGES_TYPE_GROWABLE
+  | typeof STAGES_TYPE_GROWABLE_WITH_HEALTH
+  | typeof STAGES_TYPE_BREAKABLE;
+export type LootType = typeof LOOT_TYPE_NONE | typeof LOOT_TYPE_DROP | typeof LOOT_TYPE_STAGE_DROP;
+export type PlacementPosition = typeof PLACEMENT_POSITION_CENTER | typeof PLACEMENT_POSITION_EDGE;
+export type PlacementLayer = typeof PLACEMENT_LAYER_IN_GROUND | typeof PLACEMENT_LAYER_ON_GROUND | typeof PLACEMENT_LAYER_IN_AIR;
+export type SpawningCondition = typeof GRASSLAND_CONDITION | typeof FARMLAND_CONDITION | typeof INSIDE_CONDITION;
+export type AccentType = typeof ACCENT_TYPE_GRASSLAND | typeof ACCENT_TYPE_FARMLAND | typeof ACCENT_TYPE_INSIDE;
+export type InventoryType = typeof INVENTORY_TYPE_NONE | typeof INVENTORY_TYPE_SMALL | typeof INVENTORY_TYPE_LARGE;
 
 export interface LocalizedObjectType extends ObjectType {
   name: string;
@@ -447,7 +513,7 @@ export interface Sprite {
 
 export type RawCollider = DeepNullish<ProcessedRawCollider>;
 
-export type ColliderType = (typeof COLLIDER_TYPES)[number];
+export type ColliderType = typeof POLYGON_COLLIDER_TYPE | typeof AUTO_BOX_COLLIDER_TYPE | typeof BOX_COLLIDER_TYPE;
 
 export interface ProcessedRawCollider extends Omit<Collider, 'type'> {
   type?: string;
@@ -468,7 +534,7 @@ export interface ProcessedRawObjectTypeStage extends Omit<ObjectTypeStage, 'jump
   jumpCondition?: string;
 }
 
-export type StageJumpCondition = 'TIME' | 'HARVEST';
+export type StageJumpCondition = typeof STAGE_JUMP_CONDITION_TIME | typeof STAGE_JUMP_CONDITION_HARVEST;
 
 export interface ObjectTypeStage {
   growthDays: number;
@@ -847,7 +913,7 @@ export interface DialogueTree {
   completionEvent?: string;
 }
 
-export type TimeComparator = (typeof TIME_COMPARATORS)[number];
+export type TimeComparator = typeof TIME_COMPARATOR_BEFORE | typeof TIME_COMPARATOR_AFTER | typeof TIME_COMPARATOR_BETWEEN;
 
 export type RawDialogueConditions = DeepNullish<ProcessedRawDialogueConditions>;
 
@@ -891,7 +957,7 @@ export interface DialogueResponse {
   nextDialogId?: number;
 }
 
-export type Season = (typeof SEASONS)[number];
+export type Season = typeof SPRING | typeof SUMMER | typeof FALL | typeof WINTER;
 
 /**
  * Player Data
@@ -1065,9 +1131,13 @@ export interface Localization {
 /**
  * Quests
  */
-export type QuestObjectiveType = (typeof QUEST_OBJECTIVE_TYPES)[number];
-export type QuestSource = (typeof QUEST_SOURCES)[number];
-export type QuestCompletionTrigger = (typeof QUEST_COMPLETION_TRIGGERS)[number];
+export type QuestObjectiveType =
+  | typeof QUEST_OBJECTIVE_TYPE_GATHER
+  | typeof QUEST_OBJECTIVE_TYPE_CRAFT
+  | typeof QUEST_OBJECTIVE_TYPE_DESTINATION
+  | typeof QUEST_OBJECTIVE_TYPE_TALK_TO_CREATURE;
+export type QuestSource = typeof QUEST_SOURCE_CREATURE | typeof QUEST_SOURCE_AUTO_START;
+export type QuestCompletionTrigger = typeof QUEST_COMPLETION_TRIGGER_AUTO_COMPLETE | typeof QUEST_COMPLETION_TRIGGER_TALK_TO_CREATURE;
 
 export interface QuestDataFile {
   quests?: (RawQuest | null | undefined)[] | null | undefined;
