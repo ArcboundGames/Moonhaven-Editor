@@ -32,21 +32,12 @@ export interface SingletonViewerProps<T extends object> extends BaseDataViewerPr
   onSave: (dataSaved: T) => void;
 }
 
-export interface FreeformNestedDataViewerProps<T extends object, F extends Record<string, unknown>>
-  extends BaseDataViewerProps<T> {
-  dataKey?: undefined;
-  fileSection: string;
-  section: 'ui';
-  getFileData: () => F;
-  onSave: (dataSaved: T) => void;
-}
-
 export interface GameDataNestedViewerProps<T extends object, F extends Record<string, unknown>>
   extends BaseDataViewerProps<T> {
   dataKey: string;
   defaultValue?: T;
   fileSection: string;
-  section: Omit<Section, 'player-data' | 'world-settings' | 'ui' | 'localization-key'>;
+  section: Omit<Section, 'player-data' | 'world-settings' | 'localization-key'>;
   valueDataKey: string | undefined;
   getFileData: () => F;
   onSave: (dataSaved: T[], valueSaved: T | undefined) => void;
@@ -68,14 +59,7 @@ export interface BaseDataViewerProps<T extends object> {
 
 export type DataViewerProps<T extends object, F extends Record<string, unknown>> =
   | GameDataNestedViewerProps<T, F>
-  | FreeformNestedDataViewerProps<T, F>
   | SingletonViewerProps<T>;
-
-function isFreeformNestedDataViewerProps<T extends object, F extends Record<string, unknown>>(
-  props: DataViewerProps<T, F>
-): props is FreeformNestedDataViewerProps<T, F> {
-  return props.section === 'ui';
-}
 
 function isSingletonViewerProps<T extends object, F extends Record<string, unknown>>(
   props: DataViewerProps<T, F>
@@ -115,7 +99,7 @@ const DataViewer = <T extends object, F extends Record<string, unknown>>(props: 
 
   const [dataKeyChanged, setDataKeyChanged] = useState<boolean>(false);
   useEffect(() => {
-    if (isFreeformNestedDataViewerProps(props) || isSingletonViewerProps(props)) {
+    if (isSingletonViewerProps(props)) {
       return;
     }
     if (props.dataKey === props.valueDataKey || props.dataKey === 'new') {
@@ -165,7 +149,7 @@ const DataViewer = <T extends object, F extends Record<string, unknown>>(props: 
   }, [value, dataKey, onDataChange]);
 
   useEffect(() => {
-    if (isFreeformNestedDataViewerProps(props) || isSingletonViewerProps(props)) {
+    if (isSingletonViewerProps(props)) {
       return;
     }
 
@@ -200,7 +184,7 @@ const DataViewer = <T extends object, F extends Record<string, unknown>>(props: 
   }, []);
 
   const handleOnDeleteConfirm = useCallback(async () => {
-    if (isFreeformNestedDataViewerProps(props) || isSingletonViewerProps(props) || !path || !value) {
+    if (isSingletonViewerProps(props) || !path || !value) {
       return;
     }
 
@@ -275,20 +259,6 @@ const DataViewer = <T extends object, F extends Record<string, unknown>>(props: 
         );
 
         props.onSave(individualDataToSave);
-      } else if (isFreeformNestedDataViewerProps(props)) {
-        const dataToSave = {
-          ...props.getFileData(),
-          [props.fileSection]: individualDataToSave
-        };
-
-        saveJsonToFile(
-          await window.api.join(path, `${file}${DATA_FILE_EXTENSION}`),
-          dataToSave,
-          section as Section,
-          dispatch
-        );
-
-        props.onSave(individualDataToSave);
       } else {
         const dataFile = props.getFileData();
         const currentData = dataFile[props.fileSection] as T[];
@@ -356,7 +326,7 @@ const DataViewer = <T extends object, F extends Record<string, unknown>>(props: 
       setValid(false);
       return;
     }
-    setValid(Boolean(isFreeformNestedDataViewerProps(props) || isSingletonViewerProps(props) || props.valueDataKey));
+    setValid(Boolean(isSingletonViewerProps(props) || props.valueDataKey));
   }, [data, props]);
 
   const onKeyDown = useCallback(
@@ -437,7 +407,7 @@ const DataViewer = <T extends object, F extends Record<string, unknown>>(props: 
             {header}
           </Typography>
           <Box sx={{ display: 'flex' }}>
-            {!isFreeformNestedDataViewerProps(props) && !isSingletonViewerProps(props) && dataKey !== 'new' ? (
+            {!isSingletonViewerProps(props) && dataKey !== 'new' ? (
               <Box key="delete" sx={{ m: 1 }}>
                 <Button color="error" onClick={handleOnDelete} disabled={saving || deleting || showErrors}>
                   Delete

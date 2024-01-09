@@ -19,7 +19,6 @@ import {
   DATA_FILE_EXTENSION,
   CRAFTING_RECIPES_DATA_FILE,
   LOOT_TABLES_DATA_FILE,
-  UI_DATA_FILE,
   CREATURES_DATA_FILE,
   DIALOGUE_DATA_FILE,
   PLAYER_DATA_FILE,
@@ -33,7 +32,6 @@ import {
 import { loadItemData } from '../store/slices/items';
 import { loadCraftingRecipeData } from '../store/slices/craftingRecipes';
 import { loadLootTableData } from '../store/slices/lootTables';
-import { loadUiData } from '../store/slices/ui';
 import { loadCreatureData } from '../store/slices/creatures';
 import { loadDialogueData } from '../store/slices/dialogue';
 import { loadPlayerData } from '../store/slices/player';
@@ -113,9 +111,6 @@ const LandingArea = () => {
             await window.api.join(filePath, `${LOOT_TABLES_DATA_FILE}${DATA_FILE_EXTENSION}`),
             'Loot tables',
             (rawData) => dispatch(loadLootTableData(rawData))
-          ),
-          loadFile(await window.api.join(filePath, `${UI_DATA_FILE}${DATA_FILE_EXTENSION}`), 'UI', (rawData) =>
-            dispatch(loadUiData(rawData))
           ),
           loadFile(
             await window.api.join(filePath, `${DIALOGUE_DATA_FILE}${DATA_FILE_EXTENSION}`),

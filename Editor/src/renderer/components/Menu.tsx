@@ -10,7 +10,7 @@ import Toolbar from '@mui/material/Toolbar';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { toTitleCaseFromKey, toTitleCaseFromVariableName } from '../../../../SharedLibrary/src/util/string.util';
+import { toTitleCaseFromKey } from '../../../../SharedLibrary/src/util/string.util';
 import { useAppDispatch, useAppSelector, useQuery } from '../hooks';
 import {
   selectCraftingRecipeCategories,
@@ -58,12 +58,10 @@ import {
 import { selectPlayerDataErrors } from '../store/slices/player';
 import { selectQuestErrors } from '../store/slices/quests';
 import { selectSkillErrors } from '../store/slices/skills';
-import { selectUiErrors } from '../store/slices/ui';
 import { selectWorldSettingsErrors } from '../store/slices/world';
 
 import type { SelectChangeEvent } from '@mui/material/Select';
 import type { Section } from '../../../../SharedLibrary/src/interface';
-import type { UiState } from '../store/slices/ui';
 
 const Menu = () => {
   const section = useAppSelector(selectSection);
@@ -179,7 +177,6 @@ const Menu = () => {
   const objectErrors = useAppSelector(selectObjectErrors);
   const objectCategoryErrors = useAppSelector(selectObjectCategoryErrors);
   const objectSubCategoryErrors = useAppSelector(selectObjectSubCategoryErrors);
-  const uiErrors = useAppSelector(selectUiErrors);
   const dialogueTreeErrors = useAppSelector(selectDialogueTreeErrors);
   const playerDataErrors = useAppSelector(selectPlayerDataErrors);
   const eventLogErrors = useAppSelector(selectEventLogErrors);
@@ -515,24 +512,6 @@ const Menu = () => {
                         sx={{ ml: 1 }}
                         titleAccess={`Errors with: ${Object.keys(skillErrors)
                           .map((key) => toTitleCaseFromKey(key))
-                          .join(', ')}`}
-                      />
-                    ) : null}
-                  </Box>
-                </MenuItem>
-                <MenuItem value="ui">
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Box>UI</Box>
-                    {uiErrors &&
-                    Object.keys(uiErrors).reduce(
-                      (previous, uiSection) => previous && uiErrors[uiSection as keyof UiState['sections']].length > 0,
-                      true
-                    ) ? (
-                      <ReportProblemIcon
-                        color="error"
-                        sx={{ ml: 1 }}
-                        titleAccess={`Errors with: ${Object.keys(uiErrors)
-                          .map((key) => toTitleCaseFromVariableName(key))
                           .join(', ')}`}
                       />
                     ) : null}

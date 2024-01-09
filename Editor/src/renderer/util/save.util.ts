@@ -12,7 +12,6 @@ import { setRawObjectData } from '../store/slices/objects';
 import { setRawPlayerData } from '../store/slices/player';
 import { setRawQuestData } from '../store/slices/quests';
 import { setRawSkillData } from '../store/slices/skills';
-import { setRawUiData } from '../store/slices/ui';
 
 import type { AnyAction, Dispatch } from '@reduxjs/toolkit';
 import type { Section } from '../../../../SharedLibrary/src/interface';
@@ -41,9 +40,6 @@ const saveJsonToFile = async function (
     case 'object-category':
     case 'object-sub-category':
       dispatch(setRawObjectData(dataString));
-      break;
-    case 'ui':
-      dispatch(setRawUiData(dataString));
       break;
     case 'dialogue-tree':
       dispatch(setRawDialogueData(dataString));

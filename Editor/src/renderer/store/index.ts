@@ -16,7 +16,6 @@ import objectsReducer from './slices/objects';
 import playerReducer from './slices/player';
 import questsReducer from './slices/quests';
 import skillsReducer from './slices/skills';
-import uiReducer from './slices/ui';
 import worldReducer from './slices/world';
 
 export const store = configureStore({
@@ -27,7 +26,6 @@ export const store = configureStore({
     lootTables: lootTablesReducer,
     objects: objectsReducer,
     data: dataReducer,
-    ui: uiReducer,
     dialogue: dialogueReducer,
     player: playerReducer,
     eventLogs: eventLogsReducer,

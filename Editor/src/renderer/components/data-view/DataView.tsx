@@ -20,7 +20,6 @@ import ObjectList from './lists/ObjectList';
 import ObjectSubCategoryList from './lists/ObjectSubCategoryList';
 import QuestList from './lists/QuestList';
 import SkillList from './lists/SkillList';
-import UiList from './lists/UiList';
 import CraftingRecipeCategoryView from './views/gameData/CraftingRecipeCategoryView';
 import CraftingRecipeView from './views/gameData/CraftingRecipeView';
 import CreatureCategoryView from './views/gameData/CreatureCategoryView';
@@ -40,7 +39,6 @@ import PlayerDataView from './views/gameData/PlayerDataView';
 import QuestView from './views/gameData/QuestView';
 import SkillView from './views/gameData/SkillView';
 import WorldSettingsView from './views/gameData/WorldSettingsView';
-import ObjectDesctructionMenuView from './views/ui/ObjectDesctructionMenuView';
 
 const DataView = () => {
   const section = useAppSelector(selectSection);
@@ -79,9 +77,6 @@ const DataView = () => {
       break;
     case 'object-sub-category':
       List = ObjectSubCategoryList;
-      break;
-    case 'ui':
-      List = UiList;
       break;
     case 'dialogue-tree':
       List = DialogueTreeList;
@@ -135,7 +130,6 @@ const DataView = () => {
           <Route path="/object/:dataKey" element={<ObjectTypeView />} />
           <Route path="/object-category/:dataKey" element={<ObjectCategoryView />} />
           <Route path="/object-sub-category/:dataKey" element={<ObjectSubCategoryView />} />
-          <Route path="/ui/objectDestructionMenu" element={<ObjectDesctructionMenuView />} />
           <Route path="/dialogue-tree/:dataKey" element={<DialogueTreeView />} />
           <Route path="/player-data" element={<PlayerDataView />} />
           <Route path="/event-log/:dataKey" element={<EventLogView />} />

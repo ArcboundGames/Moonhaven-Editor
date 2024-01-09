@@ -87,7 +87,6 @@ import {
   TIME_COMPARATOR_AFTER,
   TIME_COMPARATOR_BEFORE,
   TIME_COMPARATOR_BETWEEN,
-  UI_DATA_FILE,
   WEAPON_TYPES,
   WEAPON_TYPE_ARC,
   WEAPON_TYPE_NONE,
@@ -118,7 +117,6 @@ import {
   toProcessedRawWorldSettings,
   toQuest,
   toSkill,
-  toUiDataFile,
   toWorldSettings
 } from './util/converters.util';
 import { getCreatureSetting } from './util/creatureType.util';
@@ -135,7 +133,6 @@ import type {
   CraftingRecipeCategory,
   CreatureCategory,
   CreatureType,
-  DestructionMenuButtonConditions,
   DialogueTree,
   EventLog,
   FilledFromType,
@@ -165,8 +162,6 @@ import type {
   ProcessedRawCreatureShop,
   ProcessedRawCreatureSprites,
   ProcessedRawCreatureType,
-  ProcessedRawDestructionMenu,
-  ProcessedRawDestructionMenuButton,
   ProcessedRawDialogue,
   ProcessedRawDialogueResponse,
   ProcessedRawDialogueTree,
@@ -190,7 +185,6 @@ import type {
   ProcessedRawSkill,
   ProcessedRawSkillLevel,
   ProcessedRawSprite,
-  ProcessedRawUiDataFile,
   ProcessedRawWorldSettings,
   Quest,
   QuestCompletionTrigger,
@@ -201,7 +195,6 @@ import type {
   StageJumpCondition,
   StagesType,
   TimeComparator,
-  UiDataFile,
   WeaponType,
   WorldSettings
 } from './interface';
@@ -237,7 +230,6 @@ export function validateData(
   objectSpriteCounts: Record<string, number>,
   objectAccentSpriteCounts: Record<string, Record<string, number>>,
   rawPlayerData: ProcessedRawPlayerData | null | undefined,
-  rawUiDataFile: ProcessedRawUiDataFile | null | undefined,
   rawDialogueTrees: ProcessedRawDialogueTree[] | null | undefined,
   rawEventLogs: ProcessedRawEventLog[] | null | undefined,
   rawWorldSettings: ProcessedRawWorldSettings | null | undefined,
@@ -388,16 +380,6 @@ export function validateData(
     damagableCreatureCategoryKeys,
     projectileItemKeyOptions,
     projectileItemCategoryKeyOptions
-  );
-
-  validateUI(
-    allErrors,
-    rawUiDataFile,
-    objectsByKey,
-    objectCategoriesByKey,
-    objectSubCategoriesByKey,
-    englishLocalization,
-    localizationKeys
   );
 
   validateFishingZones(allErrors, rawFishingZones, lootTablesByKey);
@@ -3292,192 +3274,6 @@ export function validateStartingItems(startingItems: Record<string, number>, ite
   });
 
   return errors;
-}
-
-/**
- * UI
- */
-export function validateUI(
-  allErrors: AllErrors,
-  rawUiDataFile: ProcessedRawUiDataFile | null | undefined,
-  objectsByKey: Record<string, ObjectType>,
-  objectCategoriesByKey: Record<string, ObjectCategory>,
-  objectSubCategoriesByKey: Record<string, ObjectSubCategory>,
-  localization: Localization | null | undefined,
-  localizationKeys: string[]
-): UiDataFile {
-  const uiErrors: AllErrors[typeof UI_DATA_FILE] = {};
-
-  if (isNotNullish(rawUiDataFile?.objectDestructionMenu)) {
-    validateObjectDestructionMenu(
-      rawUiDataFile?.objectDestructionMenu,
-      objectsByKey,
-      objectCategoriesByKey,
-      objectSubCategoriesByKey,
-      localization,
-      localizationKeys
-    );
-  }
-
-  if (Object.keys(uiErrors).length > 0) {
-    allErrors[UI_DATA_FILE] = uiErrors;
-  }
-
-  return toUiDataFile(rawUiDataFile);
-}
-
-export function validateObjectDestructionMenu(
-  rawDestructionMenu: ProcessedRawDestructionMenu | null | undefined,
-  objectsByKey: Record<string, ObjectType>,
-  objectCategoriesByKey: Record<string, ObjectCategory>,
-  objectSubCategoriesByKey: Record<string, ObjectSubCategory>,
-  localization: Localization | null | undefined,
-  localizationKeys: string[]
-): string[] {
-  const { errors, assert, assertNotNullish } = createAssert();
-
-  if (assertNotNullish(rawDestructionMenu, 'No destruction menu configuration')) {
-    if (assertNotNullish(rawDestructionMenu.diameter, 'No diameter')) {
-      assert(rawDestructionMenu.diameter > 0, 'Diameter must be greater than 0');
-      assert(rawDestructionMenu.diameter % 1 === 0, 'Diameter must be a whole number');
-    }
-
-    if (assertNotNullish(rawDestructionMenu.buttons, 'No buttons')) {
-      for (let i = 0; i < rawDestructionMenu.buttons.length; i++) {
-        const button = rawDestructionMenu.buttons[i];
-        assertDestructionMenuButton(
-          assert,
-          assertNotNullish,
-          button,
-          objectsByKey,
-          objectCategoriesByKey,
-          objectSubCategoriesByKey,
-          localization,
-          localizationKeys,
-          i + 1
-        );
-      }
-    }
-  }
-
-  return errors;
-}
-
-export function assertDestructionMenuButton(
-  assert: Assert,
-  assertNotNullish: AssertNotNullish,
-  button: ProcessedRawDestructionMenuButton,
-  objectsByKey: Record<string, ObjectType>,
-  objectCategoriesByKey: Record<string, ObjectCategory>,
-  objectSubCategoriesByKey: Record<string, ObjectSubCategory>,
-  localization: Localization | null | undefined,
-  localizationKeys: string[],
-  index: number
-) {
-  if (localization) {
-    assert(
-      isNotEmpty(getLocalizedValue(localization, localizationKeys, getLocalizationKey('ui', `destruction-menu-button-${index}-text`))),
-      `Button ${index}: No text`
-    );
-  }
-
-  const hasConditions =
-    (isNotNullish(button.categories) &&
-      ((isNotNullish(button.categories.include) && button.categories.include.length > 0) ||
-        (isNotNullish(button.categories.exclude) && button.categories.exclude.length > 0))) ||
-    (isNotNullish(button.subCategories) &&
-      ((isNotNullish(button.subCategories.include) && button.subCategories.include.length > 0) ||
-        (isNotNullish(button.subCategories.exclude) && button.subCategories.exclude.length > 0))) ||
-    (isNotNullish(button.objects) &&
-      ((isNotNullish(button.objects.include) && button.objects.include.length > 0) ||
-        (isNotNullish(button.objects.exclude) && button.objects.exclude.length > 0)));
-
-  if (assertNotNullish(button.placementLayer, `Button ${index}: No placement layer`)) {
-    if (
-      hasConditions &&
-      assert(
-        PLACEMENT_LAYERS.includes(button.placementLayer as PlacementLayer),
-        `Button ${index}: Invalid placement layer: ${button.placementLayer}`
-      )
-    ) {
-      if (isNotNullish(button.categories)) {
-        assertDestructionMenuButtonConditions(
-          assert,
-          button.categories,
-          button.placementLayer,
-          `Button ${index}`,
-          'Category Conditions',
-          objectCategoriesByKey,
-          (category) => category.settings?.placementLayer
-        );
-      }
-
-      if (isNotNullish(button.subCategories)) {
-        assertDestructionMenuButtonConditions(
-          assert,
-          button.subCategories,
-          button.placementLayer,
-          `Button ${index}`,
-          'Sub Category Conditions',
-          objectSubCategoriesByKey,
-          (subCategory) => getObjectSetting('placementLayer', subCategory, objectCategoriesByKey, objectSubCategoriesByKey).value
-        );
-      }
-
-      if (isNotNullish(button.objects)) {
-        assertDestructionMenuButtonConditions(
-          assert,
-          button.objects,
-          button.placementLayer,
-          `Button ${index}`,
-          'Object Conditions',
-          objectsByKey,
-          (type) => getObjectSetting('placementLayer', type, objectCategoriesByKey, objectSubCategoriesByKey).value
-        );
-      }
-    }
-  }
-
-  assert(hasConditions, `Button ${index}: No conditions`);
-}
-
-export function assertDestructionMenuButtonConditions<T>(
-  assert: Assert,
-  condtions: DestructionMenuButtonConditions,
-  placementLayer: string,
-  buttonTag: string,
-  type: string,
-  byKeys: Record<string, T>,
-  getPlacementLayer: (data: T) => string | undefined
-) {
-  if (isNotNullish(condtions.include)) {
-    for (let i = 0; i < condtions.include.length; i++) {
-      const conditionPlacementLayer = getPlacementLayer(byKeys[condtions.include[i]]);
-      assert(
-        placementLayer === conditionPlacementLayer,
-        `${buttonTag} => ${type} => ${condtions.include[i]}: Expected placement layer ${placementLayer} but got ${conditionPlacementLayer}`
-      );
-    }
-  }
-
-  if (isNotNullish(condtions.exclude)) {
-    for (let i = 0; i < condtions.exclude.length; i++) {
-      const conditionPlacementLayer = getPlacementLayer(byKeys[condtions.exclude[i]]);
-      assert(
-        placementLayer === conditionPlacementLayer,
-        `${buttonTag} => ${type} => ${condtions.exclude[i]}: Expected placement layer ${placementLayer} but got ${conditionPlacementLayer}`
-      );
-    }
-  }
-
-  if (isNotNullish(condtions.include) && isNotNullish(condtions.exclude)) {
-    for (let i = 0; i < condtions.exclude.length; i++) {
-      assert(
-        !condtions.include.includes(condtions.exclude[i]),
-        `${buttonTag} => ${type}: ${condtions.exclude[i]} is in both include and exclude lists`
-      );
-    }
-  }
 }
 
 /**

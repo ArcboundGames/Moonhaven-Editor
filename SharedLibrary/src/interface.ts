@@ -27,7 +27,6 @@ import type {
   ERROR_SECTION_PLAYER_WORLD_WEATHER,
   ERROR_SECTION_QUESTS,
   ERROR_SECTION_SKILLS,
-  ERROR_SECTION_UI_OBJECT_DESTRUCTION_MENU,
   EVENTS_DATA_FILE,
   FALL,
   FARMLAND_CONDITION,
@@ -87,7 +86,6 @@ import type {
   TIME_COMPARATOR_AFTER,
   TIME_COMPARATOR_BEFORE,
   TIME_COMPARATOR_BETWEEN,
-  UI_DATA_FILE,
   WEAPON_TYPE_ARC,
   WEAPON_TYPE_NONE,
   WEAPON_TYPE_POINT,
@@ -124,7 +122,6 @@ export interface GameData {
   objectSubCategories: ObjectSubCategory[];
   objectSubCategoriesByKey: Record<string, ObjectSubCategory>;
   playerData: PlayerData;
-  ui: UiDataFile;
   dialogueTrees: DialogueTree[];
   dialogueTreesByKey: Record<string, DialogueTree>;
   eventLogs: EventLog[];
@@ -160,9 +157,6 @@ export interface AllErrors {
     [ERROR_SECTION_PLAYER_STARTING_ITEMS]?: string[];
     [ERROR_SECTION_PLAYER_LEVELS]?: string[];
   };
-  [UI_DATA_FILE]?: {
-    [ERROR_SECTION_UI_OBJECT_DESTRUCTION_MENU]?: string[];
-  };
   [DIALOGUE_DATA_FILE]?: {
     [ERROR_SECTION_DIALOGUE_TREES]?: Record<string, string[]>;
   };
@@ -197,7 +191,6 @@ export type Section =
   | 'crafting-recipe'
   | 'crafting-recipe-category'
   | 'starting-item'
-  | 'ui'
   | 'dialogue-tree'
   | 'player-data'
   | 'event-log'
@@ -673,63 +666,7 @@ export interface CraftingRecipe {
   requiredSkillLevelKey?: string;
 }
 
-/**
- * UI File
- */
-export interface RawUiDataFile {
-  objectDestructionMenu?: RawDestructionMenu | null;
-}
-
-export interface ProcessedRawUiDataFile {
-  objectDestructionMenu?: ProcessedRawDestructionMenu;
-}
-
-export type UiSection = 'objectDestructionMenu';
-
-export interface UiDataFile {
-  objectDestructionMenu?: DestructionMenu;
-}
-
-export interface RawDestructionMenu extends DeepNullish<Omit<DestructionMenu, 'buttons'>> {
-  buttons?: (RawDestructionMenuButton | undefined | null)[] | null;
-}
-
-export interface ProcessedRawDestructionMenu extends Omit<DestructionMenu, 'buttons'> {
-  buttons?: ProcessedRawDestructionMenuButton[];
-}
-
-export interface DestructionMenu {
-  diameter: number;
-  buttons?: DestructionMenuButton[];
-}
-
-export interface RawDestructionMenuButton
-  extends DeepNullish<Omit<DestructionMenuButton, 'placementLayer' | 'categories' | 'subCategories' | 'objects'>> {
-  placementLayer?: string | null;
-  categories?: RawDestructionMenuButtonConditions;
-  subCategories?: RawDestructionMenuButtonConditions;
-  objects?: RawDestructionMenuButtonConditions;
-}
-
-export interface ProcessedRawDestructionMenuButton extends Omit<DestructionMenuButton, 'placementLayer'> {
-  placementLayer?: string;
-}
-
-export interface DestructionMenuButton {
-  placementLayer?: PlacementLayer;
-  categories?: DestructionMenuButtonConditions;
-  subCategories?: DestructionMenuButtonConditions;
-  objects?: DestructionMenuButtonConditions;
-}
-
-export type RawDestructionMenuButtonConditions = DeepNullish<DestructionMenuButtonConditions>;
-
-export interface DestructionMenuButtonConditions {
-  include?: string[];
-  exclude?: string[];
-}
-
-//#region Creatures
+// Creatures
 export interface CreatureDataFile {
   categories?: (RawCreatureCategory | undefined | null)[] | null;
   creatures?: (RawCreatureType | undefined | null)[] | null;

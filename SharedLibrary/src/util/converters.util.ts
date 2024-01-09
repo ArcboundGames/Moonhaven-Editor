@@ -76,9 +76,6 @@ import type {
   CreatureSprites,
   CreatureType,
   DeepNullish,
-  DestructionMenu,
-  DestructionMenuButton,
-  DestructionMenuButtonConditions,
   Dialogue,
   DialogueConditions,
   DialogueResponse,
@@ -167,9 +164,6 @@ import type {
   RawCreatureShop,
   RawCreatureSprites,
   RawCreatureType,
-  RawDestructionMenu,
-  RawDestructionMenuButton,
-  RawDestructionMenuButtonConditions,
   RawDialogue,
   RawDialogueConditions,
   RawDialogueResponse,
@@ -200,7 +194,6 @@ import type {
   RawSkill,
   RawSkillLevel,
   RawSprite,
-  RawUiDataFile,
   RawWeatherSettings,
   RawWorldSettings,
   Season,
@@ -212,7 +205,6 @@ import type {
   StageJumpCondition,
   StagesType,
   TimeComparator,
-  UiDataFile,
   Vector2,
   WeaponType,
   WeatherSettings,
@@ -255,11 +247,6 @@ export function toDataObject<T>(section: Section, fileSection: string | undefine
       return raw as T;
     case 'localization':
       return toLocalization(raw as ProcessedRawLocalization) as T;
-    case 'ui':
-      switch (fileSection) {
-        default:
-          return toDestructionMenu(raw as DestructionMenu) as T;
-      }
     case 'quest':
       return toQuest(raw as ProcessedRawQuest) as T;
     default:
@@ -1604,38 +1591,6 @@ export function toCreatureSettings(processedRawCreatureSettings: ProcessedRawCre
 
   return {
     ...processedRawCreatureSettings
-  };
-}
-
-export function toUiDataFile(rawDestructionMenu: RawUiDataFile | undefined | null): UiDataFile {
-  return {
-    objectDestructionMenu: toDestructionMenu(rawDestructionMenu?.objectDestructionMenu)
-  };
-}
-
-export function toDestructionMenu(rawDestructionMenu: RawDestructionMenu | null | undefined): DestructionMenu {
-  return {
-    diameter: fromNullish(rawDestructionMenu?.diameter) ?? 0,
-    buttons: fromNullish(rawDestructionMenu?.buttons)?.map(toDestructionMenuButton)
-  };
-}
-
-export function toDestructionMenuButton(rawButton: RawDestructionMenuButton | null | undefined): DestructionMenuButton {
-  return {
-    ...rawButton,
-    categories: toDestructionMenuButtonConditions(rawButton?.categories),
-    subCategories: toDestructionMenuButtonConditions(rawButton?.subCategories),
-    objects: toDestructionMenuButtonConditions(rawButton?.objects),
-    placementLayer: toPlacementLayer(rawButton?.placementLayer)
-  };
-}
-
-export function toDestructionMenuButtonConditions(
-  rawConditions: RawDestructionMenuButtonConditions | null | undefined
-): DestructionMenuButtonConditions {
-  return {
-    include: fromNullishArray(rawConditions?.include, (entry) => entry ?? ''),
-    exclude: fromNullishArray(rawConditions?.exclude, (entry) => entry ?? '')
   };
 }
 

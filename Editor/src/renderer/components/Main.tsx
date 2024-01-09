@@ -14,7 +14,6 @@ import {
   PLAYER_DATA_FILE,
   QUESTS_DATA_FILE,
   SKILLS_DATA_FILE,
-  UI_DATA_FILE,
   WORLD_DATA_FILE
 } from '../../../../SharedLibrary/src/constants';
 import { getDamagableData, getProjectileData } from '../../../../SharedLibrary/src/util/combat.util';
@@ -90,7 +89,6 @@ import {
 import { loadPlayerData, selectPlayerData, validatePlayerData } from '../store/slices/player';
 import { loadQuestData, localizeQuests, selectQuests, validateQuests } from '../store/slices/quests';
 import { loadSkillData, localizeSkills, selectSkills, selectSkillsByKey, validateSkills } from '../store/slices/skills';
-import { loadUiData, selectUiSection, validateObjectDestructionMenu } from '../store/slices/ui';
 import { loadWorldSettingsData, selectWorldSettings, validateWorldSettings } from '../store/slices/world';
 import ErrorBoundary from './ErrorBoundary';
 import LandingArea from './LandingArea';
@@ -134,9 +132,6 @@ const Main = () => {
   const objectSubCategories = useAppSelector(selectObjectSubCategories);
   const objectSubCategoriesByKey = useAppSelector(selectObjectSubCategoriesByKey);
   const spritesVersion = useAppSelector(selectSpritesVersion);
-
-  // UI
-  const objectDestructionMenu = useAppSelector(useMemo(() => selectUiSection('objectDestructionMenu'), []));
 
   // Dialogue Trees
   const dialogueTrees = useAppSelector(selectDialogueTrees);
@@ -234,7 +229,6 @@ const Main = () => {
         `${CRAFTING_RECIPES_DATA_FILE}${DATA_FILE_EXTENSION}`
       );
       const lootTablesDataFilePath = await window.api.join(path, `${LOOT_TABLES_DATA_FILE}${DATA_FILE_EXTENSION}`);
-      const uiDataFilePath = await window.api.join(path, `${UI_DATA_FILE}${DATA_FILE_EXTENSION}`);
       const dialogueDataFilePath = await window.api.join(path, `${DIALOGUE_DATA_FILE}${DATA_FILE_EXTENSION}`);
       const worldDataFilePath = await window.api.join(path, `${WORLD_DATA_FILE}${DATA_FILE_EXTENSION}`);
       const playerDataFilePath = await window.api.join(path, `${PLAYER_DATA_FILE}${DATA_FILE_EXTENSION}`);
@@ -249,7 +243,6 @@ const Main = () => {
         objectsDataFilePath,
         craftingRecipesDataFilePath,
         lootTablesDataFilePath,
-        uiDataFilePath,
         dialogueDataFilePath,
         worldDataFilePath,
         playerDataFilePath,
@@ -273,8 +266,6 @@ const Main = () => {
           dispatch(loadCraftingRecipeData(data));
         } else if (file === lootTablesDataFilePath) {
           dispatch(loadLootTableData(data));
-        } else if (file === uiDataFilePath) {
-          dispatch(loadUiData(data));
         } else if (file === dialogueDataFilePath) {
           dispatch(loadDialogueData(data));
         } else if (file === worldDataFilePath) {
@@ -565,31 +556,6 @@ const Main = () => {
       })
     );
   }, [dispatch, isLoaded, objectCategoriesByKey, objectSubCategories, objectSubCategoriesByKey, objectsByKey]);
-
-  useEffect(() => {
-    if (!isLoaded) {
-      return;
-    }
-    dispatch(
-      validateObjectDestructionMenu({
-        objectDestructionMenu,
-        objectsByKey,
-        objectCategoriesByKey,
-        objectSubCategoriesByKey,
-        localization,
-        localizationKeys
-      })
-    );
-  }, [
-    dispatch,
-    isLoaded,
-    localization,
-    localizationKeys,
-    objectCategoriesByKey,
-    objectDestructionMenu,
-    objectSubCategoriesByKey,
-    objectsByKey
-  ]);
 
   useEffect(() => {
     if (!isLoaded) {

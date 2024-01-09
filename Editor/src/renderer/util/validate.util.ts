@@ -53,7 +53,6 @@ import type {
   CraftingRecipeCategory,
   CreatureCategory,
   CreatureType,
-  DestructionMenu,
   DialogueTree,
   EventLog,
   FishingZone,
@@ -964,27 +963,6 @@ export async function validateObjects(
   dataValidation.checkObjectsRequiredSettings(allErrors, objects, categoriesByKey, subCategoriesByKey, objectsByKey);
 
   return allErrors[OBJECTS_DATA_FILE]?.[ERROR_SECTION_OBJECTS] ?? {};
-}
-
-/**
- * Validate UI
- */
-export function validateObjectDestructionMenu(
-  objectDestructionMenu: DestructionMenu,
-  objectsByKey: Record<string, ObjectType>,
-  objectCategoriesByKey: Record<string, ObjectCategory>,
-  objectSubCategoriesByKey: Record<string, ObjectSubCategory>,
-  localization: Localization | null | undefined,
-  localizationKeys: string[]
-): string[] {
-  return dataValidation.validateObjectDestructionMenu(
-    objectDestructionMenu,
-    objectsByKey,
-    objectCategoriesByKey,
-    objectSubCategoriesByKey,
-    localization,
-    localizationKeys
-  );
 }
 
 /**
