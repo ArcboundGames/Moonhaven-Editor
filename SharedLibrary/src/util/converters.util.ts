@@ -1508,6 +1508,7 @@ export function toProcessedRawObjectSettings(rawObjectSettings: RawObjectSetting
     destroyOnHarvest: fromNullish(rawObjectSettings.destroyOnHarvest),
     canHarvestWithHand: fromNullish(rawObjectSettings.canHarvestWithHand),
     breakable: fromNullish(rawObjectSettings.breakable),
+    isPlayerDestructible: fromNullish(rawObjectSettings.isPlayerDestructible),
     inventoryType: fromNullish(rawObjectSettings.inventoryType),
     canOpen: fromNullish(rawObjectSettings.canOpen),
     changesSpritesWithSeason: fromNullish(rawObjectSettings.changesSpritesWithSeason),

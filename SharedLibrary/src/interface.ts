@@ -573,6 +573,7 @@ export interface ObjectSettings {
   requiredAdjacentObjectSubCategoryKeys?: string[];
   requiredAdjacentObjectKeys?: string[];
   breakable?: boolean;
+  isPlayerDestructible?: boolean;
   inventoryType?: InventoryType;
   canOpen?: boolean;
   changesSpritesWithSeason?: boolean;

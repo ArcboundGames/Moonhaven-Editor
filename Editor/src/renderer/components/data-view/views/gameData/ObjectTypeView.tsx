@@ -75,11 +75,7 @@ import CollidersCard from './widgets/CollidersCard';
 import { OverriddenObjectPropertyCard as OverriddenObjectProperty } from './widgets/OverriddenPropertyCard';
 import SpritesCard from './widgets/SpritesCard';
 
-import type {
-  ObjectSubCategory,
-  ObjectType,
-  SpawningCondition
-} from '../../../../../../../SharedLibrary/src/interface';
+import type { ObjectSubCategory, ObjectType } from '../../../../../../../SharedLibrary/src/interface';
 
 const ObjectTypeView = () => {
   const { dataKey = '' } = useParams();
@@ -553,6 +549,16 @@ const ObjectTypeView = () => {
                     variant="boolean"
                   />
                   <OverriddenObjectProperty
+                    title="Player Destructible"
+                    label="Player Destructible"
+                    type={data}
+                    setting="isPlayerDestructible"
+                    onChange={handleOnChange}
+                    defaultValue={false}
+                    disabled={disabled}
+                    variant="boolean"
+                  />
+                  <OverriddenObjectProperty
                     title="Inventory"
                     type={data}
                     setting="inventoryType"
@@ -888,7 +894,7 @@ const ObjectTypeView = () => {
                     control: ({ controlled, value, helperText }) => (
                       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-                          {(CONDITIONS as SpawningCondition[]).map((condition) => (
+                          {CONDITIONS.map((condition) => (
                             <FormBox key={`condition-${condition}`}>
                               <Checkbox
                                 label={toTitleCaseFromKey(condition)}

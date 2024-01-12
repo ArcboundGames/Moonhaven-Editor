@@ -62,11 +62,7 @@ import { useByAdjacentPlacementLayer, useByBelowPlacementLayer } from './hooks/u
 import CollidersCard from './widgets/CollidersCard';
 import { OverriddenObjectPropertyCard as OverriddenObjectProperty } from './widgets/OverriddenPropertyCard';
 
-import type {
-  LocalizedObjectType,
-  ObjectSubCategory,
-  SpawningCondition
-} from '../../../../../../../SharedLibrary/src/interface';
+import type { LocalizedObjectType, ObjectSubCategory } from '../../../../../../../SharedLibrary/src/interface';
 import type { DataViewListItem } from '../../DataViewList';
 
 const ObjectSubCategoryView = () => {
@@ -457,6 +453,16 @@ const ObjectSubCategoryView = () => {
                   variant="boolean"
                 />
                 <OverriddenObjectProperty
+                  title="Player Destructible"
+                  label="Player Destructible"
+                  type={data}
+                  setting="isPlayerDestructible"
+                  onChange={handleOnChange}
+                  defaultValue={false}
+                  disabled={disabled}
+                  variant="boolean"
+                />
+                <OverriddenObjectProperty
                   title="Inventory"
                   type={data}
                   setting="inventoryType"
@@ -636,7 +642,7 @@ const ObjectSubCategoryView = () => {
                     control: ({ controlled, value, helperText }) => (
                       <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-                          {(CONDITIONS as SpawningCondition[]).map((condition) => (
+                          {CONDITIONS.map((condition) => (
                             <FormBox key={`condition-${condition}`}>
                               <Checkbox
                                 label={toTitleCaseFromKey(condition)}

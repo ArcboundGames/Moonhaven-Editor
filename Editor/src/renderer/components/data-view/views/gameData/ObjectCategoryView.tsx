@@ -67,7 +67,7 @@ import DataViewList from '../../DataViewList';
 import { useByAdjacentPlacementLayer, useByBelowPlacementLayer } from './hooks/useByPlacementLayer';
 import CollidersCard from './widgets/CollidersCard';
 
-import type { ObjectCategory, SpawningCondition } from '../../../../../../../SharedLibrary/src/interface';
+import type { ObjectCategory } from '../../../../../../../SharedLibrary/src/interface';
 import type { DataViewListItem } from '../../DataViewList';
 
 const ObjectCategoryView = () => {
@@ -407,6 +407,21 @@ const ObjectCategoryView = () => {
                       </FormBox>
                       <FormBox>
                         <Checkbox
+                          label="Player Destructible"
+                          checked={data.settings?.isPlayerDestructible}
+                          onChange={(newValue) =>
+                            handleOnChange({
+                              settings: {
+                                ...data.settings,
+                                isPlayerDestructible: newValue
+                              }
+                            })
+                          }
+                          disabled={disabled}
+                        />
+                      </FormBox>
+                      <FormBox>
+                        <Checkbox
                           label="Can Open"
                           checked={data.settings?.canOpen}
                           onChange={(newValue) =>
@@ -673,7 +688,7 @@ const ObjectCategoryView = () => {
                 </Card>
                 <Card header="Spawning Conditions">
                   <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-                    {(CONDITIONS as SpawningCondition[]).map((condition) => (
+                    {CONDITIONS.map((condition) => (
                       <FormBox key={`condition-${condition}`}>
                         <Checkbox
                           label={toTitleCaseFromKey(condition)}
