@@ -136,7 +136,7 @@
   "devDependencies": {
     "@babel/core": "7.23.7",
     "@electron/notarize": "1.2.4",
-    "@electron/rebuild": "3.4.1",
+    "@electron/rebuild": "3.5.0",
     "@emotion/eslint-plugin": "11.10.0",
     "@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
     "@svgr/webpack": "6.5.1",
