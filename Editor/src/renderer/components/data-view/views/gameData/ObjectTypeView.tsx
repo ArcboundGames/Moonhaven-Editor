@@ -738,6 +738,33 @@ const ObjectTypeView = () => {
                     variant="boolean"
                   />
                   <OverriddenObjectProperty
+                    title="Activate"
+                    label="Can Activate"
+                    type={data}
+                    setting="canActivate"
+                    onChange={handleOnChange}
+                    defaultValue={false}
+                    disabled={disabled}
+                    variant="boolean"
+                  >
+                    {{
+                      other: (canActivate) =>
+                        canActivate ? (
+                          <FormBox>
+                            <NumberTextField
+                              label="Animation Sample Rate"
+                              value={data.animationSampleRate}
+                              onChange={(value) => handleOnChange({ animationSampleRate: value })}
+                              required
+                              error={!data.animationSampleRate || data.animationSampleRate <= 0}
+                              disabled={disabled}
+                              wholeNumber
+                            />
+                          </FormBox>
+                        ) : null
+                    }}
+                  </OverriddenObjectProperty>
+                  <OverriddenObjectProperty
                     title="Light"
                     label="Has Light"
                     type={data}
@@ -882,7 +909,8 @@ const ObjectTypeView = () => {
                         )
                       }}
                     </OverriddenObjectProperty>
-                    {getObjectSetting('placementLayer', data, categoriesByKey, subCategoriesByKey).value === PLACEMENT_LAYER_IN_GROUND ? (
+                    {getObjectSetting('placementLayer', data, categoriesByKey, subCategoriesByKey).value ===
+                    PLACEMENT_LAYER_IN_GROUND ? (
                       <OverriddenObjectProperty
                         type={data}
                         setting="blocksPlacement"

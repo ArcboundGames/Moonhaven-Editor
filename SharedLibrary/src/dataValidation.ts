@@ -2605,6 +2605,7 @@ export function validateObjectSpriteStageTab(
   assertNotNullish(rawType.sprite, 'No sprite data');
 
   const { value: canOpen = false } = getObjectSetting('canOpen', rawType, categoriesByKey, subCategoriesByKey);
+  const { value: canActivate = false } = getObjectSetting('canActivate', rawType, categoriesByKey, subCategoriesByKey);
   const { value: placementPosition = PLACEMENT_POSITION_CENTER } = getObjectSetting(
     'placementPosition',
     rawType,
@@ -2635,6 +2636,7 @@ export function validateObjectSpriteStageTab(
         subCategoriesByKey,
         placementPosition,
         canOpen,
+        canActivate,
         rawType.key ? spriteCounts[spriteKey] : 0,
         rawType.key ? accentSpriteCounts[spriteKey] : {},
         stagesType,
@@ -2649,6 +2651,7 @@ export function validateObjectSpriteStageTab(
       subCategoriesByKey,
       placementPosition,
       canOpen,
+      canActivate,
       rawType.key ? spriteCounts[rawType.key] : 0,
       rawType.key ? accentSpriteCounts[rawType.key] : {},
       stagesType,
@@ -2663,8 +2666,22 @@ export function validateObjectSpriteStageTab(
     assert(rawType.worldSize.y % 1 == 0, 'World size height must be a whole number');
   }
 
+  if (canOpen) {
+    assert(!canActivate, 'Objects that can open cannot be activated');
+    assert(!changesSpritesWithSeason, 'Objects that can open cannot change sprites with seasons');
+  }
+
+  if (canActivate) {
+    assert(!changesSpritesWithSeason, 'Objects that can be activated cannot change sprites with seasons');
+    if (assertNotNullish(rawType.animationSampleRate, 'Objects that can be activated must have an animation sample rate')) {
+      assert(rawType.animationSampleRate >= 1, 'Animation sample rate must be at least 1');
+      assert(rawType.animationSampleRate % 1 == 0, 'Animation sample rate must be a whole number');
+    }
+  }
+
   if (isNotNullish(stagesType) && stagesType !== STAGES_TYPE_NONE) {
     assert(!canOpen, 'Objects that can open cannot have stages');
+    assert(!canActivate, 'Objects that can be activated cannot have stages');
 
     if (assert(STAGES_TYPES.includes(stagesType), `Invalid stages type: ${stagesType}`) && isNotNullish(rawType.stages)) {
       const { value: lootType } = getObjectSetting('lootType', rawType, categoriesByKey, subCategoriesByKey);
@@ -2718,13 +2735,14 @@ export function assertSpriteCounts(
   subCategoriesByKey: Record<string, ObjectSubCategory>,
   placementPosition: PlacementPosition,
   canOpen: boolean,
+  canActivate: boolean,
   spriteCount: number,
   accentSpriteCounts: Record<string, number>,
   stagesType: StagesType | undefined,
   prefix: string
 ) {
   if (isNotNullish(rawType.sprite)) {
-    assertObjectSprite(assert, rawType.sprite, placementPosition, canOpen, spriteCount, accentSpriteCounts, prefix);
+    assertObjectSprite(assert, rawType.sprite, placementPosition, canOpen, canActivate, spriteCount, accentSpriteCounts, prefix);
   }
 
   if (isNotNullish(stagesType) && stagesType !== STAGES_TYPE_NONE) {
@@ -2780,6 +2798,7 @@ export function assertObjectSprite(
   objectSprite: ProcessedRawObjectSprites,
   placementPosition: PlacementPosition,
   canOpen: boolean,
+  canActivate: boolean,
   spriteCount: number,
   accentSpriteCounts: Record<string, number>,
   prefix: string
@@ -2801,6 +2820,8 @@ export function assertObjectSprite(
     } else {
       assert(!canOpen || spriteCount >= 2, `${prefix} Objects that can open must have at least 2 sprites`);
     }
+
+    assert(!canActivate || spriteCount >= 2, `${prefix} Objects that can be activated must have at least 2 sprites`);
   }
   assert(objectSprite.width >= 16, `${prefix} Sprite width must be at least 16`);
   assert(objectSprite.width % 1 == 0, `${prefix} Sprite width must be a whole number`);

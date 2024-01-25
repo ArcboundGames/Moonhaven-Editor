@@ -437,6 +437,21 @@ const ObjectCategoryView = () => {
                       </FormBox>
                       <FormBox>
                         <Checkbox
+                          label="Can Activate"
+                          checked={data.settings?.canActivate}
+                          onChange={(newValue) =>
+                            handleOnChange({
+                              settings: {
+                                ...data.settings,
+                                canActivate: newValue
+                              }
+                            })
+                          }
+                          disabled={disabled}
+                        />
+                      </FormBox>
+                      <FormBox>
+                        <Checkbox
                           label="Changes Sprites with Season"
                           checked={data.settings?.changesSpritesWithSeason}
                           onChange={(newValue) =>

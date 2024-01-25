@@ -625,7 +625,8 @@ export function toProcessedRawObjectType(rawObjectType: RawObjectType | undefine
     season: fromNullish(rawObjectType?.season),
     craftingSpeedIncreaseSkillKey: fromNullish(rawObjectType?.craftingSpeedIncreaseSkillKey),
     lightLevel: fromNullish(rawObjectType?.lightLevel),
-    lightPosition: toVector2(rawObjectType?.lightPosition)
+    lightPosition: toVector2(rawObjectType?.lightPosition),
+    animationSampleRate: rawObjectType?.animationSampleRate ?? 0
   };
 }
 
@@ -1513,6 +1514,7 @@ export function toProcessedRawObjectSettings(rawObjectSettings: RawObjectSetting
     isPlayerDestructible: fromNullish(rawObjectSettings.isPlayerDestructible),
     inventoryType: fromNullish(rawObjectSettings.inventoryType),
     canOpen: fromNullish(rawObjectSettings.canOpen),
+    canActivate: fromNullish(rawObjectSettings.canActivate),
     changesSpritesWithSeason: fromNullish(rawObjectSettings.changesSpritesWithSeason),
     hasLight: fromNullish(rawObjectSettings?.hasLight)
   };

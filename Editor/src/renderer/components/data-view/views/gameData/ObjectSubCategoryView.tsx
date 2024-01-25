@@ -514,6 +514,16 @@ const ObjectSubCategoryView = () => {
                   variant="boolean"
                 />
                 <OverriddenObjectProperty
+                  title="Activate"
+                  label="Can Activate"
+                  type={data}
+                  setting="canActivate"
+                  onChange={handleOnChange}
+                  defaultValue={false}
+                  disabled={disabled}
+                  variant="boolean"
+                />
+                <OverriddenObjectProperty
                   title="Seasons"
                   label="Changes Sprites with Season"
                   type={data}

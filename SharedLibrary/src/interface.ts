@@ -469,6 +469,7 @@ export interface ObjectType {
   craftingSpeedIncreaseSkillKey?: string;
   lightLevel?: number;
   lightPosition?: Vector2;
+  animationSampleRate?: number;
 }
 
 export interface RawObjectSprites extends DeepNullish<Omit<ObjectSprites, 'sprites'>> {
@@ -577,6 +578,7 @@ export interface ObjectSettings {
   isPlayerDestructible?: boolean;
   inventoryType?: InventoryType;
   canOpen?: boolean;
+  canActivate?: boolean;
   changesSpritesWithSeason?: boolean;
   hasLight?: boolean;
 }
