@@ -1,6 +1,6 @@
 import type {
   ACCENT_TYPE_FARMLAND,
-  ACCENT_TYPE_GRASSLAND,
+  ACCENT_TYPE_EMPTY_GROUND,
   ACCENT_TYPE_INSIDE,
   ALL_SEASONS,
   AUTO_BOX_COLLIDER_TYPE,
@@ -38,7 +38,7 @@ import type {
   FISHING_ITEM_TYPE_LURE,
   FISHING_ITEM_TYPE_NONE,
   FISHING_ITEM_TYPE_POLE,
-  GRASSLAND_CONDITION,
+  EMPTY_GROUND_CONDITION,
   INSIDE_CONDITION,
   INVENTORY_TYPE_LARGE,
   INVENTORY_TYPE_NONE,
@@ -443,8 +443,8 @@ export type StagesType =
 export type LootType = typeof LOOT_TYPE_NONE | typeof LOOT_TYPE_DROP | typeof LOOT_TYPE_STAGE_DROP;
 export type PlacementPosition = typeof PLACEMENT_POSITION_CENTER | typeof PLACEMENT_POSITION_EDGE;
 export type PlacementLayer = typeof PLACEMENT_LAYER_IN_GROUND | typeof PLACEMENT_LAYER_ON_GROUND | typeof PLACEMENT_LAYER_IN_AIR;
-export type SpawningCondition = typeof GRASSLAND_CONDITION | typeof FARMLAND_CONDITION | typeof INSIDE_CONDITION;
-export type AccentType = typeof ACCENT_TYPE_GRASSLAND | typeof ACCENT_TYPE_FARMLAND | typeof ACCENT_TYPE_INSIDE;
+export type SpawningCondition = typeof EMPTY_GROUND_CONDITION | typeof FARMLAND_CONDITION | typeof INSIDE_CONDITION;
+export type AccentType = typeof ACCENT_TYPE_EMPTY_GROUND | typeof ACCENT_TYPE_FARMLAND | typeof ACCENT_TYPE_INSIDE;
 export type InventoryType = typeof INVENTORY_TYPE_NONE | typeof INVENTORY_TYPE_SMALL | typeof INVENTORY_TYPE_LARGE;
 
 export interface LocalizedObjectType extends ObjectType {
@@ -563,6 +563,7 @@ export interface ObjectSettings {
   isWorkstation?: boolean;
   placementPosition?: PlacementPosition;
   placementLayer?: PlacementLayer;
+  blocksPlacement?: boolean;
   destroyOnHarvest?: boolean;
   canHarvestWithHand?: boolean;
   spawningConditions?: SpawningCondition[];
@@ -1146,6 +1147,7 @@ export interface QuestObjective {
   itemTypeKey?: string;
   itemAmount?: number;
   craftingRecipeKey?: string;
+  craftingAmount?: number;
   destinationPosition?: Vector2;
   destinationRadius?: number;
   creatureTypeKey?: string;

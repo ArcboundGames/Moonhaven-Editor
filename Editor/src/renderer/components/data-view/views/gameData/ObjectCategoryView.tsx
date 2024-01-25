@@ -684,6 +684,23 @@ const ObjectCategoryView = () => {
                         error={data.settings?.isWorkstation && data.settings?.inventoryType !== INVENTORY_TYPE_SMALL}
                       />
                     </FormBox>
+                    {data.settings?.placementLayer === PLACEMENT_LAYER_IN_GROUND ? (
+                      <FormBox sx={{ m: 0 }}>
+                        <Checkbox
+                          label="Blocks On Ground Placement"
+                          checked={data.settings?.blocksPlacement}
+                          onChange={(newValue) =>
+                            handleOnChange({
+                              settings: {
+                                ...data.settings,
+                                blocksPlacement: newValue
+                              }
+                            })
+                          }
+                          disabled={disabled}
+                        />
+                      </FormBox>
+                    ) : null}
                   </Box>
                 </Card>
                 <Card header="Spawning Conditions">

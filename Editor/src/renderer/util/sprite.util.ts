@@ -1,6 +1,6 @@
 import {
   ACCENT_TYPE_FARMLAND,
-  ACCENT_TYPE_GRASSLAND,
+  ACCENT_TYPE_EMPTY_GROUND,
   ACCENT_TYPE_INSIDE,
   CREATURES_DATA_FILE,
   IMAGE_FILE_EXTENSION,
@@ -91,10 +91,10 @@ export async function getSpriteCount(
 }
 
 async function getObjectSpriteCounts(type: ObjectType, path: string | undefined, key: string) {
-  const [spriteCount, grasslandSpriteCount, farmlandSpriteCount, insideSpriteCount] = await Promise.all([
+  const [spriteCount, emptyGroundSpriteCount, farmlandSpriteCount, insideSpriteCount] = await Promise.all([
     path ? await getSpriteCount(path, 'object', key, type.sprite?.width, type.sprite?.height) : 0,
     path
-      ? await getAccentSpriteCount(path, 'object', key, ACCENT_TYPE_GRASSLAND, type.sprite?.width, type.sprite?.height)
+      ? await getAccentSpriteCount(path, 'object', key, ACCENT_TYPE_EMPTY_GROUND, type.sprite?.width, type.sprite?.height)
       : 0,
     path
       ? await getAccentSpriteCount(path, 'object', key, ACCENT_TYPE_FARMLAND, type.sprite?.width, type.sprite?.height)
@@ -108,7 +108,7 @@ async function getObjectSpriteCounts(type: ObjectType, path: string | undefined,
     key,
     spriteCount,
     accentSpriteCounts: {
-      [ACCENT_TYPE_GRASSLAND]: grasslandSpriteCount,
+      [ACCENT_TYPE_EMPTY_GROUND]: emptyGroundSpriteCount,
       [ACCENT_TYPE_FARMLAND]: farmlandSpriteCount,
       [ACCENT_TYPE_INSIDE]: insideSpriteCount
     }
@@ -126,7 +126,7 @@ export async function getObjectSpriteCountsWithSeason(
     let accentSpritesCounts: Record<
       string,
       {
-        [ACCENT_TYPE_GRASSLAND]: number;
+        [ACCENT_TYPE_EMPTY_GROUND]: number;
         [ACCENT_TYPE_FARMLAND]: number;
         [ACCENT_TYPE_INSIDE]: number;
       }
@@ -174,7 +174,7 @@ export async function getObjectsSpritesCountsWithSeason(
   let allAccentSpritesCounts: Record<
     string,
     {
-      [ACCENT_TYPE_GRASSLAND]: number;
+      [ACCENT_TYPE_EMPTY_GROUND]: number;
       [ACCENT_TYPE_FARMLAND]: number;
       [ACCENT_TYPE_INSIDE]: number;
     }

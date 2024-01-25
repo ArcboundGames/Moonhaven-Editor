@@ -12,7 +12,7 @@ import {
   FISHING_ITEM_TYPE_LURE,
   FISHING_ITEM_TYPE_NONE,
   FISHING_ITEM_TYPE_POLE,
-  GRASSLAND_CONDITION,
+  EMPTY_GROUND_CONDITION,
   INSIDE_CONDITION,
   INVENTORY_TYPE_LARGE,
   INVENTORY_TYPE_NONE,
@@ -1218,6 +1218,7 @@ export function toProcessedRawQuestObjective(questObjective: RawQuestObjective |
     itemTypeKey: fromNullish(questObjective?.itemTypeKey),
     itemAmount: fromNullish(questObjective?.itemAmount),
     craftingRecipeKey: fromNullish(questObjective?.craftingRecipeKey),
+    craftingAmount: fromNullish(questObjective?.craftingAmount),
     destinationPosition: toVector2(questObjective?.destinationPosition),
     destinationRadius: fromNullish(questObjective?.destinationRadius),
     creatureTypeKey: fromNullish(questObjective?.creatureTypeKey),
@@ -1338,7 +1339,7 @@ export function toSpawningCondition(rawSpawningCondition: string | undefined): S
   let spawningCondition: SpawningCondition | undefined = undefined;
   switch (rawSpawningCondition) {
     case FARMLAND_CONDITION:
-    case GRASSLAND_CONDITION:
+    case EMPTY_GROUND_CONDITION:
     case INSIDE_CONDITION:
       spawningCondition = rawSpawningCondition;
       break;
@@ -1496,6 +1497,7 @@ export function toProcessedRawObjectSettings(rawObjectSettings: RawObjectSetting
     isWorkstation: fromNullish(rawObjectSettings.isWorkstation),
     placementPosition: fromNullish(rawObjectSettings.placementPosition),
     placementLayer: fromNullish(rawObjectSettings.placementLayer),
+    blocksPlacement: fromNullish(rawObjectSettings.blocksPlacement),
     requiredBelowObjectCategoryKeys: fromNullish(rawObjectSettings.requiredBelowObjectCategoryKeys)?.map((entry) => entry ?? ''),
     requiredBelowObjectSubCategoryKeys: fromNullish(rawObjectSettings.requiredBelowObjectSubCategoryKeys)?.map((entry) => entry ?? ''),
     requiredBelowObjectKeys: fromNullish(rawObjectSettings.requiredBelowObjectKeys)?.map((entry) => entry ?? ''),

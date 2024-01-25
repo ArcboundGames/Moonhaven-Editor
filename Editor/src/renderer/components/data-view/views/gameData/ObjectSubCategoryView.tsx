@@ -588,46 +588,72 @@ const ObjectSubCategoryView = () => {
                     )
                   }}
                 </OverriddenObjectProperty>
-                <OverriddenObjectProperty
-                  title="Layer"
-                  type={data}
-                  setting="placementLayer"
-                  onChange={handleOnChange}
-                  defaultValue={PLACEMENT_LAYER_ON_GROUND}
-                  disabled={disabled}
-                >
-                  {{
-                    control: ({ controlled, value, helperText, onChange }) => (
-                      <Select
-                        label="Placement Layer"
-                        disabled={disabled || controlled}
-                        required
-                        value={value}
-                        onChange={onChange}
-                        options={[
-                          {
-                            label: 'In Ground',
-                            value: PLACEMENT_LAYER_IN_GROUND
-                          },
-                          {
-                            label: 'On Ground',
-                            value: PLACEMENT_LAYER_ON_GROUND
-                          },
-                          {
-                            label: 'In Air',
-                            value: PLACEMENT_LAYER_IN_AIR
-                          }
-                        ]}
-                        helperText={helperText}
-                        error={
-                          data.settings?.isWorkstation &&
-                          getObjectSetting('inventoryType', data, objectCategoriesByKey, undefined).value !==
-                            INVENTORY_TYPE_SMALL
-                        }
-                      />
-                    )
-                  }}
-                </OverriddenObjectProperty>
+                <Card header="Layer">
+                  <Box sx={{ display: 'grid', gridTemplateColumns: '1fr' }}>
+                    <OverriddenObjectProperty
+                      type={data}
+                      setting="placementLayer"
+                      onChange={handleOnChange}
+                      defaultValue={PLACEMENT_LAYER_ON_GROUND}
+                      disabled={disabled}
+                      layout="inline"
+                    >
+                      {{
+                        control: ({ controlled, value, helperText, onChange }) => (
+                          <Select
+                            label="Placement Layer"
+                            disabled={disabled || controlled}
+                            required
+                            value={value}
+                            onChange={onChange}
+                            options={[
+                              {
+                                label: 'In Ground',
+                                value: PLACEMENT_LAYER_IN_GROUND
+                              },
+                              {
+                                label: 'On Ground',
+                                value: PLACEMENT_LAYER_ON_GROUND
+                              },
+                              {
+                                label: 'In Air',
+                                value: PLACEMENT_LAYER_IN_AIR
+                              }
+                            ]}
+                            helperText={helperText}
+                            error={
+                              data.settings?.isWorkstation &&
+                              getObjectSetting('inventoryType', data, objectCategoriesByKey, undefined).value !==
+                                INVENTORY_TYPE_SMALL
+                            }
+                          />
+                        )
+                      }}
+                    </OverriddenObjectProperty>
+                    {getObjectSetting('placementLayer', data, objectCategoriesByKey, undefined).value === PLACEMENT_LAYER_IN_GROUND ? (
+                      <OverriddenObjectProperty
+                        type={data}
+                        setting="blocksPlacement"
+                        onChange={handleOnChange}
+                        defaultValue={false}
+                        disabled={disabled}
+                        layout="inline"
+                      >
+                        {{
+                          control: ({ controlled, value, helperText, onChange }) => (
+                            <Checkbox
+                              label="Blocks On Ground Placement"
+                              checked={value}
+                              disabled={disabled || controlled}
+                              onChange={onChange}
+                              helperText={helperText}
+                            />
+                          )
+                        }}
+                      </OverriddenObjectProperty>
+                    ) : null}
+                  </Box>
+                </Card>
                 <OverriddenObjectProperty
                   title="Spawning Conditions"
                   type={data}

@@ -4339,6 +4339,13 @@ export function assertQuestObjective(
             `${header}: No crafting recipe with key ${objective.craftingRecipeKey} exists`
           );
         }
+
+        if (assertNotNullish(objective.craftingAmount, `${header}: No crafting amount`)) {
+          assert(
+            objective.craftingAmount > 0 && objective.craftingAmount % 1 == 0,
+            `${header}: Crafting amount must be a positive whole number greater than 0`
+          );
+        }
         break;
       case QUEST_OBJECTIVE_TYPE_DESTINATION:
         if (assertNotNullish(objective.destinationPosition, `${header}: No destination position`)) {

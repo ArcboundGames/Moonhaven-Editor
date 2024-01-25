@@ -136,6 +136,17 @@ const ObjectiveFields = ({ objective, index, disabled, onChange, onDelete }: Obj
                     value={objective.craftingRecipeKey}
                     onChange={(craftingRecipeKey) => onChange({ craftingRecipeKey })}
                   />
+                </FormBox>,
+                <FormBox key="objective-craft-amount">
+                  <NumberTextField
+                    label="Amount"
+                    value={objective.craftingAmount}
+                    min={1}
+                    onChange={(craftingAmount) => onChange({ craftingAmount })}
+                    disabled={disabled}
+                    required
+                    wholeNumber
+                  />
                 </FormBox>
               ]
             : null}
