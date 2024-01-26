@@ -972,6 +972,7 @@ export type ProcessedRawWeatherSettings = WeatherSettings;
 
 export interface WeatherSettings {
   rainChance: number;
+  snowChance: number;
 }
 
 /**

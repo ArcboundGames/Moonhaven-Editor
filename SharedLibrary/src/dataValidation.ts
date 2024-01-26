@@ -3738,6 +3738,9 @@ export function validateWorldSettingsWeatherTab(allErrors: AllErrors, rawWorldSe
   assert(rawWorldSettings.weather.rainChance > 0, 'Rain chance must be greater than 0');
   assert(rawWorldSettings.weather.rainChance <= 100, 'Rain chance must be less than or equal to 100');
 
+  assert(rawWorldSettings.weather.snowChance > 0, 'Snow chance must be greater than 0');
+  assert(rawWorldSettings.weather.snowChance <= 100, 'Snow chance must be less than or equal to 100');
+
   if (errors.length > 0) {
     allErrors[WORLD_DATA_FILE] = {
       ...(allErrors[WORLD_DATA_FILE] ?? {}),

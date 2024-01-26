@@ -97,6 +97,28 @@ const WorldSettingsView = () => {
                     </FormBox>
                   </Box>
                 </Card>
+                <Card header="Snow">
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                    <FormBox>
+                      <NumberTextField
+                        label="Snow Chance"
+                        value={data.weather?.snowChance}
+                        min={1}
+                        max={100}
+                        onChange={(value) =>
+                          handleOnChange({
+                            weather: {
+                              ...data.weather,
+                              snowChance: value ?? 0
+                            }
+                          })
+                        }
+                        disabled={disabled}
+                        wholeNumber
+                      />
+                    </FormBox>
+                  </Box>
+                </Card>
               </Box>
             </Box>
           </TabPanel>

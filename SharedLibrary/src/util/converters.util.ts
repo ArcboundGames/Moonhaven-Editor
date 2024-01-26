@@ -1053,7 +1053,8 @@ export function toWeatherSettings(processedRawWeatherSettings: ProcessedRawWeath
 export function toProcessedRawWeatherSettings(rawWeatherSettings: RawWeatherSettings | undefined | null): ProcessedRawWeatherSettings {
   return {
     ...rawWeatherSettings,
-    rainChance: rawWeatherSettings?.rainChance ?? 0
+    rainChance: rawWeatherSettings?.rainChance ?? 0,
+    snowChance: rawWeatherSettings?.snowChance ?? 0
   };
 }
 
