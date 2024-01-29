@@ -480,6 +480,21 @@ const ObjectCategoryView = () => {
                           disabled={disabled}
                         />
                       </FormBox>
+                      <FormBox>
+                        <Checkbox
+                          label="Fades When Player is Behind"
+                          checked={data.settings?.fadesWhenPlayerBehind}
+                          onChange={(newValue) =>
+                            handleOnChange({
+                              settings: {
+                                ...data.settings,
+                                fadesWhenPlayerBehind: newValue
+                              }
+                            })
+                          }
+                          disabled={disabled}
+                        />
+                      </FormBox>
                     </Box>
                     <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
                       <FormBox>

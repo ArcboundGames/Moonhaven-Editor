@@ -581,6 +581,7 @@ export interface ObjectSettings {
   canActivate?: boolean;
   changesSpritesWithSeason?: boolean;
   hasLight?: boolean;
+  fadesWhenPlayerBehind?: boolean;
 }
 
 export interface Vector2 {

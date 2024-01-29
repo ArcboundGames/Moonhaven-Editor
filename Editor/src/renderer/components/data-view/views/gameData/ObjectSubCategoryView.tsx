@@ -543,6 +543,16 @@ const ObjectSubCategoryView = () => {
                   disabled={disabled}
                   variant="boolean"
                 />
+                <OverriddenObjectProperty
+                  title="Clear Sight"
+                  label="Fades When Player is Behind"
+                  type={data}
+                  setting="fadesWhenPlayerBehind"
+                  onChange={handleOnChange}
+                  defaultValue={false}
+                  disabled={disabled}
+                  variant="boolean"
+                />
               </Box>
               <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
                 <Card

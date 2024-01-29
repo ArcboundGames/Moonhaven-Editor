@@ -1517,7 +1517,8 @@ export function toProcessedRawObjectSettings(rawObjectSettings: RawObjectSetting
     canOpen: fromNullish(rawObjectSettings.canOpen),
     canActivate: fromNullish(rawObjectSettings.canActivate),
     changesSpritesWithSeason: fromNullish(rawObjectSettings.changesSpritesWithSeason),
-    hasLight: fromNullish(rawObjectSettings?.hasLight)
+    hasLight: fromNullish(rawObjectSettings?.hasLight),
+    fadesWhenPlayerBehind: fromNullish(rawObjectSettings.fadesWhenPlayerBehind),
   };
 }
 

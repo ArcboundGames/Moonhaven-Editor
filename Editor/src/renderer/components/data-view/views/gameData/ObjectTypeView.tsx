@@ -805,6 +805,16 @@ const ObjectTypeView = () => {
                         ) : null
                     }}
                   </OverriddenObjectProperty>
+                  <OverriddenObjectProperty
+                    title="Clear Sight"
+                    label="Fades When Player is Behind"
+                    type={data}
+                    setting="fadesWhenPlayerBehind"
+                    onChange={handleOnChange}
+                    defaultValue={false}
+                    disabled={disabled}
+                    variant="boolean"
+                  />
                   {stagesType && stagesType !== STAGES_TYPE_NONE && lootType && lootType !== LOOT_TYPE_NONE ? (
                     <Card header="Experience">
                       <FormBox>
