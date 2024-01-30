@@ -1,20 +1,21 @@
 import {
-  ACCENT_TYPE_FARMLAND,
-  ACCENT_TYPE_EMPTY_GROUND,
-  ACCENT_TYPE_INSIDE,
   CREATURES_DATA_FILE,
   IMAGE_FILE_EXTENSION,
   ITEMS_DATA_FILE,
   OBJECTS_DATA_FILE,
   SEASONS,
   STAGES_TYPE_GROWABLE,
-  STAGES_TYPE_GROWABLE_WITH_HEALTH
+  STAGES_TYPE_GROWABLE_WITH_HEALTH,
+  GROUND_TYPE_GRASS,
+  GROUND_TYPE_SAND,
+  GROUND_TYPE_FARMLAND,
+  GROUND_TYPE_INSIDE
 } from '../../../../SharedLibrary/src/constants';
 import { isNotNullish } from '../../../../SharedLibrary/src/util/null.util';
 import { getObjectSetting } from '../../../../SharedLibrary/src/util/objectType.util';
 
 import type {
-  AccentType,
+  GroundType,
   ObjectCategory,
   ObjectSubCategory,
   ObjectType,
@@ -52,7 +53,7 @@ export async function getAccentSpriteCount(
   path: string | undefined,
   type: Section,
   key: string | undefined,
-  accentType: AccentType,
+  groundType: GroundType,
   width: number | undefined = 16,
   height: number | undefined = 16
 ): Promise<number> {
@@ -65,7 +66,7 @@ export async function getAccentSpriteCount(
       path,
       '..',
       getSectionPath(type),
-      `${key.toLowerCase()}-${accentType.toLowerCase()}${IMAGE_FILE_EXTENSION}`
+      `${key.toLowerCase()}-${groundType.toLowerCase()}${IMAGE_FILE_EXTENSION}`
     )
   ).replace(/\\/g, '/');
 
@@ -91,16 +92,19 @@ export async function getSpriteCount(
 }
 
 async function getObjectSpriteCounts(type: ObjectType, path: string | undefined, key: string) {
-  const [spriteCount, emptyGroundSpriteCount, farmlandSpriteCount, insideSpriteCount] = await Promise.all([
+  const [spriteCount, grassSpriteCount, sandSpriteCount, farmlandSpriteCount, insideSpriteCount] = await Promise.all([
     path ? await getSpriteCount(path, 'object', key, type.sprite?.width, type.sprite?.height) : 0,
     path
-      ? await getAccentSpriteCount(path, 'object', key, ACCENT_TYPE_EMPTY_GROUND, type.sprite?.width, type.sprite?.height)
+      ? await getAccentSpriteCount(path, 'object', key, GROUND_TYPE_GRASS, type.sprite?.width, type.sprite?.height)
       : 0,
     path
-      ? await getAccentSpriteCount(path, 'object', key, ACCENT_TYPE_FARMLAND, type.sprite?.width, type.sprite?.height)
+      ? await getAccentSpriteCount(path, 'object', key, GROUND_TYPE_SAND, type.sprite?.width, type.sprite?.height)
       : 0,
     path
-      ? await getAccentSpriteCount(path, 'object', key, ACCENT_TYPE_INSIDE, type.sprite?.width, type.sprite?.height)
+      ? await getAccentSpriteCount(path, 'object', key, GROUND_TYPE_FARMLAND, type.sprite?.width, type.sprite?.height)
+      : 0,
+    path
+      ? await getAccentSpriteCount(path, 'object', key, GROUND_TYPE_INSIDE, type.sprite?.width, type.sprite?.height)
       : 0
   ]);
 
@@ -108,9 +112,10 @@ async function getObjectSpriteCounts(type: ObjectType, path: string | undefined,
     key,
     spriteCount,
     accentSpriteCounts: {
-      [ACCENT_TYPE_EMPTY_GROUND]: emptyGroundSpriteCount,
-      [ACCENT_TYPE_FARMLAND]: farmlandSpriteCount,
-      [ACCENT_TYPE_INSIDE]: insideSpriteCount
+      [GROUND_TYPE_GRASS]: grassSpriteCount,
+      [GROUND_TYPE_SAND]: sandSpriteCount,
+      [GROUND_TYPE_FARMLAND]: farmlandSpriteCount,
+      [GROUND_TYPE_INSIDE]: insideSpriteCount
     }
   };
 }
@@ -126,9 +131,10 @@ export async function getObjectSpriteCountsWithSeason(
     let accentSpritesCounts: Record<
       string,
       {
-        [ACCENT_TYPE_EMPTY_GROUND]: number;
-        [ACCENT_TYPE_FARMLAND]: number;
-        [ACCENT_TYPE_INSIDE]: number;
+        [GROUND_TYPE_GRASS]: number;
+        [GROUND_TYPE_SAND]: number;
+        [GROUND_TYPE_FARMLAND]: number;
+        [GROUND_TYPE_INSIDE]: number;
       }
     > = {};
 
@@ -174,9 +180,10 @@ export async function getObjectsSpritesCountsWithSeason(
   let allAccentSpritesCounts: Record<
     string,
     {
-      [ACCENT_TYPE_EMPTY_GROUND]: number;
-      [ACCENT_TYPE_FARMLAND]: number;
-      [ACCENT_TYPE_INSIDE]: number;
+      [GROUND_TYPE_GRASS]: number;
+      [GROUND_TYPE_SAND]: number;
+      [GROUND_TYPE_FARMLAND]: number;
+      [GROUND_TYPE_INSIDE]: number;
     }
   > = {};
 

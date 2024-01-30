@@ -1,8 +1,8 @@
 import type {
-  AccentType,
   ColliderType,
   FilledFromType,
   FishingItemType,
+  GroundType,
   InventoryType,
   LootType,
   ObjectSpriteRulePosition,
@@ -168,10 +168,11 @@ export const CONDITIONS: SpawningCondition[] = [EMPTY_GROUND_CONDITION, FARMLAND
 /**
  * Accents
  */
-export const ACCENT_TYPE_EMPTY_GROUND = EMPTY_GROUND_CONDITION;
-export const ACCENT_TYPE_FARMLAND = FARMLAND_CONDITION;
-export const ACCENT_TYPE_INSIDE = INSIDE_CONDITION;
-export const ACCENT_TYPES: AccentType[] = CONDITIONS;
+export const GROUND_TYPE_GRASS = 'GRASS';
+export const GROUND_TYPE_SAND = 'SAND';
+export const GROUND_TYPE_FARMLAND = 'FARMLAND';
+export const GROUND_TYPE_INSIDE = 'INSIDE';
+export const GROUND_TYPES: GroundType[] = [GROUND_TYPE_GRASS, GROUND_TYPE_SAND, GROUND_TYPE_FARMLAND, GROUND_TYPE_INSIDE];
 
 /**
  * Inventory Types

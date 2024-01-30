@@ -8,26 +8,33 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import ItemSelect from '../../../../../widgets/form/item/ItemSelect';
 import NumberTextField from '../../../../../widgets/form/NumberTextField';
 import Card from '../../../../../widgets/layout/Card';
 import FormBox from '../../../../../widgets/layout/FormBox';
 import SpriteImage from '../../../../../widgets/SpriteImage';
+import { ALL_SEASONS, SEASONS } from '../../../../../../../../../SharedLibrary/src/constants';
+import { toSeason } from '../../../../../../../../../SharedLibrary/src/util/converters.util';
+import { toTitleCaseFromKey } from '../../../../../../../../../SharedLibrary/src/util/string.util';
+import Select from 'renderer/components/widgets/form/Select';
 
-import type { LocalizedItemType } from '../../../../../../../../../SharedLibrary/src/interface';
+import type { LocalizedItemType, Season } from '../../../../../../../../../SharedLibrary/src/interface';
 
 export interface ShopItemsCardProps {
-  prices: Record<string, number>;
+  prices: Record<string, Record<string, number>>;
   disabled?: boolean;
   itemsByKey: Record<string, LocalizedItemType>;
-  onChange: (prices: Record<string, number>) => void;
+  onChange: (prices: Record<string, Record<string, number>>) => void;
 }
 
 const ShopItemsCard = ({ prices, disabled = true, itemsByKey, onChange }: ShopItemsCardProps) => {
   const [adding, setAdding] = useState(false);
   const [itemToAdd, setItemToAdd] = useState<string | undefined>(undefined);
+
+  const [season, setSeason] = useState<Season | typeof ALL_SEASONS>(ALL_SEASONS);
+  const seasonPrices = useMemo(() => prices[season] ?? {}, [prices, season]);
 
   const handleOnAdd = useCallback(() => {
     setItemToAdd(undefined);
@@ -39,13 +46,19 @@ const ShopItemsCard = ({ prices, disabled = true, itemsByKey, onChange }: ShopIt
   }, []);
   const handleOnAddConfirm = useCallback(() => {
     if (itemToAdd) {
-      const newSalePrices = { ...prices, [itemToAdd]: 1 };
+      const newSalePrices = {
+        ...prices,
+        [season]: {
+          ...seasonPrices,
+          [itemToAdd]: 1
+        }
+      };
 
       onChange(newSalePrices);
       setItemToAdd(undefined);
       setAdding(false);
     }
-  }, [itemToAdd, prices, onChange]);
+  }, [itemToAdd, prices, seasonPrices, season, onChange]);
 
   const [itemToDelete, setItemToDelete] = useState<LocalizedItemType | string | undefined>(undefined);
   const handleOnDeleteConfirm = useCallback(() => {
@@ -53,13 +66,18 @@ const ShopItemsCard = ({ prices, disabled = true, itemsByKey, onChange }: ShopIt
       return;
     }
 
-    const newSalePrices = { ...prices };
+    const newSeasonPrices = { ...seasonPrices };
 
-    delete newSalePrices[typeof itemToDelete === 'string' ? itemToDelete : itemToDelete.key];
+    delete newSeasonPrices[typeof itemToDelete === 'string' ? itemToDelete : itemToDelete.key];
 
-    onChange(newSalePrices);
+    onChange({
+      ...prices,
+      [season]: {
+        ...newSeasonPrices
+      }
+    });
     setItemToDelete(undefined);
-  }, [itemToDelete, onChange, prices]);
+  }, [itemToDelete, onChange, prices, season, seasonPrices]);
   const handleOnDeleteClose = useCallback(() => setItemToDelete(undefined), []);
 
   return (
@@ -67,7 +85,28 @@ const ShopItemsCard = ({ prices, disabled = true, itemsByKey, onChange }: ShopIt
       <Card
         header={
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div>Items</div>
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', alignItems: 'center' }}>
+              Items
+              <Select
+                label="Season"
+                required
+                disabled={disabled}
+                value={season}
+                onChange={(value) => {
+                  const newSeason = toSeason(value);
+                  if (newSeason) {
+                    setSeason(newSeason);
+                  }
+                }}
+                options={[ALL_SEASONS, ...SEASONS]?.map((entry) => ({
+                  label: toTitleCaseFromKey(entry),
+                  value: entry
+                }))}
+                sx={{
+                  minWidth: 120
+                }}
+              />
+            </Box>
             <Button
               variant="contained"
               color="secondary"
@@ -81,7 +120,7 @@ const ShopItemsCard = ({ prices, disabled = true, itemsByKey, onChange }: ShopIt
           </Box>
         }
       >
-        {Object.keys(prices)?.map((itemKey) => {
+        {Object.keys(seasonPrices)?.map((itemKey) => {
           const item = itemsByKey[itemKey];
           return (
             <Box
@@ -115,12 +154,15 @@ const ShopItemsCard = ({ prices, disabled = true, itemsByKey, onChange }: ShopIt
               <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
                 <FormBox>
                   <NumberTextField
-                    label="ID"
-                    value={prices[itemKey]}
+                    label="Price"
+                    value={seasonPrices[itemKey]}
                     onChange={(value) =>
                       onChange({
                         ...prices,
-                        [itemKey]: value ?? 0
+                        [season]: {
+                          ...seasonPrices,
+                          [itemKey]: value ?? 0
+                        }
                       })
                     }
                     min={1}

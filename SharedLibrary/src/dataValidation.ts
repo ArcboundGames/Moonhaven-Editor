@@ -1,5 +1,4 @@
 import {
-  ACCENT_TYPES,
   ALL_SEASONS,
   AUTO_BOX_COLLIDER_TYPE,
   BOX_COLLIDER_TYPE,
@@ -38,6 +37,7 @@ import {
   FISHING_ITEM_TYPES,
   FISHING_ITEM_TYPE_FISH,
   FISHING_ITEM_TYPE_POLE,
+  GROUND_TYPES,
   ICON_HEIGHT,
   ICON_WIDTH,
   INVENTORY_TYPES,
@@ -815,14 +815,18 @@ export function assertCreatureShop(
   localization: Localization | null | undefined,
   localizationKeys: string[]
 ) {
-  for (const itemKey of Object.keys(shop.prices)) {
-    assert(itemKey in itemsByKey, `Shop Price: No item exists with key '${itemKey}'`);
-    if (itemKey in itemsByKey) {
-      const item = itemsByKey[itemKey];
-      const itemName = getLocalizedValue(localization, localizationKeys, getLocalizationKey('item', 'name', item.key));
-      const amount = shop.prices[itemKey];
-      assert(amount > 0, `Shop Price [${itemName}]: Amount must be greater than 0`);
-      assert(amount % 1 === 0, `Shop Price [${itemName}]: Amount must be a whole number`);
+  for (const seasonKey of Object.keys(shop.prices)) {
+    if (assert(seasonKey === ALL_SEASONS || SEASONS.includes(seasonKey as Season), `Invalid season: ${seasonKey}`)) {
+      for (const itemKey of Object.keys(shop.prices[seasonKey])) {
+        assert(itemKey in itemsByKey, `Shop Price: No item exists with key '${itemKey}'`);
+        if (itemKey in itemsByKey) {
+          const item = itemsByKey[itemKey];
+          const itemName = getLocalizedValue(localization, localizationKeys, getLocalizationKey('item', 'name', item.key));
+          const amount = shop.prices[seasonKey][itemKey];
+          assert(amount > 0, `Shop Price [${itemName}]: Amount must be greater than 0`);
+          assert(amount % 1 === 0, `Shop Price [${itemName}]: Amount must be a whole number`);
+        }
+      }
     }
   }
 
@@ -2805,12 +2809,12 @@ export function assertObjectSprite(
 ) {
   if (assert(spriteCount > 0, `${prefix} No sprites`)) {
     if (isNotNullish(accentSpriteCounts)) {
-      for (const accentType of ACCENT_TYPES) {
+      for (const groundType of GROUND_TYPES) {
         assert(
-          isNullish(accentSpriteCounts[accentType]) ||
-            accentSpriteCounts[accentType] === 0 ||
-            accentSpriteCounts[accentType] === spriteCount,
-          `${prefix} Accent "${accentType}": Sprite count (${accentSpriteCounts[accentType]}) does not match main sprite count (${spriteCount})`
+          isNullish(accentSpriteCounts[groundType]) ||
+            accentSpriteCounts[groundType] === 0 ||
+            accentSpriteCounts[groundType] === spriteCount,
+          `${prefix} Accent "${groundType}": Sprite count (${accentSpriteCounts[groundType]}) does not match main sprite count (${spriteCount})`
         );
       }
     }

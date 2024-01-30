@@ -3,6 +3,7 @@ import {
   AUTO_BOX_COLLIDER_TYPE,
   BOX_COLLIDER_TYPE,
   DAYS_IN_A_WEEK,
+  EMPTY_GROUND_CONDITION,
   FALL,
   FARMLAND_CONDITION,
   FILLED_FROM_TYPE_NONE,
@@ -12,7 +13,10 @@ import {
   FISHING_ITEM_TYPE_LURE,
   FISHING_ITEM_TYPE_NONE,
   FISHING_ITEM_TYPE_POLE,
-  EMPTY_GROUND_CONDITION,
+  GROUND_TYPE_FARMLAND,
+  GROUND_TYPE_GRASS,
+  GROUND_TYPE_INSIDE,
+  GROUND_TYPE_SAND,
   INSIDE_CONDITION,
   INVENTORY_TYPE_LARGE,
   INVENTORY_TYPE_NONE,
@@ -64,7 +68,6 @@ import {
 import { isNotNullish, isNullish } from './null.util';
 
 import type {
-  AccentType,
   CampSpawn,
   Collider,
   ColliderType,
@@ -85,6 +88,7 @@ import type {
   FishingItemType,
   FishingPoleAnchorPoints,
   FishingZone,
+  GroundType,
   InventoryType,
   ItemCategory,
   ItemSettings,
@@ -364,7 +368,8 @@ export function toProcessedRawCreatureShop(rawCreatureShop: RawCreatureShop | nu
   return {
     ...rawCreatureShop,
     openingEvent: fromNullish(rawCreatureShop.openingEvent),
-    prices: fromNullishRecord(rawCreatureShop?.prices, (price) => price ?? 0) || {},
+    prices:
+      fromNullishRecord(rawCreatureShop?.prices, (seasonPrices) => fromNullishRecord(seasonPrices, (price) => price ?? 0) || {}) || {},
     openTimes: fromNullishArray(rawCreatureShop?.openTimes, (time) => time ?? -1) || (Array(DAYS_IN_A_WEEK) as number[]),
     closeTimes: fromNullishArray(rawCreatureShop?.closeTimes, (time) => time ?? -1) || (Array(DAYS_IN_A_WEEK) as number[])
   };
@@ -1481,8 +1486,19 @@ export function toQuestSource(rawQuestSource: string | undefined): QuestSource |
   return questSource;
 }
 
-export function toAccentType(rawAccentType: string | undefined): AccentType | undefined {
-  return toSpawningCondition(rawAccentType);
+export function toGroundType(rawGroundType: string | undefined): GroundType | undefined {
+  let groundType: GroundType | undefined = undefined;
+  switch (rawGroundType) {
+    case GROUND_TYPE_GRASS:
+    case GROUND_TYPE_SAND:
+    case GROUND_TYPE_FARMLAND:
+    case GROUND_TYPE_INSIDE:
+      groundType = rawGroundType;
+      break;
+    default:
+      break;
+  }
+  return groundType;
 }
 
 export function toProcessedRawObjectSettings(rawObjectSettings: RawObjectSettings | undefined | null): ProcessedRawObjectSettings {
@@ -1518,7 +1534,7 @@ export function toProcessedRawObjectSettings(rawObjectSettings: RawObjectSetting
     canActivate: fromNullish(rawObjectSettings.canActivate),
     changesSpritesWithSeason: fromNullish(rawObjectSettings.changesSpritesWithSeason),
     hasLight: fromNullish(rawObjectSettings?.hasLight),
-    fadesWhenPlayerBehind: fromNullish(rawObjectSettings.fadesWhenPlayerBehind),
+    fadesWhenPlayerBehind: fromNullish(rawObjectSettings.fadesWhenPlayerBehind)
   };
 }
 

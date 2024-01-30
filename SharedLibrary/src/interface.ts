@@ -1,13 +1,11 @@
 import type {
-  ACCENT_TYPE_FARMLAND,
-  ACCENT_TYPE_EMPTY_GROUND,
-  ACCENT_TYPE_INSIDE,
   ALL_SEASONS,
   AUTO_BOX_COLLIDER_TYPE,
   BOX_COLLIDER_TYPE,
   CRAFTING_RECIPES_DATA_FILE,
   CREATURES_DATA_FILE,
   DIALOGUE_DATA_FILE,
+  EMPTY_GROUND_CONDITION,
   ERROR_SECTION_CRAFTING_RECIPES,
   ERROR_SECTION_CRAFTING_RECIPE_CATEGORIES,
   ERROR_SECTION_CREATURES,
@@ -38,7 +36,10 @@ import type {
   FISHING_ITEM_TYPE_LURE,
   FISHING_ITEM_TYPE_NONE,
   FISHING_ITEM_TYPE_POLE,
-  EMPTY_GROUND_CONDITION,
+  GROUND_TYPE_FARMLAND,
+  GROUND_TYPE_GRASS,
+  GROUND_TYPE_INSIDE,
+  GROUND_TYPE_SAND,
   INSIDE_CONDITION,
   INVENTORY_TYPE_LARGE,
   INVENTORY_TYPE_NONE,
@@ -444,7 +445,7 @@ export type LootType = typeof LOOT_TYPE_NONE | typeof LOOT_TYPE_DROP | typeof LO
 export type PlacementPosition = typeof PLACEMENT_POSITION_CENTER | typeof PLACEMENT_POSITION_EDGE;
 export type PlacementLayer = typeof PLACEMENT_LAYER_IN_GROUND | typeof PLACEMENT_LAYER_ON_GROUND | typeof PLACEMENT_LAYER_IN_AIR;
 export type SpawningCondition = typeof EMPTY_GROUND_CONDITION | typeof FARMLAND_CONDITION | typeof INSIDE_CONDITION;
-export type AccentType = typeof ACCENT_TYPE_EMPTY_GROUND | typeof ACCENT_TYPE_FARMLAND | typeof ACCENT_TYPE_INSIDE;
+export type GroundType = typeof GROUND_TYPE_GRASS | typeof GROUND_TYPE_SAND | typeof GROUND_TYPE_FARMLAND | typeof GROUND_TYPE_INSIDE;
 export type InventoryType = typeof INVENTORY_TYPE_NONE | typeof INVENTORY_TYPE_SMALL | typeof INVENTORY_TYPE_LARGE;
 
 export interface LocalizedObjectType extends ObjectType {
@@ -774,7 +775,7 @@ export type ProcessedRawCreatureShop = CreatureShop;
 
 export interface CreatureShop {
   openingEvent?: string;
-  prices: Record<string, number>;
+  prices: Record<string, Record<string, number>>;
   openTimes: number[];
   closeTimes: number[];
 }
