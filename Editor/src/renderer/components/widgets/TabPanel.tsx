@@ -1,5 +1,8 @@
 import Box from '@mui/material/Box';
 
+import type { SxProps } from '@mui/system';
+import type { ReactNode } from 'react';
+
 export function a11yProps(index: number) {
   return {
     id: `object-type-view-tab-${index}`,
@@ -8,14 +11,13 @@ export function a11yProps(index: number) {
 }
 
 interface TabPanelProps {
-  children: JSX.Element;
+  children: ReactNode;
   value: number;
   index: number;
+  sx?: SxProps;
 }
 
-export default function TabPanel(props: TabPanelProps) {
-  const { children, value, index } = props;
-
+export default function TabPanel({ children, value, index, sx }: TabPanelProps) {
   return (
     <div
       role="tabpanel"
@@ -23,7 +25,7 @@ export default function TabPanel(props: TabPanelProps) {
       id={`object-type-view-tabpanel-${index}`}
       aria-labelledby={`object-type-view-tab-${index}`}
     >
-      {value === index && <Box sx={{ p: 1 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: 1, ...sx }}>{children}</Box>}
     </div>
   );
 }

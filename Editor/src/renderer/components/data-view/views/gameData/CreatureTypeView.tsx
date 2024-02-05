@@ -15,7 +15,7 @@ import {
   validateCreatureSpawningTab,
   validatePhysicsTab
 } from '../../../../../../../SharedLibrary/src/dataValidation';
-import { createCreatureSprites, createVector2 } from '../../../../../../../SharedLibrary/src/util/converters.util';
+import { createCreatureSprites } from '../../../../../../../SharedLibrary/src/util/converters.util';
 import { getCreatureSetting } from '../../../../../../../SharedLibrary/src/util/creatureType.util';
 import { getEnglishLocalization } from '../../../../../../../SharedLibrary/src/util/localization.util';
 import { isNotNullish } from '../../../../../../../SharedLibrary/src/util/null.util';
@@ -37,7 +37,6 @@ import { selectItemTypesByKeyWithName } from '../../../../store/slices/items';
 import { selectLocalizationKeys, selectLocalizations } from '../../../../store/slices/localizations';
 import { selectLootTables, selectLootTablesByKey } from '../../../../store/slices/lootTables';
 import { getNewCreature } from '../../../../util/section.util';
-import { getSpriteCount } from '../../../../util/sprite.util';
 import {
   validateCreature,
   validateCreatureGeneralTab,
@@ -46,22 +45,22 @@ import {
 import useLocalization from '../../../hooks/useLocalization.hook';
 import { useUpdateLocalization } from '../../../hooks/useUpdateLocalization.hook';
 import DayBox from '../../../widgets/DayBox';
+import Portrait from '../../../widgets/Portrait';
+import TabPanel from '../../../widgets/TabPanel';
+import TimesBox from '../../../widgets/TimesBox';
 import NumberTextField from '../../../widgets/form/NumberTextField';
 import Select from '../../../widgets/form/Select';
 import TextField from '../../../widgets/form/TextField';
 import Card from '../../../widgets/layout/Card';
 import FormBox from '../../../widgets/layout/FormBox';
-import Portrait from '../../../widgets/Portrait';
-import TabPanel from '../../../widgets/TabPanel';
 import Tabs from '../../../widgets/tabs/Tabs';
-import TimesBox from '../../../widgets/TimesBox';
 import DataViewer from '../../DataViewer';
 import CreatureTypeBehaviorTab from './creatureTypeView/CreatureTypeBehaviorTab';
 import CreatureTypeSpawningTab from './creatureTypeView/CreatureTypeSpawningTab';
+import CreatureTypeSpriteTab from './creatureTypeView/CreatureTypeSpriteTab';
 import CreatureTypeViewShopTab from './creatureTypeView/CreatureTypeViewShopTab';
 import CollidersCard from './widgets/CollidersCard';
 import { OverriddenCreaturePropertyCard } from './widgets/OverriddenPropertyCard';
-import SpritesCard from './widgets/SpritesCard';
 
 import type { CreatureType } from '../../../../../../../SharedLibrary/src/interface';
 
@@ -85,8 +84,6 @@ const CreatureTypeView = () => {
       setTab(queryTab);
     }
   }, [queryTab, tab]);
-
-  const [spriteCount, setSpriteCount] = useState<number>(0);
 
   const [dataKeyChanged, setDataKeyChanged] = useState<boolean>(true);
   const categories = useAppSelector(selectCreatureCategories);
@@ -141,26 +138,6 @@ const CreatureTypeView = () => {
 
   const dialogueTrees = useAppSelector(useMemo(() => selectDialogueTreesByCreature(editData?.key), [editData?.key]));
   const dialogueTreesSorted = useMemo(() => dialogueTrees.sort((a, b) => b.priority - a.priority), [dialogueTrees]);
-
-  useEffect(() => {
-    let alive = true;
-    const spriteCountGetter = async () => {
-      const newSpriteCount =
-        path && editData
-          ? await getSpriteCount(path, 'creature', editData.key, editData.sprite?.width, editData.sprite?.height)
-          : 0;
-
-      if (alive) {
-        setSpriteCount(newSpriteCount);
-      }
-    };
-
-    spriteCountGetter();
-
-    return () => {
-      alive = false;
-    };
-  }, [path, editData]);
 
   useEffect(() => {
     setDataKeyChanged(true);
@@ -247,16 +224,13 @@ const CreatureTypeView = () => {
 
   const getBehaviorTabErrorrs = useCallback(
     (data: CreatureType) => [
-      ...validateCreatureBehaviorTab(data),
+      ...validateCreatureBehaviorTab(data, creatureCategoriesByKey),
       ...checkCreatureConnections(data, creaturesByKey, creatureCategoriesByKey)
     ],
     [creaturesByKey, creatureCategoriesByKey]
   );
 
   const getSpawningTabErrors = useCallback((data: CreatureType) => validateCreatureSpawningTab(data), []);
-
-  const spriteWidth = useDebounce(editData?.sprite?.width, dataKeyChanged ? 0 : 300);
-  const spriteHeight = useDebounce(editData?.sprite?.height, dataKeyChanged ? 0 : 300);
 
   const validate = useCallback(
     async (data: CreatureType) => {
@@ -524,131 +498,12 @@ const CreatureTypeView = () => {
             </Box>
           </TabPanel>
           <TabPanel value={tab} index={1}>
-            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-              <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
-                <Card header="Sprite">
-                  <Typography gutterBottom variant="subtitle2" component="div">
-                    Size
-                  </Typography>
-                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-                    <FormBox>
-                      <NumberTextField
-                        label="Width"
-                        value={data.sprite?.width}
-                        onChange={(value) =>
-                          handleOnChange({
-                            sprite: {
-                              ...(data.sprite ?? createCreatureSprites()),
-                              width: value ?? 1
-                            }
-                          })
-                        }
-                        disabled={disabled}
-                        min={16}
-                        required
-                        helperText="Pixels"
-                        wholeNumber
-                      />
-                    </FormBox>
-                    <FormBox>
-                      <NumberTextField
-                        label="Height"
-                        value={data.sprite?.height}
-                        onChange={(value) =>
-                          handleOnChange({
-                            sprite: {
-                              ...(data.sprite ?? createCreatureSprites()),
-                              height: value ?? 1
-                            }
-                          })
-                        }
-                        disabled={disabled}
-                        min={16}
-                        helperText="Pixels"
-                        wholeNumber
-                        required
-                      />
-                    </FormBox>
-                  </Box>
-                  <Typography gutterBottom variant="subtitle2" component="div" sx={{ marginTop: 2 }}>
-                    Pivot Offset
-                  </Typography>
-                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-                    <FormBox>
-                      <NumberTextField
-                        label="X"
-                        value={data.sprite?.pivotOffset?.x}
-                        onChange={(value) =>
-                          handleOnChange({
-                            sprite: {
-                              ...(data.sprite ?? createCreatureSprites()),
-                              pivotOffset: {
-                                ...(data.sprite?.pivotOffset ?? createVector2()),
-                                x: value ?? 0
-                              }
-                            }
-                          })
-                        }
-                        disabled={disabled}
-                        error={data.sprite?.pivotOffset !== undefined && data.sprite?.pivotOffset?.x === undefined}
-                        helperText="Pixels"
-                        wholeNumber
-                      />
-                    </FormBox>
-                    <FormBox>
-                      <NumberTextField
-                        label="Y"
-                        value={data.sprite?.pivotOffset?.y}
-                        onChange={(value) =>
-                          handleOnChange({
-                            sprite: {
-                              ...(data.sprite ?? createCreatureSprites()),
-                              pivotOffset: {
-                                ...(data.sprite?.pivotOffset ?? createVector2()),
-                                y: value ?? 0
-                              }
-                            }
-                          })
-                        }
-                        disabled={disabled}
-                        error={data.sprite?.pivotOffset !== undefined && data.sprite?.pivotOffset?.y === undefined}
-                        helperText="Pixels"
-                        wholeNumber
-                      />
-                    </FormBox>
-                  </Box>
-                </Card>
-              </Box>
-              <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
-                {(spriteWidth ?? 0) >= 16 && (spriteHeight ?? 0) >= 16 ? (
-                  <SpritesCard
-                    key="sprites-card"
-                    section="creature"
-                    spriteCount={spriteCount}
-                    dataKey={data.key}
-                    dataKeyChanged={dataKeyChanged}
-                    spriteWidth={spriteWidth}
-                    spriteHeight={spriteHeight}
-                    disabled={disabled}
-                    sprites={data.sprite?.sprites}
-                    onChange={(index, sprite) => {
-                      const sprites = { ...(data.sprite?.sprites ?? {}) };
-                      if (sprite === undefined) {
-                        delete sprites[index];
-                      } else {
-                        sprites[index] = sprite;
-                      }
-                      handleOnChange({
-                        sprite: {
-                          ...(data.sprite ?? createCreatureSprites()),
-                          sprites
-                        }
-                      });
-                    }}
-                  />
-                ) : null}
-              </Box>
-            </Box>
+            <CreatureTypeSpriteTab
+              dataKeyChanged={dataKeyChanged}
+              data={data}
+              disabled={disabled}
+              handleOnChange={handleOnChange}
+            />
           </TabPanel>
           <TabPanel value={tab} index={2}>
             <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>

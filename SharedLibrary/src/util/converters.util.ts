@@ -24,6 +24,8 @@ import {
   LOOT_TYPE_DROP,
   LOOT_TYPE_NONE,
   LOOT_TYPE_STAGE_DROP,
+  MOVEMENT_TYPE_JUMP,
+  MOVEMENT_TYPE_WALK,
   PLACEMENT_LAYER_IN_AIR,
   PLACEMENT_LAYER_IN_GROUND,
   PLACEMENT_LAYER_ON_GROUND,
@@ -99,6 +101,7 @@ import type {
   LootTableComponent,
   LootTableComponentGroup,
   LootType,
+  MovementType,
   ObjectCategory,
   ObjectCategorySprite,
   ObjectSettings,
@@ -303,6 +306,9 @@ export function toProcessedRawCreatureType(rawCreatureType: RawCreatureType | un
 
     walkSpeed: rawCreatureType?.walkSpeed ?? 0,
     runSpeed: rawCreatureType?.runSpeed ?? 0,
+    jumpFrequencySpeed: rawCreatureType?.jumpFrequencySpeed ?? 0,
+    jumpMinDistance: rawCreatureType?.jumpMinDistance ?? 0,
+    jumpMaxDistance: rawCreatureType?.jumpMaxDistance ?? 0,
 
     wanderBehaviorEnabled: rawCreatureType?.wanderBehaviorEnabled ?? false,
     wanderTime: rawCreatureType?.wanderTime ?? 0,
@@ -404,14 +410,18 @@ export function toProcessedRawCreatureSprites(creatureSprites: RawCreatureSprite
           x: creatureSprites?.pivotOffset.x ?? 0,
           y: creatureSprites?.pivotOffset?.y ?? 0
         },
-    sprites: toProcessedRawSprites(creatureSprites?.sprites)
+    sprites: toProcessedRawSprites(creatureSprites?.sprites),
+    idleSprites: toProcessedRawSprites(creatureSprites?.idleSprites),
+    deathSprites: toProcessedRawSprites(creatureSprites?.deathSprites)
   };
 }
 
 export function toCreatureSprites(objectSprites: ProcessedRawCreatureSprites): CreatureSprites {
   return {
     ...objectSprites,
-    sprites: toSprites(objectSprites.sprites)
+    sprites: toSprites(objectSprites.sprites),
+    idleSprites: toSprites(objectSprites.idleSprites),
+    deathSprites: toSprites(objectSprites.deathSprites)
   };
 }
 
@@ -1603,7 +1613,8 @@ export function toProcessedRawCreatureSettings(rawCreatureSettings: RawCreatureS
     ...rawCreatureSettings,
     hasDialogue: fromNullish(rawCreatureSettings.hasDialogue),
     isShopkeeper: fromNullish(rawCreatureSettings.isShopkeeper),
-    hasHealth: fromNullish(rawCreatureSettings.hasHealth)
+    hasHealth: fromNullish(rawCreatureSettings.hasHealth),
+    movementType: fromNullish(rawCreatureSettings.movementType)
   };
 }
 
@@ -1613,8 +1624,22 @@ export function toCreatureSettings(processedRawCreatureSettings: ProcessedRawCre
   }
 
   return {
-    ...processedRawCreatureSettings
+    ...processedRawCreatureSettings,
+    movementType: toMovementType(processedRawCreatureSettings.movementType)
   };
+}
+
+export function toMovementType(rawMovementType: string | undefined): MovementType | undefined {
+  let movementType: MovementType | undefined = undefined;
+  switch (rawMovementType) {
+    case MOVEMENT_TYPE_JUMP:
+    case MOVEMENT_TYPE_WALK:
+      movementType = rawMovementType;
+      break;
+    default:
+      break;
+  }
+  return movementType;
 }
 
 export function toVector2(rawVector: DeepNullish<Vector2> | undefined | null): Vector2 | undefined;

@@ -26,6 +26,8 @@ export interface TabsProps<T> {
   sxTabs?: SxProps<Theme> | undefined;
   ariaLabel?: string;
   endAdornment?: React.ReactNode;
+  tabKey?: string;
+  navigateOnChange?: boolean;
   onChange?: (tab: number) => void;
 }
 
@@ -40,12 +42,14 @@ const Tabs = <T extends any = unknown>({
   sxWrapper = {},
   sxTabs = {},
   endAdornment,
+  tabKey = 'tab',
+  navigateOnChange = true,
   onChange
 }: TabsProps<T>) => {
   const query = useQuery();
   const navigate = useNavigate();
 
-  const queryTab = Number(query.get('tab') ?? 0);
+  const queryTab = Number(query.get(tabKey) ?? 0);
   const [tab, setTab] = useState(0);
   useEffect(() => {
     if (!Number.isNaN(queryTab) && queryTab !== tab) {
@@ -54,7 +58,8 @@ const Tabs = <T extends any = unknown>({
         onChange(queryTab);
       }
     }
-  }, [onChange, queryTab, tab]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onChange, queryTab]);
 
   const handleTabChange = useCallback(
     (_: React.SyntheticEvent<Element, Event>, newTab: number) => {
@@ -64,13 +69,18 @@ const Tabs = <T extends any = unknown>({
       if (onChange) {
         onChange(newTab);
       }
-      if (dataKey) {
-        navigate(`/${section}/${dataKey}?tab=${newTab}`);
+
+      if (navigateOnChange) {
+        if (dataKey) {
+          navigate(`/${section}/${dataKey}?${tabKey}=${newTab}`);
+        } else {
+          navigate(`/${section}?${tabKey}=${newTab}`);
+        }
       } else {
-        navigate(`/${section}?tab=${newTab}`);
+        setTab(queryTab);
       }
     },
-    [tab, data, onChange, navigate, section, dataKey]
+    [tab, data, onChange, navigateOnChange, dataKey, navigate, section, tabKey, queryTab]
   );
 
   const tabs = useMemo(() => {

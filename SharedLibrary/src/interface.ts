@@ -50,6 +50,8 @@ import type {
   LOOT_TYPE_DROP,
   LOOT_TYPE_NONE,
   LOOT_TYPE_STAGE_DROP,
+  MOVEMENT_TYPE_JUMP,
+  MOVEMENT_TYPE_WALK,
   OBJECTS_DATA_FILE,
   PLACEMENT_LAYER_IN_AIR,
   PLACEMENT_LAYER_IN_GROUND,
@@ -724,6 +726,9 @@ export interface CreatureType {
   // Behavior
   walkSpeed: number;
   runSpeed: number;
+  jumpFrequencySpeed: number;
+  jumpMinDistance: number;
+  jumpMaxDistance: number;
 
   wanderBehaviorEnabled: boolean;
   wanderTime: number;
@@ -780,22 +785,31 @@ export interface CreatureShop {
   closeTimes: number[];
 }
 
+export type MovementType = typeof MOVEMENT_TYPE_WALK | typeof MOVEMENT_TYPE_JUMP;
+
 export type RawCreatureSettings = DeepNullish<ProcessedRawCreatureSettings>;
 
-export type ProcessedRawCreatureSettings = CreatureSettings;
+export interface ProcessedRawCreatureSettings extends Omit<CreatureSettings, 'movementType'> {
+  movementType?: string;
+}
 
 export interface CreatureSettings {
   hasDialogue?: boolean;
   isShopkeeper?: boolean;
   hasHealth?: boolean;
+  movementType?: MovementType;
 }
 
-export interface RawCreatureSprites extends DeepNullish<Omit<CreatureSprites, 'sprites'>> {
+export interface RawCreatureSprites extends DeepNullish<Omit<CreatureSprites, 'sprites' | 'idleSprites' | 'deathSprites'>> {
   sprites?: Record<string, RawSprite | null | undefined> | null | undefined;
+  idleSprites?: Record<string, RawSprite | null | undefined> | null | undefined;
+  deathSprites?: Record<string, RawSprite | null | undefined> | null | undefined;
 }
 
-export interface ProcessedRawCreatureSprites extends Omit<CreatureSprites, 'sprites'> {
+export interface ProcessedRawCreatureSprites extends Omit<CreatureSprites, 'sprites' | 'idleSprites' | 'deathSprites'> {
   sprites?: Record<string, ProcessedRawSprite>;
+  idleSprites?: Record<string, ProcessedRawSprite>;
+  deathSprites?: Record<string, ProcessedRawSprite>;
 }
 
 export interface CreatureSprites {
@@ -804,6 +818,8 @@ export interface CreatureSprites {
   pivotOffset?: Vector2;
 
   sprites?: Record<string, Sprite>;
+  idleSprites?: Record<string, Sprite>;
+  deathSprites?: Record<string, Sprite>;
 }
 
 export interface RawCreatureCategory extends DeepNullish<Omit<CreatureCategory, 'settings'>> {

@@ -3,7 +3,13 @@ import Box from '@mui/material/Box';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { CREATURES_DATA_FILE } from '../../../../../../../SharedLibrary/src/constants';
+import Select from 'renderer/components/widgets/form/Select';
+import {
+  CREATURES_DATA_FILE,
+  MOVEMENT_TYPE_JUMP,
+  MOVEMENT_TYPE_WALK
+} from '../../../../../../../SharedLibrary/src/constants';
+import { toMovementType } from '../../../../../../../SharedLibrary/src/util/converters.util';
 import { toTitleCaseFromKey } from '../../../../../../../SharedLibrary/src/util/string.util';
 import { useAppDispatch, useAppSelector, useDebounce } from '../../../../hooks';
 import {
@@ -21,8 +27,8 @@ import Checkbox from '../../../widgets/form/Checkbox';
 import TextField from '../../../widgets/form/TextField';
 import Card from '../../../widgets/layout/Card';
 import FormBox from '../../../widgets/layout/FormBox';
-import DataViewer from '../../DataViewer';
 import DataViewList from '../../DataViewList';
+import DataViewer from '../../DataViewer';
 
 import type { CreatureCategory } from '../../../../../../../SharedLibrary/src/interface';
 import type { DataViewListItem } from '../../DataViewList';
@@ -187,6 +193,35 @@ const CreatureCategoryView = () => {
                         })
                       }
                       disabled={disabled}
+                    />
+                  </FormBox>
+                </Card>
+                <Card header="Movement">
+                  <FormBox>
+                    <Select
+                      label="Movement Type"
+                      disabled={disabled}
+                      required
+                      value={data.settings?.movementType}
+                      onChange={(newValue) =>
+                        handleOnChange({
+                          settings: {
+                            ...data.settings,
+                            movementType: toMovementType(newValue)
+                          }
+                        })
+                      }
+                      options={[
+                        {
+                          label: 'Walk',
+                          value: MOVEMENT_TYPE_WALK
+                        },
+                        {
+                          label: 'Jump',
+                          value: MOVEMENT_TYPE_JUMP
+                        }
+                      ]}
+                      error={data.settings?.movementType === undefined}
                     />
                   </FormBox>
                 </Card>

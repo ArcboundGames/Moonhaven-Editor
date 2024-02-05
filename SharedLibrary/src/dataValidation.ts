@@ -49,6 +49,8 @@ import {
   LOOT_TYPE_DROP,
   LOOT_TYPE_NONE,
   LOOT_TYPE_STAGE_DROP,
+  MOVEMENT_TYPE_JUMP,
+  MOVEMENT_TYPE_WALK,
   OBJECTS_DATA_FILE,
   PLACEMENT_LAYERS,
   PLACEMENT_LAYER_IN_AIR,
@@ -565,7 +567,7 @@ export function validateCreature(
     ...validateCreatureSpriteStageTab(rawType, animationSpriteCount),
     ...validatePhysicsTab(rawType),
     ...validateCreatureShopTab(rawType, categoriesByKeys, itemsByKey, eventLogsByKey, localization, localizationKeys),
-    ...validateCreatureBehaviorTab(rawType),
+    ...validateCreatureBehaviorTab(rawType, categoriesByKeys),
     ...validateCreatureSpawningTab(rawType)
   ];
 }
@@ -660,16 +662,28 @@ export function validateCreatureShopTab(
   return errors;
 }
 
-export function validateCreatureBehaviorTab(rawType: ProcessedRawCreatureType) {
+export function validateCreatureBehaviorTab(rawType: ProcessedRawCreatureType, categoriesByKeys: Record<string, CreatureCategory>) {
   const { errors, assert, assertNotNullish } = createAssert();
 
-  assert(rawType.walkSpeed >= 0, 'Walk speed must be greater than or equal to 0');
-  assert(rawType.walkSpeed <= 10, 'Walk speed must be less than or equal to 10');
+  const movementType = getCreatureSetting('movementType', rawType, categoriesByKeys).value;
+  if (movementType === MOVEMENT_TYPE_WALK) {
+    assert(rawType.walkSpeed >= 1, 'Walk speed must be greater than or equal to 1');
+    assert(rawType.walkSpeed <= 10, 'Walk speed must be less than or equal to 10');
+  } else if (movementType === MOVEMENT_TYPE_JUMP) {
+    assert(rawType.jumpFrequencySpeed >= 1, 'Jump frequency speed must be greater than or equal to 1');
+    assert(rawType.jumpFrequencySpeed <= 10, 'Jump frequency speed must be less than or equal to 10');
+    assert(rawType.jumpMinDistance >= 1, 'Jump min distance must be greater than or equal to 1');
+    assert(rawType.jumpMinDistance <= 10, 'Jump min distance must be less than or equal to 10');
+    assert(rawType.jumpMaxDistance >= 1, 'Jump max distance must be greater than or equal to 1');
+    assert(rawType.jumpMaxDistance <= 10, 'Jump max distance must be less than or equal to 10');
+  }
 
   if (rawType.dangerBehaviorEnabled) {
-    assert(rawType.runSpeed >= 0, 'Run speed must be greater than or equal to 0');
-    assert(rawType.runSpeed <= 10, 'Run speed must be less than or equal to 10');
-    assert(rawType.walkSpeed < rawType.runSpeed, 'Run speed must be greater than walk speed');
+    if (movementType === MOVEMENT_TYPE_WALK) {
+      assert(rawType.runSpeed >= 0, 'Run speed must be greater than or equal to 0');
+      assert(rawType.runSpeed <= 10, 'Run speed must be less than or equal to 10');
+      assert(rawType.walkSpeed < rawType.runSpeed, 'Run speed must be greater than walk speed');
+    }
     assert(rawType.dangerRadius >= 1, 'Danger radius must be greater than or equal to 1');
     assert(rawType.dangerRadius <= 20, 'Danger radius must be less than or equal to 20');
     assert(rawType.dangerTolerance > 0, 'Danger tolerance must be between 0 and 1 (inclusive)');
@@ -882,28 +896,40 @@ export function assertCreatureSprite(assert: Assert, creatureSprite: ProcessedRa
   }
 
   if (isNotNullish(creatureSprite.sprites)) {
-    for (const key of Object.keys(creatureSprite.sprites)) {
-      const keyAsNumber = Number(key);
-      assert(!Number.isNaN(keyAsNumber), `Sprite key '${key}' must be a number`);
-      if (!Number.isNaN(keyAsNumber)) {
-        const individualObjectSprite = creatureSprite.sprites[key];
-        if (isNotNullish(individualObjectSprite)) {
-          if (isNotNullish(individualObjectSprite.pivotOffset)) {
-            assert(individualObjectSprite.pivotOffset?.x % 1 == 0, `Sprite ${keyAsNumber + 1} pivot offset x must be a whole number`);
-            assert(individualObjectSprite.pivotOffset?.y % 1 == 0, `Sprite ${keyAsNumber + 1} pivot offset y must be a whole number`);
-          }
+    assertCreatureSprites(assert, creatureSprite.sprites);
+  }
 
-          if (isNotNullish(individualObjectSprite.spriteOffset)) {
-            assert(individualObjectSprite.spriteOffset?.x % 1 == 0, `Sprite ${keyAsNumber + 1} sprite offset x must be a whole number`);
-            assert(individualObjectSprite.spriteOffset?.y % 1 == 0, `Sprite ${keyAsNumber + 1} sprite offset y must be a whole number`);
-          }
+  if (isNotNullish(creatureSprite.idleSprites)) {
+    assertCreatureSprites(assert, creatureSprite.idleSprites);
+  }
 
-          if (isNotNullish(individualObjectSprite.placementLayer)) {
-            assert(
-              PLACEMENT_LAYERS.includes(individualObjectSprite.placementLayer as PlacementLayer),
-              `Sprite ${keyAsNumber + 1} Invalid placement layer: ${individualObjectSprite.placementLayer}`
-            );
-          }
+  if (isNotNullish(creatureSprite.deathSprites)) {
+    assertCreatureSprites(assert, creatureSprite.deathSprites);
+  }
+}
+
+export function assertCreatureSprites(assert: Assert, sprites: Record<string, ProcessedRawSprite>) {
+  for (const key of Object.keys(sprites)) {
+    const keyAsNumber = Number(key);
+    assert(!Number.isNaN(keyAsNumber), `Sprite key '${key}' must be a number`);
+    if (!Number.isNaN(keyAsNumber)) {
+      const individualObjectSprite = sprites[key];
+      if (isNotNullish(individualObjectSprite)) {
+        if (isNotNullish(individualObjectSprite.pivotOffset)) {
+          assert(individualObjectSprite.pivotOffset?.x % 1 == 0, `Sprite ${keyAsNumber + 1} pivot offset x must be a whole number`);
+          assert(individualObjectSprite.pivotOffset?.y % 1 == 0, `Sprite ${keyAsNumber + 1} pivot offset y must be a whole number`);
+        }
+
+        if (isNotNullish(individualObjectSprite.spriteOffset)) {
+          assert(individualObjectSprite.spriteOffset?.x % 1 == 0, `Sprite ${keyAsNumber + 1} sprite offset x must be a whole number`);
+          assert(individualObjectSprite.spriteOffset?.y % 1 == 0, `Sprite ${keyAsNumber + 1} sprite offset y must be a whole number`);
+        }
+
+        if (isNotNullish(individualObjectSprite.placementLayer)) {
+          assert(
+            PLACEMENT_LAYERS.includes(individualObjectSprite.placementLayer as PlacementLayer),
+            `Sprite ${keyAsNumber + 1} Invalid placement layer: ${individualObjectSprite.placementLayer}`
+          );
         }
       }
     }

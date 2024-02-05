@@ -5,6 +5,7 @@ import type {
   GroundType,
   InventoryType,
   LootType,
+  MovementType,
   ObjectSpriteRulePosition,
   PlacementLayer,
   PlacementPosition,
@@ -337,3 +338,11 @@ export const QUEST_SOURCE_CREATURE = 'CREATURE';
 export const QUEST_SOURCE_AUTO_START = 'AUTO_START';
 
 export const QUEST_SOURCES: QuestSource[] = [QUEST_SOURCE_CREATURE, QUEST_SOURCE_AUTO_START];
+
+/**
+ * Movement Type
+ */
+export const MOVEMENT_TYPE_WALK = 'WALK';
+export const MOVEMENT_TYPE_JUMP = 'JUMP';
+
+export const MOVEMENT_TYPES: MovementType[] = [MOVEMENT_TYPE_WALK, MOVEMENT_TYPE_JUMP];

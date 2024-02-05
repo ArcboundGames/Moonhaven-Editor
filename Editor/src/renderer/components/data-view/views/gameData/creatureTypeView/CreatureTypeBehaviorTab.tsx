@@ -1,15 +1,18 @@
 import Box from '@mui/material/Box';
 
+import Select from 'renderer/components/widgets/form/Select';
+import { MOVEMENT_TYPE_JUMP, MOVEMENT_TYPE_WALK } from '../../../../../../../../SharedLibrary/src/constants';
 import { toTitleCaseFromKey } from '../../../../../../../../SharedLibrary/src/util/string.util';
 import { useAppSelector } from '../../../../../hooks';
 import { selectCreatureCategories } from '../../../../../store/slices/creatures';
 import Checkbox from '../../../../widgets/form/Checkbox';
-import CreatureMultiSelect from '../../../../widgets/form/creature/CreatureMultiSelect';
 import MultiSelect from '../../../../widgets/form/MultiSelect';
 import NumberTextField from '../../../../widgets/form/NumberTextField';
 import Vector2Field from '../../../../widgets/form/Vector2Field';
+import CreatureMultiSelect from '../../../../widgets/form/creature/CreatureMultiSelect';
 import Card from '../../../../widgets/layout/Card';
 import FormBox from '../../../../widgets/layout/FormBox';
+import { OverriddenCreaturePropertyCard } from '../widgets/OverriddenPropertyCard';
 
 import type { CreatureType } from '../../../../../../../../SharedLibrary/src/interface';
 
@@ -25,43 +28,138 @@ const CreatureTypeBehaviorTab = ({ data, disabled, handleOnChange }: CreatureTyp
   return (
     <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
       <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
-        <Card header="Movement">
-          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-            <FormBox>
-              <NumberTextField
-                label="Walk Speed"
-                value={data.walkSpeed}
-                min={1}
-                max={10}
-                onChange={(value) =>
-                  handleOnChange({
-                    walkSpeed: value
-                  })
-                }
+        <OverriddenCreaturePropertyCard
+          title="Movement"
+          type={data}
+          setting="movementType"
+          onChange={handleOnChange}
+          defaultValue={MOVEMENT_TYPE_WALK}
+          disabled={disabled}
+          wrapperSx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+            width: '100%'
+          }}
+        >
+          {{
+            control: ({ controlled, value, helperText, onChange }) => (
+              <Select
+                label="Movement Type"
                 required
-                disabled={disabled}
-              />
-            </FormBox>
-            {data.dangerBehaviorEnabled ? (
-              <FormBox>
-                <NumberTextField
-                  label="Run Speed"
-                  value={data.runSpeed}
-                  min={0}
-                  max={10}
-                  onChange={(value) =>
-                    handleOnChange({
-                      runSpeed: value
-                    })
+                disabled={controlled || disabled}
+                value={value}
+                onChange={onChange}
+                options={[
+                  {
+                    label: 'Walk',
+                    value: MOVEMENT_TYPE_WALK
+                  },
+                  {
+                    label: 'Jump',
+                    value: MOVEMENT_TYPE_JUMP
                   }
-                  required
-                  error={data.runSpeed <= data.walkSpeed}
-                  disabled={disabled}
-                />
-              </FormBox>
-            ) : null}
-          </Box>
-        </Card>
+                ]}
+                error={value === undefined}
+                helperText={helperText}
+              />
+            ),
+            other: (filledFromType) => {
+              if (filledFromType === MOVEMENT_TYPE_WALK) {
+                return (
+                  <>
+                    <FormBox>
+                      <NumberTextField
+                        label="Walk Speed"
+                        value={data.walkSpeed}
+                        min={1}
+                        max={10}
+                        onChange={(value) =>
+                          handleOnChange({
+                            walkSpeed: value
+                          })
+                        }
+                        required
+                        disabled={disabled}
+                      />
+                    </FormBox>
+                    {data.dangerBehaviorEnabled ? (
+                      <FormBox>
+                        <NumberTextField
+                          label="Run Speed"
+                          value={data.runSpeed}
+                          min={1}
+                          max={10}
+                          onChange={(value) =>
+                            handleOnChange({
+                              runSpeed: value
+                            })
+                          }
+                          required
+                          error={data.runSpeed <= data.walkSpeed}
+                          disabled={disabled}
+                        />
+                      </FormBox>
+                    ) : null}
+                  </>
+                );
+              }
+
+              if (filledFromType === MOVEMENT_TYPE_JUMP) {
+                return (
+                  <>
+                    <FormBox>
+                      <NumberTextField
+                        label="Jump Frequency Speed"
+                        value={data.jumpFrequencySpeed}
+                        min={1}
+                        max={10}
+                        onChange={(value) =>
+                          handleOnChange({
+                            jumpFrequencySpeed: value
+                          })
+                        }
+                        required
+                        disabled={disabled}
+                      />
+                    </FormBox>
+                    <FormBox>
+                      <NumberTextField
+                        label="Jump Min Distance"
+                        value={data.jumpMinDistance}
+                        min={1}
+                        max={10}
+                        onChange={(value) =>
+                          handleOnChange({
+                            jumpMinDistance: value
+                          })
+                        }
+                        required
+                        disabled={disabled}
+                      />
+                    </FormBox>
+                    <FormBox>
+                      <NumberTextField
+                        label="Jump Max Distance"
+                        value={data.jumpMaxDistance}
+                        min={1}
+                        max={10}
+                        onChange={(value) =>
+                          handleOnChange({
+                            jumpMaxDistance: value
+                          })
+                        }
+                        required
+                        disabled={disabled}
+                      />
+                    </FormBox>
+                  </>
+                );
+              }
+
+              return null;
+            }
+          }}
+        </OverriddenCreaturePropertyCard>
         <Card header="Danger Behavior">
           <FormBox>
             <Checkbox
