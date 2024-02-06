@@ -306,7 +306,9 @@ export function toProcessedRawCreatureType(rawCreatureType: RawCreatureType | un
 
     walkSpeed: rawCreatureType?.walkSpeed ?? 0,
     runSpeed: rawCreatureType?.runSpeed ?? 0,
-    jumpFrequencySpeed: rawCreatureType?.jumpFrequencySpeed ?? 0,
+    jumpWaitTime: rawCreatureType?.jumpWaitTime ?? 0,
+    jumpMoveStartSpriteIndex: rawCreatureType?.jumpMoveStartSpriteIndex ?? 0,
+    jumpMoveEndSpriteIndex: rawCreatureType?.jumpMoveEndSpriteIndex ?? 0,
     jumpMinDistance: rawCreatureType?.jumpMinDistance ?? 0,
     jumpMaxDistance: rawCreatureType?.jumpMaxDistance ?? 0,
 
@@ -1614,7 +1616,8 @@ export function toProcessedRawCreatureSettings(rawCreatureSettings: RawCreatureS
     hasDialogue: fromNullish(rawCreatureSettings.hasDialogue),
     isShopkeeper: fromNullish(rawCreatureSettings.isShopkeeper),
     hasHealth: fromNullish(rawCreatureSettings.hasHealth),
-    movementType: fromNullish(rawCreatureSettings.movementType)
+    movementType: fromNullish(rawCreatureSettings.movementType),
+    neutral: fromNullish(rawCreatureSettings.neutral)
   };
 }
 

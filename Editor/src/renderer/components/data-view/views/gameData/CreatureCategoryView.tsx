@@ -195,6 +195,21 @@ const CreatureCategoryView = () => {
                       disabled={disabled}
                     />
                   </FormBox>
+                  <FormBox>
+                    <Checkbox
+                      label="Neutral"
+                      checked={Boolean(data.settings?.neutral)}
+                      onChange={(newValue) =>
+                        handleOnChange({
+                          settings: {
+                            ...data.settings,
+                            neutral: newValue
+                          }
+                        })
+                      }
+                      disabled={disabled}
+                    />
+                  </FormBox>
                 </Card>
                 <Card header="Movement">
                   <FormBox>

@@ -253,6 +253,22 @@ export async function validateCreatureSpriteStageTab(
   return dataValidation.validateCreatureSpriteStageTab(creature, spriteCount);
 }
 
+export async function validateCreatureBehaviorTab(
+  creature: CreatureType,
+  categoriesByKeys: Record<string, CreatureCategory>,
+  path: string | undefined
+): Promise<string[]> {
+  const spriteCount = await getSpriteCount(
+    path,
+    'creature',
+    creature.key,
+    creature.sprite?.width,
+    creature.sprite?.height
+  );
+
+  return dataValidation.validateCreatureBehaviorTab(creature, categoriesByKeys, spriteCount);
+}
+
 export function validateCreatureCategory(creatureCategory: CreatureCategory): string[] {
   return dataValidation.validateCreatureCategory(creatureCategory);
 }

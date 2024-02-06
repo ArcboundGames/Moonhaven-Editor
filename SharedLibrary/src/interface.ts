@@ -726,7 +726,9 @@ export interface CreatureType {
   // Behavior
   walkSpeed: number;
   runSpeed: number;
-  jumpFrequencySpeed: number;
+  jumpWaitTime: number;
+  jumpMoveStartSpriteIndex: number;
+  jumpMoveEndSpriteIndex: number;
   jumpMinDistance: number;
   jumpMaxDistance: number;
 
@@ -798,6 +800,7 @@ export interface CreatureSettings {
   isShopkeeper?: boolean;
   hasHealth?: boolean;
   movementType?: MovementType;
+  neutral?: boolean;
 }
 
 export interface RawCreatureSprites extends DeepNullish<Omit<CreatureSprites, 'sprites' | 'idleSprites' | 'deathSprites'>> {

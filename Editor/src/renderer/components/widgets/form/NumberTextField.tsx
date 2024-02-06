@@ -45,7 +45,7 @@ const NumberTextField = ({
 
   useEffect(() => {
     const internalNumberValue = Number(internalValue);
-    if (internalNumberValue === value) {
+    if (internalValue !== "" && internalNumberValue === value) {
       return;
     }
     setInternalValue(value !== undefined ? `${value}` : '');

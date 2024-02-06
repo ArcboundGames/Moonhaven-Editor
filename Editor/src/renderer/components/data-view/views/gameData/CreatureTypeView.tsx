@@ -10,7 +10,6 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { CREATURES_DATA_FILE, DAYS_IN_A_WEEK } from '../../../../../../../SharedLibrary/src/constants';
 import {
   checkCreatureConnections,
-  validateCreatureBehaviorTab,
   validateCreatureShopTab,
   validateCreatureSpawningTab,
   validatePhysicsTab
@@ -39,6 +38,7 @@ import { selectLootTables, selectLootTablesByKey } from '../../../../store/slice
 import { getNewCreature } from '../../../../util/section.util';
 import {
   validateCreature,
+  validateCreatureBehaviorTab,
   validateCreatureGeneralTab,
   validateCreatureSpriteStageTab
 } from '../../../../util/validate.util';
@@ -195,6 +195,11 @@ const CreatureTypeView = () => {
     [categoriesByKey, editData]
   );
 
+  const movementType = useMemo(
+    () => getCreatureSetting('movementType', editData, categoriesByKey).value,
+    [categoriesByKey, editData]
+  );
+
   const getGeneralTabErrors = useCallback(
     (data: CreatureType) => {
       return validateCreatureGeneralTab(
@@ -223,11 +228,12 @@ const CreatureTypeView = () => {
   );
 
   const getBehaviorTabErrorrs = useCallback(
-    (data: CreatureType) => [
-      ...validateCreatureBehaviorTab(data, creatureCategoriesByKey),
-      ...checkCreatureConnections(data, creaturesByKey, creatureCategoriesByKey)
-    ],
-    [creaturesByKey, creatureCategoriesByKey]
+    async (data: CreatureType) => {
+      const errors = await validateCreatureBehaviorTab(data, creatureCategoriesByKey, path);
+      errors.push(...checkCreatureConnections(data, creaturesByKey, creatureCategoriesByKey));
+      return errors;
+    },
+    [creatureCategoriesByKey, path, creaturesByKey]
   );
 
   const getSpawningTabErrors = useCallback((data: CreatureType) => validateCreatureSpawningTab(data), []);
@@ -399,7 +405,7 @@ const CreatureTypeView = () => {
                   }}
                 </OverriddenCreaturePropertyCard>
                 <OverriddenCreaturePropertyCard
-                  title="Combat"
+                  title="Health"
                   label="Has Health"
                   type={data}
                   setting="hasHealth"
@@ -428,6 +434,16 @@ const CreatureTypeView = () => {
                       ) : null
                   }}
                 </OverriddenCreaturePropertyCard>
+                <OverriddenCreaturePropertyCard
+                  title="Combat"
+                  label="Neutral"
+                  type={data}
+                  setting="neutral"
+                  onChange={handleOnChange}
+                  disabled={disabled}
+                  defaultValue={false}
+                  variant="boolean"
+                />
               </Box>
               <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
@@ -616,7 +632,12 @@ const CreatureTypeView = () => {
             />
           </TabPanel>
           <TabPanel value={tab} index={5}>
-            <CreatureTypeBehaviorTab data={data} handleOnChange={handleOnChange} disabled={disabled} />
+            <CreatureTypeBehaviorTab
+              data={data}
+              movementType={movementType}
+              handleOnChange={handleOnChange}
+              disabled={disabled}
+            />
           </TabPanel>
           <TabPanel value={tab} index={6}>
             <CreatureTypeSpawningTab data={data} handleOnChange={handleOnChange} disabled={disabled} />

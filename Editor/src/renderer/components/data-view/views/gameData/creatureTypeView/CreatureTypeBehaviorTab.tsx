@@ -14,15 +14,16 @@ import Card from '../../../../widgets/layout/Card';
 import FormBox from '../../../../widgets/layout/FormBox';
 import { OverriddenCreaturePropertyCard } from '../widgets/OverriddenPropertyCard';
 
-import type { CreatureType } from '../../../../../../../../SharedLibrary/src/interface';
+import type { CreatureType, MovementType } from '../../../../../../../../SharedLibrary/src/interface';
 
 export interface CreatureTypeBehaviorTabProps {
   data: CreatureType;
   disabled: boolean;
+  movementType: MovementType | undefined;
   handleOnChange: (input: Partial<CreatureType>) => void;
 }
 
-const CreatureTypeBehaviorTab = ({ data, disabled, handleOnChange }: CreatureTypeBehaviorTabProps) => {
+const CreatureTypeBehaviorTab = ({ data, disabled, movementType, handleOnChange }: CreatureTypeBehaviorTabProps) => {
   const creatureCategories = useAppSelector(selectCreatureCategories);
 
   return (
@@ -63,8 +64,8 @@ const CreatureTypeBehaviorTab = ({ data, disabled, handleOnChange }: CreatureTyp
                 helperText={helperText}
               />
             ),
-            other: (filledFromType) => {
-              if (filledFromType === MOVEMENT_TYPE_WALK) {
+            other: (movementType) => {
+              if (movementType !== MOVEMENT_TYPE_JUMP) {
                 return (
                   <>
                     <FormBox>
@@ -104,18 +105,18 @@ const CreatureTypeBehaviorTab = ({ data, disabled, handleOnChange }: CreatureTyp
                 );
               }
 
-              if (filledFromType === MOVEMENT_TYPE_JUMP) {
+              if (movementType === MOVEMENT_TYPE_JUMP) {
                 return (
                   <>
                     <FormBox>
                       <NumberTextField
-                        label="Jump Frequency Speed"
-                        value={data.jumpFrequencySpeed}
+                        label="Jump Wait Time"
+                        value={data.jumpWaitTime}
                         min={1}
                         max={10}
                         onChange={(value) =>
                           handleOnChange({
-                            jumpFrequencySpeed: value
+                            jumpWaitTime: value
                           })
                         }
                         required
@@ -150,6 +151,37 @@ const CreatureTypeBehaviorTab = ({ data, disabled, handleOnChange }: CreatureTyp
                         }
                         required
                         disabled={disabled}
+                      />
+                    </FormBox>
+                    <FormBox>
+                      <NumberTextField
+                        label="Jump Move Start Sprite Index"
+                        value={data.jumpMoveStartSpriteIndex}
+                        min={0}
+                        onChange={(value) =>
+                          handleOnChange({
+                            jumpMoveStartSpriteIndex: value
+                          })
+                        }
+                        required
+                        disabled={disabled}
+                        helperText="Zero index based"
+                      />
+                    </FormBox>
+                    <FormBox>
+                      <NumberTextField
+                        label="Jump Move End Sprite Index"
+                        value={data.jumpMoveEndSpriteIndex}
+                        min={0}
+                        onChange={(value) =>
+                          handleOnChange({
+                            jumpMoveEndSpriteIndex: value
+                          })
+                        }
+                        required
+                        disabled={disabled}
+                        helperText="Zero index based"
+                        error={data.jumpMoveStartSpriteIndex >= data.jumpMoveEndSpriteIndex}
                       />
                     </FormBox>
                   </>
@@ -284,47 +316,49 @@ const CreatureTypeBehaviorTab = ({ data, disabled, handleOnChange }: CreatureTyp
                   />
                 </FormBox>
               </Box>
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-                  borderBottom: 1,
-                  borderColor: 'divider'
-                }}
-              >
-                <FormBox>
-                  <NumberTextField
-                    label="Attack Destired Min Range"
-                    value={data.attackDesiredRangeMin}
-                    min={1}
-                    max={20}
-                    onChange={(value) =>
-                      handleOnChange({
-                        attackDesiredRangeMin: value
-                      })
-                    }
-                    required
-                    error={data.attackDesiredRangeMin >= data.attackDesiredRangeMax}
-                    disabled={disabled}
-                  />
-                </FormBox>
-                <FormBox>
-                  <NumberTextField
-                    label="Attack Destired Max Range"
-                    value={data.attackDesiredRangeMax}
-                    min={1}
-                    max={20}
-                    onChange={(value) =>
-                      handleOnChange({
-                        attackDesiredRangeMax: value
-                      })
-                    }
-                    required
-                    error={data.attackDesiredRangeMin >= data.attackDesiredRangeMax}
-                    disabled={disabled}
-                  />
-                </FormBox>
-              </Box>
+              {movementType !== MOVEMENT_TYPE_JUMP ? (
+                <Box
+                  sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                    borderBottom: 1,
+                    borderColor: 'divider'
+                  }}
+                >
+                  <FormBox>
+                    <NumberTextField
+                      label="Attack Desired Min Range"
+                      value={data.attackDesiredRangeMin}
+                      min={1}
+                      max={20}
+                      onChange={(value) =>
+                        handleOnChange({
+                          attackDesiredRangeMin: value
+                        })
+                      }
+                      required
+                      error={data.attackDesiredRangeMin >= data.attackDesiredRangeMax}
+                      disabled={disabled}
+                    />
+                  </FormBox>
+                  <FormBox>
+                    <NumberTextField
+                      label="Attack Desired Max Range"
+                      value={data.attackDesiredRangeMax}
+                      min={1}
+                      max={20}
+                      onChange={(value) =>
+                        handleOnChange({
+                          attackDesiredRangeMax: value
+                        })
+                      }
+                      required
+                      error={data.attackDesiredRangeMin >= data.attackDesiredRangeMax}
+                      disabled={disabled}
+                    />
+                  </FormBox>
+                </Box>
+              ) : null}
               <Box
                 sx={{
                   display: 'flex',
@@ -452,37 +486,41 @@ const CreatureTypeBehaviorTab = ({ data, disabled, handleOnChange }: CreatureTyp
           </FormBox>
           {data.wanderBehaviorEnabled ? (
             <Box key="wanderFields" sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
-              <FormBox>
-                <NumberTextField
-                  label="Wander Time"
-                  value={data.wanderTime}
-                  min={0}
-                  max={20}
-                  onChange={(value) =>
-                    handleOnChange({
-                      wanderTime: value
-                    })
-                  }
-                  required
-                  error={data.wanderTime <= 0}
-                  disabled={disabled}
-                />
-              </FormBox>
-              <FormBox>
-                <NumberTextField
-                  label="Wander Radius"
-                  value={data.wanderRadius}
-                  min={1}
-                  max={20}
-                  onChange={(value) =>
-                    handleOnChange({
-                      wanderRadius: value
-                    })
-                  }
-                  required
-                  disabled={disabled}
-                />
-              </FormBox>
+              {movementType != MOVEMENT_TYPE_JUMP ? (
+                <>
+                  <FormBox>
+                    <NumberTextField
+                      label="Wander Time"
+                      value={data.wanderTime}
+                      min={0}
+                      max={20}
+                      onChange={(value) =>
+                        handleOnChange({
+                          wanderTime: value
+                        })
+                      }
+                      required
+                      error={data.wanderTime <= 0}
+                      disabled={disabled}
+                    />
+                  </FormBox>
+                  <FormBox>
+                    <NumberTextField
+                      label="Wander Radius"
+                      value={data.wanderRadius}
+                      min={1}
+                      max={20}
+                      onChange={(value) =>
+                        handleOnChange({
+                          wanderRadius: value
+                        })
+                      }
+                      required
+                      disabled={disabled}
+                    />
+                  </FormBox>
+                </>
+              ) : null}
               <FormBox sx={{ alignItems: 'flex-start' }}>
                 <Checkbox
                   label="Use Custom Anchor"

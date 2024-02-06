@@ -50,7 +50,6 @@ import {
   LOOT_TYPE_NONE,
   LOOT_TYPE_STAGE_DROP,
   MOVEMENT_TYPE_JUMP,
-  MOVEMENT_TYPE_WALK,
   OBJECTS_DATA_FILE,
   PLACEMENT_LAYERS,
   PLACEMENT_LAYER_IN_AIR,
@@ -567,7 +566,7 @@ export function validateCreature(
     ...validateCreatureSpriteStageTab(rawType, animationSpriteCount),
     ...validatePhysicsTab(rawType),
     ...validateCreatureShopTab(rawType, categoriesByKeys, itemsByKey, eventLogsByKey, localization, localizationKeys),
-    ...validateCreatureBehaviorTab(rawType, categoriesByKeys),
+    ...validateCreatureBehaviorTab(rawType, categoriesByKeys, animationSpriteCount),
     ...validateCreatureSpawningTab(rawType)
   ];
 }
@@ -662,24 +661,41 @@ export function validateCreatureShopTab(
   return errors;
 }
 
-export function validateCreatureBehaviorTab(rawType: ProcessedRawCreatureType, categoriesByKeys: Record<string, CreatureCategory>) {
+export function validateCreatureBehaviorTab(
+  rawType: ProcessedRawCreatureType,
+  categoriesByKeys: Record<string, CreatureCategory>,
+  animationSpriteCount: number
+) {
   const { errors, assert, assertNotNullish } = createAssert();
 
   const movementType = getCreatureSetting('movementType', rawType, categoriesByKeys).value;
-  if (movementType === MOVEMENT_TYPE_WALK) {
+  if (movementType !== MOVEMENT_TYPE_JUMP) {
     assert(rawType.walkSpeed >= 1, 'Walk speed must be greater than or equal to 1');
     assert(rawType.walkSpeed <= 10, 'Walk speed must be less than or equal to 10');
   } else if (movementType === MOVEMENT_TYPE_JUMP) {
-    assert(rawType.jumpFrequencySpeed >= 1, 'Jump frequency speed must be greater than or equal to 1');
-    assert(rawType.jumpFrequencySpeed <= 10, 'Jump frequency speed must be less than or equal to 10');
+    assert(rawType.jumpWaitTime >= 1, 'Jump wait time must be greater than or equal to 1');
+    assert(rawType.jumpWaitTime <= 10, 'Jump wait time must be less than or equal to 10');
     assert(rawType.jumpMinDistance >= 1, 'Jump min distance must be greater than or equal to 1');
     assert(rawType.jumpMinDistance <= 10, 'Jump min distance must be less than or equal to 10');
     assert(rawType.jumpMaxDistance >= 1, 'Jump max distance must be greater than or equal to 1');
     assert(rawType.jumpMaxDistance <= 10, 'Jump max distance must be less than or equal to 10');
+
+    assert(rawType.jumpMoveStartSpriteIndex >= 0, 'Jump move start sprite index must be greater than or equal to 0');
+    assert(
+      rawType.jumpMoveStartSpriteIndex < animationSpriteCount,
+      `Jump move start sprite index must be less than the number of sprites in the jump animation (${animationSpriteCount})`
+    );
+
+    assert(rawType.jumpMoveEndSpriteIndex >= 0, 'Jump move end sprite index must be greater than or equal to 0');
+    assert(
+      rawType.jumpMoveEndSpriteIndex < animationSpriteCount,
+      `Jump move end sprite index must be less than the number of sprites in the jump animation (${animationSpriteCount})`
+    );
+    assert(rawType.jumpMoveStartSpriteIndex < rawType.jumpMoveEndSpriteIndex, 'Jump move end sprite index must be greater than the jump move start sprite index');
   }
 
   if (rawType.dangerBehaviorEnabled) {
-    if (movementType === MOVEMENT_TYPE_WALK) {
+    if (movementType !== MOVEMENT_TYPE_JUMP) {
       assert(rawType.runSpeed >= 0, 'Run speed must be greater than or equal to 0');
       assert(rawType.runSpeed <= 10, 'Run speed must be less than or equal to 10');
       assert(rawType.walkSpeed < rawType.runSpeed, 'Run speed must be greater than walk speed');
@@ -690,10 +706,12 @@ export function validateCreatureBehaviorTab(rawType: ProcessedRawCreatureType, c
   }
 
   if (rawType.wanderBehaviorEnabled) {
-    assert(rawType.wanderTime > 0, 'Wander time must be greater than 0');
-    assert(rawType.wanderTime <= 20, 'Wander time must be less than or equal to 20');
-    assert(rawType.wanderRadius >= 1, 'Wander radius must be greater than or equal to 1');
-    assert(rawType.wanderRadius <= 20, 'Wander radius must be less than or equal to 20');
+    if (movementType !== MOVEMENT_TYPE_JUMP) {
+      assert(rawType.wanderTime > 0, 'Wander time must be greater than 0');
+      assert(rawType.wanderTime <= 20, 'Wander time must be less than or equal to 20');
+      assert(rawType.wanderRadius >= 1, 'Wander radius must be greater than or equal to 1');
+      assert(rawType.wanderRadius <= 20, 'Wander radius must be less than or equal to 20');
+    }
 
     if (rawType.campSpawns.length > 0) {
       assert(rawType.wanderUseSpawnAnchor === true, 'Spawn anchor must be used with camp spawns');
@@ -725,14 +743,16 @@ export function validateCreatureBehaviorTab(rawType: ProcessedRawCreatureType, c
   if (rawType.attackBehaviorEnabled) {
     assert(rawType.attackRadius >= 1, 'Attack radius must be greater than or equal to 1');
     assert(rawType.attackRadius <= 20, 'Attack radius must be less than or equal to 20');
-    assert(rawType.attackDesiredRangeMin >= 1, 'Attack desired min range must be greater than or equal to 1');
-    assert(rawType.attackDesiredRangeMin <= 20, 'Attack desired min range must be less than or equal to 20');
-    assert(rawType.attackDesiredRangeMax >= 1, 'Attack desired max range must be greater than or equal to 1');
-    assert(rawType.attackDesiredRangeMax <= 20, 'Attack desired max range must be less than or equal to 20');
-    assert(
-      rawType.attackDesiredRangeMin < rawType.attackDesiredRangeMax,
-      'Attack desired min range must be less than attack desired max range'
-    );
+    if (movementType !== MOVEMENT_TYPE_JUMP) {
+      assert(rawType.attackDesiredRangeMin >= 1, 'Attack desired min range must be greater than or equal to 1');
+      assert(rawType.attackDesiredRangeMin <= 20, 'Attack desired min range must be less than or equal to 20');
+      assert(rawType.attackDesiredRangeMax >= 1, 'Attack desired max range must be greater than or equal to 1');
+      assert(rawType.attackDesiredRangeMax <= 20, 'Attack desired max range must be less than or equal to 20');
+      assert(
+        rawType.attackDesiredRangeMin < rawType.attackDesiredRangeMax,
+        'Attack desired min range must be less than attack desired max range'
+      );
+    }
   }
 
   return errors;
