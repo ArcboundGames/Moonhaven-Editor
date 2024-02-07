@@ -22,13 +22,28 @@ const CreatureTypeSpawningTab = ({ data, disabled, handleOnChange }: CreatureTyp
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
             <FormBox>
               <NumberTextField
-                label="Spawn Distance From Players"
-                value={data.spawnDistanceFromPlayers}
-                min={1}
+                label="Min Spawn Distance From Players"
+                value={data.spawnDistanceMinFromPlayers}
+                min={0}
                 max={100}
                 onChange={(value) =>
                   handleOnChange({
-                    spawnDistanceFromPlayers: value
+                    spawnDistanceMinFromPlayers: value
+                  })
+                }
+                required
+                disabled={disabled}
+              />
+            </FormBox>
+            <FormBox>
+              <NumberTextField
+                label="Max Spawn Distance From Players"
+                value={data.spawnDistanceMaxFromPlayers}
+                min={0}
+                max={100}
+                onChange={(value) =>
+                  handleOnChange({
+                    spawnDistanceMaxFromPlayers: value
                   })
                 }
                 required

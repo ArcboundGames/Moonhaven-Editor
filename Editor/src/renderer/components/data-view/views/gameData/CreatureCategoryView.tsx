@@ -5,11 +5,14 @@ import { useParams } from 'react-router-dom';
 
 import Select from 'renderer/components/widgets/form/Select';
 import {
+  ATTACK_TYPE_ARC,
+  ATTACK_TYPE_NONE,
+  ATTACK_TYPE_TOUCH,
   CREATURES_DATA_FILE,
   MOVEMENT_TYPE_JUMP,
   MOVEMENT_TYPE_WALK
 } from '../../../../../../../SharedLibrary/src/constants';
-import { toMovementType } from '../../../../../../../SharedLibrary/src/util/converters.util';
+import { toAttackType, toMovementType } from '../../../../../../../SharedLibrary/src/util/converters.util';
 import { toTitleCaseFromKey } from '../../../../../../../SharedLibrary/src/util/string.util';
 import { useAppDispatch, useAppSelector, useDebounce } from '../../../../hooks';
 import {
@@ -208,6 +211,38 @@ const CreatureCategoryView = () => {
                         })
                       }
                       disabled={disabled}
+                    />
+                  </FormBox>
+                  <FormBox>
+                    <Select
+                      label="Attack Type"
+                      disabled={disabled}
+                      required
+                      value={data.settings?.attackType}
+                      onChange={(newValue) =>
+                        handleOnChange({
+                          settings: {
+                            ...data.settings,
+                            attackType: toAttackType(newValue)
+                          }
+                        })
+                      }
+                      options={[
+                        {
+                          label: 'None',
+                          emphasize: true,
+                          value: ATTACK_TYPE_NONE
+                        },
+                        {
+                          label: 'Touch',
+                          value: ATTACK_TYPE_TOUCH
+                        },
+                        {
+                          label: 'Arc',
+                          value: ATTACK_TYPE_ARC
+                        }
+                      ]}
+                      error={data.settings?.attackType === undefined}
                     />
                   </FormBox>
                 </Card>

@@ -189,6 +189,25 @@ const PlayerDataView = () => {
                     </FormBox>
                   </Box>
                 </Card>
+                <Card header="Combat">
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+                    <FormBox>
+                      <NumberTextField
+                        label="Damage Immunity Time"
+                        value={data.damageImmunityTime}
+                        min={0}
+                        onChange={(value) =>
+                          handleOnChange({
+                            damageImmunityTime: value
+                          })
+                        }
+                        disabled={disabled}
+                        error={data.damageImmunityTime <= 0 || data.damageImmunityTime > 10}
+                        helperText="Seconds"
+                      />
+                    </FormBox>
+                  </Box>
+                </Card>
                 <Card header="Energy">
                   <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
                     <FormBox>

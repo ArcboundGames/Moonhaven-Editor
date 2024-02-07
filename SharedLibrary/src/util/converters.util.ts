@@ -1,5 +1,8 @@
 import {
   ALL_SEASONS,
+  ATTACK_TYPE_ARC,
+  ATTACK_TYPE_NONE,
+  ATTACK_TYPE_TOUCH,
   AUTO_BOX_COLLIDER_TYPE,
   BOX_COLLIDER_TYPE,
   DAYS_IN_A_WEEK,
@@ -70,6 +73,7 @@ import {
 import { isNotNullish, isNullish } from './null.util';
 
 import type {
+  AttackType,
   CampSpawn,
   Collider,
   ColliderType,
@@ -338,9 +342,13 @@ export function toProcessedRawCreatureType(rawCreatureType: RawCreatureType | un
     attackUseStrafing: rawCreatureType?.attackUseStrafing ?? false,
     attackStrafingTimeMin: rawCreatureType?.attackStrafingTimeMin ?? 0,
     attackStrafingTimeMax: rawCreatureType?.attackStrafingTimeMax ?? 0,
+    attackDamage: rawCreatureType?.attackDamage ?? 0,
+    attackKnockback: rawCreatureType?.attackKnockback ?? 0,
 
     randomSpawnsEnabled: rawCreatureType?.randomSpawnsEnabled ?? false,
-    spawnDistanceFromPlayers: rawCreatureType?.spawnDistanceFromPlayers ?? 0,
+    spawnDistanceMinFromPlayers: rawCreatureType?.spawnDistanceMinFromPlayers ?? 0,
+    spawnDistanceMaxFromPlayers: rawCreatureType?.spawnDistanceMaxFromPlayers ?? 0,
+    spawnDeadZoneRadius: rawCreatureType?.spawnDeadZoneRadius ?? 0,
     maxPopulation: rawCreatureType?.maxPopulation ?? 0,
 
     campSpawns: fromNullishArray(rawCreatureType?.campSpawns, toProcessedRawCampSpawn) ?? []
@@ -1029,7 +1037,8 @@ export function toProcessedRawPlayerData(rawPlayerData: RawPlayerData | undefine
     energyRefillThirstDepletionRate: rawPlayerData?.energyRefillThirstDepletionRate ?? 0,
     money: rawPlayerData?.money ?? 0,
     startingItems: fromNullishRecord(rawPlayerData?.startingItems, (value) => value ?? 0) ?? {},
-    nextLevelExp: fromNullishArray(rawPlayerData?.nextLevelExp, (exp) => exp ?? 0) ?? []
+    nextLevelExp: fromNullishArray(rawPlayerData?.nextLevelExp, (exp) => exp ?? 0) ?? [],
+    damageImmunityTime: rawPlayerData?.damageImmunityTime ?? 0
   };
 }
 
@@ -1617,7 +1626,8 @@ export function toProcessedRawCreatureSettings(rawCreatureSettings: RawCreatureS
     isShopkeeper: fromNullish(rawCreatureSettings.isShopkeeper),
     hasHealth: fromNullish(rawCreatureSettings.hasHealth),
     movementType: fromNullish(rawCreatureSettings.movementType),
-    neutral: fromNullish(rawCreatureSettings.neutral)
+    neutral: fromNullish(rawCreatureSettings.neutral),
+    attackType: fromNullish(rawCreatureSettings.attackType)
   };
 }
 
@@ -1628,7 +1638,8 @@ export function toCreatureSettings(processedRawCreatureSettings: ProcessedRawCre
 
   return {
     ...processedRawCreatureSettings,
-    movementType: toMovementType(processedRawCreatureSettings.movementType)
+    movementType: toMovementType(processedRawCreatureSettings.movementType),
+    attackType: toAttackType(processedRawCreatureSettings.attackType)
   };
 }
 
@@ -1643,6 +1654,20 @@ export function toMovementType(rawMovementType: string | undefined): MovementTyp
       break;
   }
   return movementType;
+}
+
+export function toAttackType(rawAttackType: string | undefined): AttackType | undefined {
+  let attackType: AttackType | undefined = undefined;
+  switch (rawAttackType) {
+    case ATTACK_TYPE_NONE:
+    case ATTACK_TYPE_TOUCH:
+    case ATTACK_TYPE_ARC:
+      attackType = rawAttackType;
+      break;
+    default:
+      break;
+  }
+  return attackType;
 }
 
 export function toVector2(rawVector: DeepNullish<Vector2> | undefined | null): Vector2 | undefined;

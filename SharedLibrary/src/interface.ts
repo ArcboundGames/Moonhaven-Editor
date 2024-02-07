@@ -1,5 +1,8 @@
 import type {
   ALL_SEASONS,
+  ATTACK_TYPE_ARC,
+  ATTACK_TYPE_NONE,
+  ATTACK_TYPE_TOUCH,
   AUTO_BOX_COLLIDER_TYPE,
   BOX_COLLIDER_TYPE,
   CRAFTING_RECIPES_DATA_FILE,
@@ -758,10 +761,14 @@ export interface CreatureType {
   attackUseStrafing: boolean;
   attackStrafingTimeMin: number;
   attackStrafingTimeMax: number;
+  attackDamage: number;
+  attackKnockback: number;
 
   // Spawning
   randomSpawnsEnabled: boolean;
-  spawnDistanceFromPlayers: number;
+  spawnDistanceMinFromPlayers: number;
+  spawnDistanceMaxFromPlayers: number;
+  spawnDeadZoneRadius: number;
   maxPopulation: number;
 
   campSpawns: CampSpawn[];
@@ -788,11 +795,13 @@ export interface CreatureShop {
 }
 
 export type MovementType = typeof MOVEMENT_TYPE_WALK | typeof MOVEMENT_TYPE_JUMP;
+export type AttackType = typeof ATTACK_TYPE_NONE | typeof ATTACK_TYPE_TOUCH | typeof ATTACK_TYPE_ARC;
 
 export type RawCreatureSettings = DeepNullish<ProcessedRawCreatureSettings>;
 
-export interface ProcessedRawCreatureSettings extends Omit<CreatureSettings, 'movementType'> {
+export interface ProcessedRawCreatureSettings extends Omit<CreatureSettings, 'movementType' | 'attackType'> {
   movementType?: string;
+  attackType?: string;
 }
 
 export interface CreatureSettings {
@@ -801,6 +810,7 @@ export interface CreatureSettings {
   hasHealth?: boolean;
   movementType?: MovementType;
   neutral?: boolean;
+  attackType?: AttackType;
 }
 
 export interface RawCreatureSprites extends DeepNullish<Omit<CreatureSprites, 'sprites' | 'idleSprites' | 'deathSprites'>> {
@@ -954,6 +964,9 @@ export interface PlayerData {
   money: number;
   startingItems: Record<string, number>;
   nextLevelExp: number[];
+
+  // Combat
+  damageImmunityTime: number;
 }
 
 /**

@@ -1,7 +1,13 @@
 import Box from '@mui/material/Box';
 
 import Select from 'renderer/components/widgets/form/Select';
-import { MOVEMENT_TYPE_JUMP, MOVEMENT_TYPE_WALK } from '../../../../../../../../SharedLibrary/src/constants';
+import {
+  ATTACK_TYPE_ARC,
+  ATTACK_TYPE_NONE,
+  ATTACK_TYPE_TOUCH,
+  MOVEMENT_TYPE_JUMP,
+  MOVEMENT_TYPE_WALK
+} from '../../../../../../../../SharedLibrary/src/constants';
 import { toTitleCaseFromKey } from '../../../../../../../../SharedLibrary/src/util/string.util';
 import { useAppSelector } from '../../../../../hooks';
 import { selectCreatureCategories } from '../../../../../store/slices/creatures';
@@ -299,6 +305,48 @@ const CreatureTypeBehaviorTab = ({ data, disabled, movementType, handleOnChange 
           </FormBox>
           {data.attackBehaviorEnabled ? (
             <Box key="attackFields">
+              <OverriddenCreaturePropertyCard
+                type={data}
+                setting="attackType"
+                onChange={handleOnChange}
+                defaultValue={ATTACK_TYPE_NONE}
+                disabled={disabled}
+                wrapperSx={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                  width: '100%'
+                }}
+                layout="inline"
+              >
+                {{
+                  control: ({ controlled, value, helperText, onChange }) => (
+                    <Select
+                      label="Attack Type"
+                      required
+                      disabled={controlled || disabled}
+                      value={value}
+                      onChange={onChange}
+                      options={[
+                        {
+                          label: 'None',
+                          emphasize: true,
+                          value: ATTACK_TYPE_NONE
+                        },
+                        {
+                          label: 'Touch',
+                          value: ATTACK_TYPE_TOUCH
+                        },
+                        {
+                          label: 'Arc',
+                          value: ATTACK_TYPE_ARC
+                        }
+                      ]}
+                      error={value === undefined}
+                      helperText={helperText}
+                    />
+                  )
+                }}
+              </OverriddenCreaturePropertyCard>
               <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
                 <FormBox>
                   <NumberTextField
@@ -315,113 +363,146 @@ const CreatureTypeBehaviorTab = ({ data, disabled, movementType, handleOnChange 
                     disabled={disabled}
                   />
                 </FormBox>
-              </Box>
-              {movementType !== MOVEMENT_TYPE_JUMP ? (
-                <Box
-                  sx={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-                    borderBottom: 1,
-                    borderColor: 'divider'
-                  }}
-                >
-                  <FormBox>
-                    <NumberTextField
-                      label="Attack Desired Min Range"
-                      value={data.attackDesiredRangeMin}
-                      min={1}
-                      max={20}
-                      onChange={(value) =>
-                        handleOnChange({
-                          attackDesiredRangeMin: value
-                        })
-                      }
-                      required
-                      error={data.attackDesiredRangeMin >= data.attackDesiredRangeMax}
-                      disabled={disabled}
-                    />
-                  </FormBox>
-                  <FormBox>
-                    <NumberTextField
-                      label="Attack Desired Max Range"
-                      value={data.attackDesiredRangeMax}
-                      min={1}
-                      max={20}
-                      onChange={(value) =>
-                        handleOnChange({
-                          attackDesiredRangeMax: value
-                        })
-                      }
-                      required
-                      error={data.attackDesiredRangeMin >= data.attackDesiredRangeMax}
-                      disabled={disabled}
-                    />
-                  </FormBox>
-                </Box>
-              ) : null}
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  borderBottom: 1,
-                  borderColor: 'divider'
-                }}
-              >
-                <FormBox sx={{ alignItems: 'flex-start' }}>
-                  <Checkbox
-                    label="Use Strafing"
-                    checked={data.attackUseStrafing}
+                <FormBox>
+                  <NumberTextField
+                    label="Attack Damage"
+                    value={data.attackDamage}
+                    min={1}
+                    max={1000}
                     onChange={(value) =>
                       handleOnChange({
-                        attackUseStrafing: value
+                        attackDamage: value
                       })
                     }
+                    required
+                    wholeNumber
                     disabled={disabled}
                   />
                 </FormBox>
-                {data.attackUseStrafing ? (
+                <FormBox>
+                  <NumberTextField
+                    label="Attack Knockback"
+                    value={data.attackKnockback}
+                    min={0}
+                    max={20}
+                    onChange={(value) =>
+                      handleOnChange({
+                        attackKnockback: value
+                      })
+                    }
+                    required
+                    disabled={disabled}
+                  />
+                </FormBox>
+              </Box>
+              {movementType !== MOVEMENT_TYPE_JUMP ? (
+                <>
                   <Box
-                    key="strafing-time"
                     sx={{
                       display: 'grid',
-                      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))'
+                      gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+                      borderBottom: 1,
+                      borderColor: 'divider'
                     }}
                   >
                     <FormBox>
                       <NumberTextField
-                        label="Strafing Time Min"
-                        value={data.attackStrafingTimeMin}
+                        label="Attack Desired Min Range"
+                        value={data.attackDesiredRangeMin}
                         min={1}
-                        max={10}
+                        max={20}
                         onChange={(value) =>
                           handleOnChange({
-                            attackStrafingTimeMin: value
+                            attackDesiredRangeMin: value
                           })
                         }
+                        required
+                        error={data.attackDesiredRangeMin >= data.attackDesiredRangeMax}
                         disabled={disabled}
-                        error={data.attackStrafingTimeMin >= data.attackStrafingTimeMax}
-                        helperText="Seconds"
                       />
                     </FormBox>
                     <FormBox>
                       <NumberTextField
-                        label="Strafing Time Max"
-                        value={data.attackStrafingTimeMax}
+                        label="Attack Desired Max Range"
+                        value={data.attackDesiredRangeMax}
                         min={1}
-                        max={10}
+                        max={20}
                         onChange={(value) =>
                           handleOnChange({
-                            attackStrafingTimeMax: value
+                            attackDesiredRangeMax: value
                           })
                         }
+                        required
+                        error={data.attackDesiredRangeMin >= data.attackDesiredRangeMax}
                         disabled={disabled}
-                        error={data.attackStrafingTimeMin >= data.attackStrafingTimeMax}
-                        helperText="Seconds"
                       />
                     </FormBox>
                   </Box>
-                ) : null}
-              </Box>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      borderBottom: 1,
+                      borderColor: 'divider'
+                    }}
+                  >
+                    <FormBox sx={{ alignItems: 'flex-start' }}>
+                      <Checkbox
+                        label="Use Strafing"
+                        checked={data.attackUseStrafing}
+                        onChange={(value) =>
+                          handleOnChange({
+                            attackUseStrafing: value
+                          })
+                        }
+                        disabled={disabled}
+                      />
+                    </FormBox>
+                    {data.attackUseStrafing ? (
+                      <Box
+                        key="strafing-time"
+                        sx={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(2, minmax(0, 1fr))'
+                        }}
+                      >
+                        <FormBox>
+                          <NumberTextField
+                            label="Strafing Time Min"
+                            value={data.attackStrafingTimeMin}
+                            min={1}
+                            max={10}
+                            onChange={(value) =>
+                              handleOnChange({
+                                attackStrafingTimeMin: value
+                              })
+                            }
+                            disabled={disabled}
+                            error={data.attackStrafingTimeMin >= data.attackStrafingTimeMax}
+                            helperText="Seconds"
+                          />
+                        </FormBox>
+                        <FormBox>
+                          <NumberTextField
+                            label="Strafing Time Max"
+                            value={data.attackStrafingTimeMax}
+                            min={1}
+                            max={10}
+                            onChange={(value) =>
+                              handleOnChange({
+                                attackStrafingTimeMax: value
+                              })
+                            }
+                            disabled={disabled}
+                            error={data.attackStrafingTimeMin >= data.attackStrafingTimeMax}
+                            helperText="Seconds"
+                          />
+                        </FormBox>
+                      </Box>
+                    ) : null}
+                  </Box>
+                </>
+              ) : null}
               <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
                 <FormBox>
                   <Checkbox

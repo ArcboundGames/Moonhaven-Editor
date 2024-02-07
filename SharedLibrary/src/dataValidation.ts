@@ -669,6 +669,8 @@ export function validateCreatureBehaviorTab(
   const { errors, assert, assertNotNullish } = createAssert();
 
   const movementType = getCreatureSetting('movementType', rawType, categoriesByKeys).value;
+  assertNotNullish(movementType, 'No movement type');
+
   if (movementType !== MOVEMENT_TYPE_JUMP) {
     assert(rawType.walkSpeed >= 1, 'Walk speed must be greater than or equal to 1');
     assert(rawType.walkSpeed <= 10, 'Walk speed must be less than or equal to 10');
@@ -691,7 +693,10 @@ export function validateCreatureBehaviorTab(
       rawType.jumpMoveEndSpriteIndex < animationSpriteCount,
       `Jump move end sprite index must be less than the number of sprites in the jump animation (${animationSpriteCount})`
     );
-    assert(rawType.jumpMoveStartSpriteIndex < rawType.jumpMoveEndSpriteIndex, 'Jump move end sprite index must be greater than the jump move start sprite index');
+    assert(
+      rawType.jumpMoveStartSpriteIndex < rawType.jumpMoveEndSpriteIndex,
+      'Jump move end sprite index must be greater than the jump move start sprite index'
+    );
   }
 
   if (rawType.dangerBehaviorEnabled) {
@@ -730,19 +735,22 @@ export function validateCreatureBehaviorTab(
     if (rawType.wanderUseCustomAnchor) {
       assertNotNullish(rawType.wanderAnchor, 'No wander custom anchor');
     }
-
-    if (rawType.attackUseStrafing) {
-      assert(rawType.attackStrafingTimeMin >= 1, 'Strafing min time must be greater than or equal to 1');
-      assert(rawType.attackStrafingTimeMin <= 25, 'Strafing min time must be less than or equal to 10');
-      assert(rawType.attackStrafingTimeMax >= 1, 'Strafing max time must be greater than or equal to 1');
-      assert(rawType.attackStrafingTimeMax <= 25, 'Strafing max time must be less than or equal to 10');
-      assert(rawType.attackStrafingTimeMin < rawType.attackStrafingTimeMax, 'Strafing min time must be less than strafing max time');
-    }
   }
 
   if (rawType.attackBehaviorEnabled) {
+    const attackType = getCreatureSetting('attackType', rawType, categoriesByKeys).value;
+    assertNotNullish(attackType, 'No attack type');
+
     assert(rawType.attackRadius >= 1, 'Attack radius must be greater than or equal to 1');
     assert(rawType.attackRadius <= 20, 'Attack radius must be less than or equal to 20');
+
+    assert(rawType.attackDamage >= 1, 'Attack damage must be greater than or equal to 1');
+    assert(rawType.attackDamage <= 1000, 'Attack damage must be less than or equal to 1000');
+    assert(rawType.attackDamage % 1 === 0, 'Attack damage must be a whole number');
+
+    assert(rawType.attackKnockback >= 0, 'Attack knockback must be greater than or equal to 0');
+    assert(rawType.attackKnockback <= 1000, 'Attack knockback must be less than or equal to 1000');
+
     if (movementType !== MOVEMENT_TYPE_JUMP) {
       assert(rawType.attackDesiredRangeMin >= 1, 'Attack desired min range must be greater than or equal to 1');
       assert(rawType.attackDesiredRangeMin <= 20, 'Attack desired min range must be less than or equal to 20');
@@ -752,6 +760,14 @@ export function validateCreatureBehaviorTab(
         rawType.attackDesiredRangeMin < rawType.attackDesiredRangeMax,
         'Attack desired min range must be less than attack desired max range'
       );
+
+      if (rawType.attackUseStrafing) {
+        assert(rawType.attackStrafingTimeMin >= 1, 'Strafing min time must be greater than or equal to 1');
+        assert(rawType.attackStrafingTimeMin <= 25, 'Strafing min time must be less than or equal to 10');
+        assert(rawType.attackStrafingTimeMax >= 1, 'Strafing max time must be greater than or equal to 1');
+        assert(rawType.attackStrafingTimeMax <= 25, 'Strafing max time must be less than or equal to 10');
+        assert(rawType.attackStrafingTimeMin < rawType.attackStrafingTimeMax, 'Strafing min time must be less than strafing max time');
+      }
     }
   }
 
@@ -761,8 +777,11 @@ export function validateCreatureBehaviorTab(
 export function validateCreatureSpawningTab(rawType: ProcessedRawCreatureType) {
   const { errors, assert, assertNotNullish } = createAssert();
 
-  assert(rawType.spawnDistanceFromPlayers >= 0, 'Spawn distance from players must be greater than or equal to 0');
-  assert(rawType.spawnDistanceFromPlayers <= 100, 'Spawn distance from players must be less than or equal to 100');
+  assert(rawType.spawnDistanceMinFromPlayers >= 0, 'Min spawn distance from players must be greater than or equal to 0');
+  assert(rawType.spawnDistanceMinFromPlayers <= 100, 'Min spawn distance from players must be less than or equal to 100');
+
+  assert(rawType.spawnDistanceMaxFromPlayers >= 0, 'Max spawn distance from players must be greater than or equal to 0');
+  assert(rawType.spawnDistanceMaxFromPlayers <= 100, 'Max spawn distance from players must be less than or equal to 100');
 
   if (rawType.randomSpawnsEnabled) {
     assert(rawType.maxPopulation >= 1, 'Max population must be greater than or equal to 1');
@@ -3233,12 +3252,12 @@ export function validatePlayerDataGeneralTab(
     return playerData;
   }
 
-  const startingStatErrors = validateStartingStats(rawPlayerData);
+  const playerStatErrors = validatePlayerStats(rawPlayerData);
 
-  if (Object.keys(startingStatErrors).length > 0) {
+  if (Object.keys(playerStatErrors).length > 0) {
     allErrors[PLAYER_DATA_FILE] = {
       ...(allErrors[PLAYER_DATA_FILE] ?? {}),
-      [ERROR_SECTION_PLAYER_STATS]: startingStatErrors
+      [ERROR_SECTION_PLAYER_STATS]: playerStatErrors
     };
   }
 
@@ -3272,7 +3291,7 @@ export function validatePlayerDataLevelsTab(allErrors: AllErrors, playerData: Pl
   return playerData;
 }
 
-export function validateStartingStats(rawPlayerData: ProcessedRawPlayerData) {
+export function validatePlayerStats(rawPlayerData: ProcessedRawPlayerData) {
   const { errors, assert } = createAssert();
 
   assert(rawPlayerData.health > 0, 'Starting health must be greater than 0');
@@ -3327,6 +3346,9 @@ export function validateStartingStats(rawPlayerData: ProcessedRawPlayerData) {
 
   assert(rawPlayerData.money > 0, 'Money must be greater than 0');
   assert(rawPlayerData.money % 1 === 0, 'Money must be a whole number');
+
+  assert(rawPlayerData.damageImmunityTime > 0, 'Damage immunity time must be greater than 0');
+  assert(rawPlayerData.damageImmunityTime <= 10, 'Damage immunity time must be less than or equal to 10');
 
   return errors;
 }

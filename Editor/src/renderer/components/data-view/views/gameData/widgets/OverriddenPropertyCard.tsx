@@ -374,6 +374,7 @@ interface BaseUseRenderedComponentsProps<S extends AllSettings, K extends keyof 
   onChange: (newValue: T) => void;
   children: { control: ChildControl<S, K>; other?: OtherChildren<S, K> };
   value: S[K] | undefined;
+  hasSubCategories: boolean;
 }
 
 interface VariantUseRenderedComponentsProps<S extends AllSettings, K extends keyof S, T extends AllTypes<S>>
@@ -409,7 +410,8 @@ const useRenderedComponents = <S extends AllSettings, K extends keyof S, T exten
     sx,
     wrapperSx,
     disabled,
-    value
+    value,
+    hasSubCategories
   } = props;
 
   const onOverrideChange = useOnOverrideChange<S, K, T>({ onChange, setting, type, defaultValue });
@@ -429,8 +431,8 @@ const useRenderedComponents = <S extends AllSettings, K extends keyof S, T exten
   }, [controlledBy, level, setOverridden]);
 
   const helperText = useMemo(
-    () => renderHelperText(controlledBy === 1 ? 'sub category' : 'category'),
-    [controlledBy, renderHelperText]
+    () => renderHelperText(hasSubCategories && controlledBy === 1 ? 'sub category' : 'category'),
+    [controlledBy, hasSubCategories, renderHelperText]
   );
 
   const controlled = useMemo(() => controlledBy > level && !overridden, [controlledBy, level, overridden]);
@@ -489,7 +491,7 @@ export const OverriddenObjectPropertyCard = <K extends keyof ObjectSettings, T e
   const subCategoriesByKey = useAppSelector(selectObjectSubCategoriesByKey);
   const { value, controlledBy } = getObjectSetting(setting, type, categoriesByKey, subCategoriesByKey);
 
-  return useRenderedComponents({ ...props, value, controlledBy });
+  return useRenderedComponents({ ...props, value, controlledBy, hasSubCategories: true });
 };
 
 export const OverriddenItemPropertyCard = <K extends keyof ItemSettings>(props: ItemSettingsProps<K>) => {
@@ -498,7 +500,7 @@ export const OverriddenItemPropertyCard = <K extends keyof ItemSettings>(props: 
   const categoriesByKey = useAppSelector(selectItemCategoriesByKey);
   const { value, controlledBy } = getItemSetting(setting, type, categoriesByKey);
 
-  return useRenderedComponents({ ...props, value, controlledBy });
+  return useRenderedComponents({ ...props, value, controlledBy, hasSubCategories: false });
 };
 
 export const OverriddenCreaturePropertyCard = <K extends keyof CreatureSettings>(props: CreatureSettingsProps<K>) => {
@@ -507,5 +509,5 @@ export const OverriddenCreaturePropertyCard = <K extends keyof CreatureSettings>
   const categoriesByKey = useAppSelector(selectCreatureCategoriesByKey);
   const { value, controlledBy } = getCreatureSetting(setting, type, categoriesByKey);
 
-  return useRenderedComponents({ ...props, value, controlledBy });
+  return useRenderedComponents({ ...props, value, controlledBy, hasSubCategories: false });
 };

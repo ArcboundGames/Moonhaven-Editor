@@ -1,4 +1,5 @@
 import type {
+  AttackType,
   ColliderType,
   FilledFromType,
   FishingItemType,
@@ -346,3 +347,12 @@ export const MOVEMENT_TYPE_WALK = 'WALK';
 export const MOVEMENT_TYPE_JUMP = 'JUMP';
 
 export const MOVEMENT_TYPES: MovementType[] = [MOVEMENT_TYPE_WALK, MOVEMENT_TYPE_JUMP];
+
+/**
+ * Attack Type
+ */
+export const ATTACK_TYPE_NONE = 'NONE';
+export const ATTACK_TYPE_TOUCH = 'TOUCH';
+export const ATTACK_TYPE_ARC = 'ARC';
+
+export const ATTACK_TYPES: AttackType[] = [ATTACK_TYPE_NONE, ATTACK_TYPE_TOUCH, ATTACK_TYPE_ARC];
