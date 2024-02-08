@@ -44,7 +44,6 @@ const CreatureTypeBehaviorTab = ({ data, disabled, movementType, handleOnChange 
           disabled={disabled}
           wrapperSx={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
             width: '100%'
           }}
         >
@@ -113,20 +112,37 @@ const CreatureTypeBehaviorTab = ({ data, disabled, movementType, handleOnChange 
 
               if (movementType === MOVEMENT_TYPE_JUMP) {
                 return (
-                  <>
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
                     <FormBox>
                       <NumberTextField
-                        label="Jump Wait Time"
-                        value={data.jumpWaitTime}
+                        label="Jump Min Wait Time"
+                        value={data.jumpMinWaitTime}
                         min={1}
                         max={10}
                         onChange={(value) =>
                           handleOnChange({
-                            jumpWaitTime: value
+                            jumpMinWaitTime: value
                           })
                         }
                         required
                         disabled={disabled}
+                        error={data.jumpMinWaitTime >= data.jumpMaxWaitTime}
+                      />
+                    </FormBox>
+                    <FormBox>
+                      <NumberTextField
+                        label="Jump Max Wait Time"
+                        value={data.jumpMaxWaitTime}
+                        min={1}
+                        max={10}
+                        onChange={(value) =>
+                          handleOnChange({
+                            jumpMaxWaitTime: value
+                          })
+                        }
+                        required
+                        disabled={disabled}
+                        error={data.jumpMinWaitTime >= data.jumpMaxWaitTime}
                       />
                     </FormBox>
                     <FormBox>
@@ -190,7 +206,7 @@ const CreatureTypeBehaviorTab = ({ data, disabled, movementType, handleOnChange 
                         error={data.jumpMoveStartSpriteIndex >= data.jumpMoveEndSpriteIndex}
                       />
                     </FormBox>
-                  </>
+                  </Box>
                 );
               }
 

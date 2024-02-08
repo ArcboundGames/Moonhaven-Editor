@@ -310,7 +310,8 @@ export function toProcessedRawCreatureType(rawCreatureType: RawCreatureType | un
 
     walkSpeed: rawCreatureType?.walkSpeed ?? 0,
     runSpeed: rawCreatureType?.runSpeed ?? 0,
-    jumpWaitTime: rawCreatureType?.jumpWaitTime ?? 0,
+    jumpMinWaitTime: rawCreatureType?.jumpMinWaitTime ?? 0,
+    jumpMaxWaitTime: rawCreatureType?.jumpMaxWaitTime ?? 0,
     jumpMoveStartSpriteIndex: rawCreatureType?.jumpMoveStartSpriteIndex ?? 0,
     jumpMoveEndSpriteIndex: rawCreatureType?.jumpMoveEndSpriteIndex ?? 0,
     jumpMinDistance: rawCreatureType?.jumpMinDistance ?? 0,
@@ -348,6 +349,7 @@ export function toProcessedRawCreatureType(rawCreatureType: RawCreatureType | un
     randomSpawnsEnabled: rawCreatureType?.randomSpawnsEnabled ?? false,
     spawnDistanceMinFromPlayers: rawCreatureType?.spawnDistanceMinFromPlayers ?? 0,
     spawnDistanceMaxFromPlayers: rawCreatureType?.spawnDistanceMaxFromPlayers ?? 0,
+    despawnDistanceFromPlayers: rawCreatureType?.despawnDistanceFromPlayers ?? 0,
     spawnDeadZoneRadius: rawCreatureType?.spawnDeadZoneRadius ?? 0,
     maxPopulation: rawCreatureType?.maxPopulation ?? 0,
 

@@ -33,6 +33,7 @@ const CreatureTypeSpawningTab = ({ data, disabled, handleOnChange }: CreatureTyp
                 }
                 required
                 disabled={disabled}
+                error={data.spawnDistanceMinFromPlayers > data.spawnDistanceMaxFromPlayers}
               />
             </FormBox>
             <FormBox>
@@ -48,6 +49,26 @@ const CreatureTypeSpawningTab = ({ data, disabled, handleOnChange }: CreatureTyp
                 }
                 required
                 disabled={disabled}
+                error={data.spawnDistanceMinFromPlayers > data.spawnDistanceMaxFromPlayers}
+              />
+            </FormBox>
+            <FormBox>
+              <NumberTextField
+                label="Despawn Distance From Players"
+                value={data.despawnDistanceFromPlayers}
+                min={0}
+                max={100}
+                onChange={(value) =>
+                  handleOnChange({
+                    despawnDistanceFromPlayers: value
+                  })
+                }
+                required
+                disabled={disabled}
+                error={
+                  data.despawnDistanceFromPlayers > 0 &&
+                  data.despawnDistanceFromPlayers <= data.spawnDistanceMaxFromPlayers
+                }
               />
             </FormBox>
           </Box>
@@ -66,23 +87,43 @@ const CreatureTypeSpawningTab = ({ data, disabled, handleOnChange }: CreatureTyp
                 disabled={disabled}
               />
             </FormBox>
+          </Box>
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
             {data.randomSpawnsEnabled ? (
-              <FormBox>
-                <NumberTextField
-                  label="Max Population"
-                  value={data.maxPopulation}
-                  min={1}
-                  max={250}
-                  onChange={(value) =>
-                    handleOnChange({
-                      maxPopulation: value
-                    })
-                  }
-                  required
-                  disabled={disabled}
-                  wholeNumber
-                />
-              </FormBox>
+              <>
+                <FormBox>
+                  <NumberTextField
+                    label="Max Population"
+                    value={data.maxPopulation}
+                    min={1}
+                    max={250}
+                    onChange={(value) =>
+                      handleOnChange({
+                        maxPopulation: value
+                      })
+                    }
+                    required
+                    disabled={disabled}
+                    wholeNumber
+                  />
+                </FormBox>
+                <FormBox>
+                  <NumberTextField
+                    label="Dead Zone"
+                    value={data.spawnDeadZoneRadius}
+                    min={1}
+                    max={250}
+                    onChange={(value) =>
+                      handleOnChange({
+                        spawnDeadZoneRadius: value
+                      })
+                    }
+                    required
+                    disabled={disabled}
+                    wholeNumber
+                  />
+                </FormBox>
+              </>
             ) : null}
           </Box>
         </Card>

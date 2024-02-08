@@ -729,7 +729,8 @@ export interface CreatureType {
   // Behavior
   walkSpeed: number;
   runSpeed: number;
-  jumpWaitTime: number;
+  jumpMinWaitTime: number;
+  jumpMaxWaitTime: number;
   jumpMoveStartSpriteIndex: number;
   jumpMoveEndSpriteIndex: number;
   jumpMinDistance: number;
@@ -768,6 +769,7 @@ export interface CreatureType {
   randomSpawnsEnabled: boolean;
   spawnDistanceMinFromPlayers: number;
   spawnDistanceMaxFromPlayers: number;
+  despawnDistanceFromPlayers: number;
   spawnDeadZoneRadius: number;
   maxPopulation: number;
 

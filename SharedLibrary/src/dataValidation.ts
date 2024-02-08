@@ -675,8 +675,12 @@ export function validateCreatureBehaviorTab(
     assert(rawType.walkSpeed >= 1, 'Walk speed must be greater than or equal to 1');
     assert(rawType.walkSpeed <= 10, 'Walk speed must be less than or equal to 10');
   } else if (movementType === MOVEMENT_TYPE_JUMP) {
-    assert(rawType.jumpWaitTime >= 1, 'Jump wait time must be greater than or equal to 1');
-    assert(rawType.jumpWaitTime <= 10, 'Jump wait time must be less than or equal to 10');
+    assert(rawType.jumpMinWaitTime >= 1, 'Jump min wait time must be greater than or equal to 1');
+    assert(rawType.jumpMinWaitTime <= 10, 'Jump min wait time must be less than or equal to 10');
+    assert(rawType.jumpMaxWaitTime >= 1, 'Jump max wait time must be greater than or equal to 1');
+    assert(rawType.jumpMaxWaitTime <= 10, 'Jump max wait time must be less than or equal to 10');
+    assert(rawType.jumpMinWaitTime < rawType.jumpMaxWaitTime, 'Jump min wait time must be less than jump max wait time');
+
     assert(rawType.jumpMinDistance >= 1, 'Jump min distance must be greater than or equal to 1');
     assert(rawType.jumpMinDistance <= 10, 'Jump min distance must be less than or equal to 10');
     assert(rawType.jumpMaxDistance >= 1, 'Jump max distance must be greater than or equal to 1');
@@ -783,10 +787,27 @@ export function validateCreatureSpawningTab(rawType: ProcessedRawCreatureType) {
   assert(rawType.spawnDistanceMaxFromPlayers >= 0, 'Max spawn distance from players must be greater than or equal to 0');
   assert(rawType.spawnDistanceMaxFromPlayers <= 100, 'Max spawn distance from players must be less than or equal to 100');
 
+  assert(
+    rawType.spawnDistanceMinFromPlayers <= rawType.spawnDistanceMaxFromPlayers,
+    'Min spawn distance from players must be less than or equal to max spawn distance from players'
+  );
+
+  assert(rawType.despawnDistanceFromPlayers >= 0, 'Despawn distance from players must be greater than or equal to 0');
+  assert(rawType.despawnDistanceFromPlayers <= 200, 'Despawn distance from players must be less than or equal to 200');
+
+  if (rawType.despawnDistanceFromPlayers > 0) {
+    assert(
+      rawType.despawnDistanceFromPlayers > rawType.spawnDistanceMaxFromPlayers,
+      'Despawn distance from players must be greater than max spawn distance'
+    );
+  }
+
   if (rawType.randomSpawnsEnabled) {
     assert(rawType.maxPopulation >= 1, 'Max population must be greater than or equal to 1');
     assert(rawType.maxPopulation <= 250, 'Max population must be less than or equal to 250');
     assert(rawType.maxPopulation % 1 === 0, 'Max population must be a whole number');
+    assert(rawType.spawnDeadZoneRadius >= 1, 'Spawn dead zone radius must be greater than or equal to 1');
+    assert(rawType.spawnDeadZoneRadius <= 20, 'Spawn dead zone radius must be less than or equal to 20');
   }
 
   rawType.campSpawns.forEach((campSpawn, index) => assertCampSpawn(assert, assertNotNullish, campSpawn, `Camp spawn ${index}`));
