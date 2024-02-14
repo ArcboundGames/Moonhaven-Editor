@@ -283,7 +283,7 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                     control: ({ controlled, value, helperText, onChange }) => (
                       <MultiSelect
                         label="Projectile Item Category"
-                        values={data.settings?.projectileItemCategoryKeys}
+                        values={value}
                         onChange={onChange}
                         options={projectileItemCategories.map((option) => ({
                           label: toTitleCaseFromKey(option.key),
@@ -312,7 +312,7 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                     control: ({ controlled, value, helperText, onChange }) => (
                       <ItemMultiSelect
                         label="Projectile Item"
-                        values={data.settings?.projectileItemKeys}
+                        values={value}
                         onChange={onChange}
                         items={projectileItems}
                         disabled={
@@ -345,7 +345,7 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                       control: ({ controlled, value, helperText, onChange }) => (
                         <MultiSelect
                           label="Damages Creature Category"
-                          values={data.settings?.damagesCreatureCategoryKeys}
+                          values={value}
                           onChange={onChange}
                           options={damagableCreatureCategories.map((option) => ({
                             label: toTitleCaseFromKey(option.key),
@@ -374,7 +374,7 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                       control: ({ controlled, value, helperText, onChange }) => (
                         <CreatureMultiSelect
                           label="Damages Creature"
-                          values={data.settings?.damagesCreatureKeys}
+                          values={value}
                           onChange={onChange}
                           creatures={damagableCreatures}
                           disabled={
@@ -404,7 +404,7 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                       control: ({ controlled, value, helperText, onChange }) => (
                         <MultiSelect
                           label="Damages Object Category"
-                          values={data.settings?.damagesObjectCategoryKeys}
+                          values={value}
                           onChange={onChange}
                           options={damagableObjectCategories.map((option) => ({
                             label: toTitleCaseFromKey(option.key),
@@ -433,7 +433,7 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                       control: ({ controlled, value, helperText, onChange }) => (
                         <MultiSelect
                           label="Damages Object Sub Category"
-                          values={data.settings?.damagesObjectSubCategoryKeys}
+                          values={value}
                           onChange={onChange}
                           options={damagableObjectSubCategories.map((option) => ({
                             label: toTitleCaseFromKey(option.key),
@@ -462,7 +462,7 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                       control: ({ controlled, value, helperText, onChange }) => (
                         <MultiSelect
                           label="Damages Object"
-                          values={data.settings?.damagesObjectKeys}
+                          values={value}
                           onChange={onChange}
                           options={damagableObjects.map((option) => ({
                             label: option.name,
