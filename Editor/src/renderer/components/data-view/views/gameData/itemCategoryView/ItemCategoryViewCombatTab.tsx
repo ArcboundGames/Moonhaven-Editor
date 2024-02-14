@@ -103,6 +103,22 @@ const ItemCategoryViewCombatTab = ({ data, disabled, handleOnChange }: ItemCateg
 
   const isWeaponTypeNone = isNullish(weaponType) || weaponType === WEAPON_TYPE_NONE;
 
+  const canDamageObjects = useMemo(
+    () =>
+      [
+        ...(data.settings?.damagesObjectKeys ?? []),
+        ...(data.settings?.damagesObjectCategoryKeys ?? []),
+        ...(data.settings?.damagesObjectSubCategoryKeys ?? [])
+      ].length > 0,
+    [data]
+  );
+
+  const canDamageCreatures = useMemo(
+    () =>
+      [...(data.settings?.damagesCreatureKeys ?? []), ...(data.settings?.damagesCreatureCategoryKeys ?? [])].length > 0,
+    [data]
+  );
+
   return (
     <Box sx={{ display: 'grid', gridTemplateColumns: '5fr 4fr' }}>
       <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
@@ -185,25 +201,69 @@ const ItemCategoryViewCombatTab = ({ data, disabled, handleOnChange }: ItemCateg
                 </FormBox>
               </Card>
               <Card header="Damage Increase Skill">
-                <FormBox>
-                  <Select
-                    label="Skill"
-                    value={data.settings?.damagedIncreasedBySkillKey}
-                    onChange={(value) => {
-                      handleOnChange({
-                        settings: {
-                          ...data.settings,
-                          damagedIncreasedBySkillKey: value
-                        }
-                      });
-                    }}
-                    disabled={disabled}
-                    options={sortedSkills?.map((entry) => ({
-                      label: entry.name,
-                      value: entry.key
-                    }))}
-                  />
-                </FormBox>
+                {canDamageCreatures ? (
+                  <FormBox>
+                    <Select
+                      label="Creature Damage Skill"
+                      value={data.settings?.creatureDamageIncreasedBySkillKey}
+                      onChange={(value) => {
+                        handleOnChange({
+                          settings: {
+                            ...data.settings,
+                            creatureDamageIncreasedBySkillKey: value
+                          }
+                        });
+                      }}
+                      disabled={disabled}
+                      options={sortedSkills?.map((entry) => ({
+                        label: entry.name,
+                        value: entry.key
+                      }))}
+                    />
+                  </FormBox>
+                ) : null}
+                {canDamageObjects ? (
+                  <FormBox>
+                    <Select
+                      label="Object Damage Skill"
+                      value={data.settings?.objectDamageIncreasedBySkillKey}
+                      onChange={(value) => {
+                        handleOnChange({
+                          settings: {
+                            ...data.settings,
+                            objectDamageIncreasedBySkillKey: value
+                          }
+                        });
+                      }}
+                      disabled={disabled}
+                      options={sortedSkills?.map((entry) => ({
+                        label: entry.name,
+                        value: entry.key
+                      }))}
+                    />
+                  </FormBox>
+                ) : null}
+                {weaponType === WEAPON_TYPE_PROJECTILE_LAUNCHER ? (
+                  <FormBox>
+                    <Select
+                      label="Launcher Damage Skill"
+                      value={data.settings?.launcherDamageIncreasedBySkillKey}
+                      onChange={(value) => {
+                        handleOnChange({
+                          settings: {
+                            ...data.settings,
+                            launcherDamageIncreasedBySkillKey: value
+                          }
+                        });
+                      }}
+                      disabled={disabled}
+                      options={sortedSkills?.map((entry) => ({
+                        label: entry.name,
+                        value: entry.key
+                      }))}
+                    />
+                  </FormBox>
+                ) : null}
               </Card>
             </Box>
           ) : null}

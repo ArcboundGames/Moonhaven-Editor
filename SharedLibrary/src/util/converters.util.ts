@@ -476,7 +476,9 @@ export function toProcessedRawItemType(rawItemType: RawItemType | undefined | nu
     categoryKey: fromNullish(rawItemType?.categoryKey),
     objectTypeKey: fromNullish(rawItemType?.objectTypeKey),
     maxStackSize: rawItemType?.maxStackSize ?? 0,
-    damage: rawItemType?.damage ?? 0,
+    creatureDamage: rawItemType?.creatureDamage ?? 0,
+    objectDamage: rawItemType?.objectDamage ?? 0,
+    launcherDamage: rawItemType?.launcherDamage ?? 0,
     damageArcRadius: rawItemType?.damageArcRadius ?? 0,
     settings: toProcessedRawItemSettings(rawItemType?.settings),
     durability: rawItemType?.durability ?? 0,
@@ -1600,7 +1602,9 @@ export function toProcessedRawItemSettings(rawItemSettings: RawItemSettings | un
     projectileItemCategoryKeys: fromNullishArray(rawItemSettings?.projectileItemCategoryKeys, (entry) => entry ?? ''),
     projectileItemKeys: fromNullishArray(rawItemSettings?.projectileItemKeys, (entry) => entry ?? ''),
     fishingItemType: fromNullish(rawItemSettings?.fishingItemType),
-    damagedIncreasedBySkillKey: fromNullish(rawItemSettings?.damagedIncreasedBySkillKey)
+    creatureDamageIncreasedBySkillKey: fromNullish(rawItemSettings?.creatureDamageIncreasedBySkillKey),
+    objectDamageIncreasedBySkillKey: fromNullish(rawItemSettings?.objectDamageIncreasedBySkillKey),
+    launcherDamageIncreasedBySkillKey: fromNullish(rawItemSettings?.launcherDamageIncreasedBySkillKey)
   };
 }
 

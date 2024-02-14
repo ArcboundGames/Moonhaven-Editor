@@ -101,11 +101,30 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
   );
 
   const weaponType = useMemo(
-    () => getItemSetting('weaponType', data, itemCategoriesByKey),
+    () => getItemSetting('weaponType', data, itemCategoriesByKey).value,
     [data, itemCategoriesByKey]
-  ).value;
+  );
 
   const isWeaponTypeNone = isNullish(weaponType) || weaponType === WEAPON_TYPE_NONE;
+
+  const canDamageObjects = useMemo(
+    () =>
+      [
+        ...(getItemSetting('damagesObjectKeys', data, itemCategoriesByKey).value ?? []),
+        ...(getItemSetting('damagesObjectCategoryKeys', data, itemCategoriesByKey).value ?? []),
+        ...(getItemSetting('damagesObjectSubCategoryKeys', data, itemCategoriesByKey).value ?? [])
+      ].length > 0,
+    [data, itemCategoriesByKey]
+  );
+
+  const canDamageCreatures = useMemo(
+    () =>
+      [
+        ...(getItemSetting('damagesCreatureKeys', data, itemCategoriesByKey).value ?? []),
+        ...(getItemSetting('damagesCreatureCategoryKeys', data, itemCategoriesByKey).value ?? [])
+      ].length > 0,
+    [data, itemCategoriesByKey]
+  );
 
   return (
     <Box sx={{ display: 'grid', gridTemplateColumns: '5fr 4fr' }}>
@@ -161,17 +180,32 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
             </Card>
             {weaponType && weaponType !== WEAPON_TYPE_NONE ? (
               <Card header="Damage">
-                <FormBox>
-                  <NumberTextField
-                    label="Damage"
-                    value={data.damage}
-                    min={1}
-                    onChange={(value) => handleOnChange({ damage: value })}
-                    required
-                    disabled={isWeaponTypeNone || disabled}
-                    wholeNumber
-                  />
-                </FormBox>
+                {canDamageCreatures ? (
+                  <FormBox>
+                    <NumberTextField
+                      label="Creature Damage"
+                      value={data.creatureDamage}
+                      min={1}
+                      onChange={(value) => handleOnChange({ creatureDamage: value })}
+                      required
+                      disabled={isWeaponTypeNone || disabled}
+                      wholeNumber
+                    />
+                  </FormBox>
+                ) : null}
+                {canDamageObjects ? (
+                  <FormBox>
+                    <NumberTextField
+                      label="Object Damage"
+                      value={data.objectDamage}
+                      min={1}
+                      onChange={(value) => handleOnChange({ objectDamage: value })}
+                      required
+                      disabled={isWeaponTypeNone || disabled}
+                      wholeNumber
+                    />
+                  </FormBox>
+                ) : null}
                 {weaponType === WEAPON_TYPE_ARC ? (
                   <FormBox>
                     <NumberTextField
@@ -212,6 +246,19 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                     </FormBox>
                   </>
                 ) : null}
+                {weaponType === WEAPON_TYPE_PROJECTILE_LAUNCHER ? (
+                  <FormBox>
+                    <NumberTextField
+                      label="Launcher Damage"
+                      value={data.launcherDamage}
+                      min={1}
+                      onChange={(value) => handleOnChange({ launcherDamage: value })}
+                      required
+                      disabled={isWeaponTypeNone || disabled}
+                      wholeNumber
+                    />
+                  </FormBox>
+                ) : null}
               </Card>
             ) : null}
           </Box>
@@ -239,29 +286,81 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                   variant="boolean"
                 />
               </Card>
-              <OverriddenItemPropertyCard
-                type={data}
-                setting="damagedIncreasedBySkillKey"
-                onChange={handleOnChange}
-                defaultValue={''}
-                disabled={isWeaponTypeNone || disabled}
-              >
-                {{
-                  control: ({ controlled, value, helperText, onChange }) => (
-                    <Select
-                      label="Skill"
-                      value={value}
-                      onChange={onChange}
-                      disabled={controlled || disabled}
-                      options={sortedSkills?.map((entry) => ({
-                        label: entry.name,
-                        value: entry.key
-                      }))}
-                      helperText={helperText}
-                    />
-                  )
-                }}
-              </OverriddenItemPropertyCard>
+              {canDamageCreatures ? (
+                <OverriddenItemPropertyCard
+                  type={data}
+                  setting="creatureDamageIncreasedBySkillKey"
+                  onChange={handleOnChange}
+                  defaultValue={''}
+                  disabled={isWeaponTypeNone || disabled}
+                >
+                  {{
+                    control: ({ controlled, value, helperText, onChange }) => (
+                      <Select
+                        label="Creature Damage Skill"
+                        value={value}
+                        onChange={onChange}
+                        disabled={controlled || disabled}
+                        options={sortedSkills?.map((entry) => ({
+                          label: entry.name,
+                          value: entry.key
+                        }))}
+                        helperText={helperText}
+                      />
+                    )
+                  }}
+                </OverriddenItemPropertyCard>
+              ) : null}
+              {canDamageObjects ? (
+                <OverriddenItemPropertyCard
+                  type={data}
+                  setting="objectDamageIncreasedBySkillKey"
+                  onChange={handleOnChange}
+                  defaultValue={''}
+                  disabled={isWeaponTypeNone || disabled}
+                >
+                  {{
+                    control: ({ controlled, value, helperText, onChange }) => (
+                      <Select
+                        label="Object Damage Skill"
+                        value={value}
+                        onChange={onChange}
+                        disabled={controlled || disabled}
+                        options={sortedSkills?.map((entry) => ({
+                          label: entry.name,
+                          value: entry.key
+                        }))}
+                        helperText={helperText}
+                      />
+                    )
+                  }}
+                </OverriddenItemPropertyCard>
+              ) : null}
+              {weaponType === WEAPON_TYPE_PROJECTILE_LAUNCHER ? (
+                <OverriddenItemPropertyCard
+                  type={data}
+                  setting="launcherDamageIncreasedBySkillKey"
+                  onChange={handleOnChange}
+                  defaultValue={''}
+                  disabled={isWeaponTypeNone || disabled}
+                >
+                  {{
+                    control: ({ controlled, value, helperText, onChange }) => (
+                      <Select
+                        label="Launcher Damage Skill"
+                        value={value}
+                        onChange={onChange}
+                        disabled={controlled || disabled}
+                        options={sortedSkills?.map((entry) => ({
+                          label: entry.name,
+                          value: entry.key
+                        }))}
+                        helperText={helperText}
+                      />
+                    )
+                  }}
+                </OverriddenItemPropertyCard>
+              ) : null}
             </Box>
           ) : null}
         </Box>

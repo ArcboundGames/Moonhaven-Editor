@@ -93,6 +93,7 @@ import {
   WEAPON_TYPE_NONE,
   WEAPON_TYPE_POINT,
   WEAPON_TYPE_PROJECTILE,
+  WEAPON_TYPE_PROJECTILE_LAUNCHER,
   WORLD_DATA_FILE
 } from './constants';
 import * as dataValidation from './dataValidation';
@@ -1085,10 +1086,24 @@ export function validateItemCategoryCombatTab(rawCategory: ProcessedRawItemCateg
       `Invalid weapon type '${rawCategory.settings?.weaponType}'`
     );
     if (WEAPON_TYPES.includes(rawCategory.settings.weaponType as WeaponType) && rawCategory.settings.weaponType !== WEAPON_TYPE_NONE) {
-      if (isNotNullish(rawCategory.settings.damagedIncreasedBySkillKey)) {
+      if (isNotNullish(rawCategory.settings.creatureDamageIncreasedBySkillKey)) {
         assert(
-          rawCategory.settings.damagedIncreasedBySkillKey in skillsByKey,
-          `Invalid skill: ${rawCategory.settings.damagedIncreasedBySkillKey}`
+          rawCategory.settings.creatureDamageIncreasedBySkillKey in skillsByKey,
+          `Invalid skill: ${rawCategory.settings.creatureDamageIncreasedBySkillKey}`
+        );
+      }
+
+      if (isNotNullish(rawCategory.settings.objectDamageIncreasedBySkillKey)) {
+        assert(
+          rawCategory.settings.objectDamageIncreasedBySkillKey in skillsByKey,
+          `Invalid skill: ${rawCategory.settings.objectDamageIncreasedBySkillKey}`
+        );
+      }
+
+      if (isNotNullish(rawCategory.settings.launcherDamageIncreasedBySkillKey)) {
+        assert(
+          rawCategory.settings.launcherDamageIncreasedBySkillKey in skillsByKey,
+          `Invalid skill: ${rawCategory.settings.launcherDamageIncreasedBySkillKey}`
         );
       }
     }
@@ -1313,8 +1328,29 @@ export function validateItemCombatTab(
   const { errors, assert } = createAssert();
   const { value: weaponType, controlledBy: weaponTypeControlledBy } = getItemSetting('weaponType', rawType, categoriesByKeys);
   if (isNotNullish(weaponType) && weaponType != WEAPON_TYPE_NONE) {
-    assert(rawType.damage > 0, 'Damage must be greater than 0');
-    assert(rawType.damage % 1 === 0, 'Damage must be a whole number');
+    const canDamageObjects =
+      [
+        ...(getItemSetting('damagesObjectKeys', rawType, categoriesByKeys).value ?? []),
+        ...(getItemSetting('damagesObjectCategoryKeys', rawType, categoriesByKeys).value ?? []),
+        ...(getItemSetting('damagesObjectSubCategoryKeys', rawType, categoriesByKeys).value ?? [])
+      ].length > 0;
+
+    if (canDamageObjects) {
+      assert(rawType.objectDamage > 0, 'Object damage must be greater than 0');
+      assert(rawType.objectDamage % 1 === 0, 'Object damage must be a whole number');
+    }
+
+    const canDamageCreatures =
+      [
+        ...(getItemSetting('damagesCreatureKeys', rawType, categoriesByKeys).value ?? []),
+        ...(getItemSetting('damagesCreatureCategoryKeys', rawType, categoriesByKeys).value ?? [])
+      ].length > 0;
+
+    if (canDamageCreatures) {
+      assert(rawType.creatureDamage > 0, 'Creature damage must be greater than 0');
+      assert(rawType.creatureDamage % 1 === 0, 'Creature damage must be a whole number');
+    }
+
     if (weaponTypeControlledBy == 0) {
       assert(WEAPON_TYPES.includes(weaponType), `Invalid weapon type '${weaponType}'`);
     }
@@ -1327,15 +1363,36 @@ export function validateItemCombatTab(
       assert(rawType.projectileSpeed <= 20, 'Projectile speed must be less than or equal to 20');
       assert(rawType.projectileDistance >= 1, 'Projectile distance must be greater than or equal to 1');
       assert(rawType.projectileDistance <= 50, 'Projectile distance must be less than or equal to 50');
+    } else if (weaponType === WEAPON_TYPE_PROJECTILE_LAUNCHER) {
+      assert(rawType.launcherDamage > 0, 'Launcher damage must be greater than 0');
+      assert(rawType.launcherDamage % 1 === 0, 'Launcher damage must be a whole number');
     }
 
-    const { value: damagedIncreasedBySkillKey, controlledBy: damagedIncreasedBySkillKeyControlledBy } = getItemSetting(
-      'damagedIncreasedBySkillKey',
+    const { value: creatureDamageIncreasedBySkillKey, controlledBy: creatureDamageIncreasedBySkillKeyControlledBy } = getItemSetting(
+      'creatureDamageIncreasedBySkillKey',
       rawType,
       categoriesByKeys
     );
-    if (isNotNullish(damagedIncreasedBySkillKey) && damagedIncreasedBySkillKeyControlledBy === 0) {
-      assert(damagedIncreasedBySkillKey in skillsByKey, `Invalid skill: ${damagedIncreasedBySkillKey}`);
+    if (isNotNullish(creatureDamageIncreasedBySkillKey) && creatureDamageIncreasedBySkillKeyControlledBy === 0) {
+      assert(creatureDamageIncreasedBySkillKey in skillsByKey, `Invalid skill: ${creatureDamageIncreasedBySkillKey}`);
+    }
+
+    const { value: objectDamageIncreasedBySkillKey, controlledBy: objectDamageIncreasedBySkillKeyControlledBy } = getItemSetting(
+      'objectDamageIncreasedBySkillKey',
+      rawType,
+      categoriesByKeys
+    );
+    if (isNotNullish(objectDamageIncreasedBySkillKey) && objectDamageIncreasedBySkillKeyControlledBy === 0) {
+      assert(objectDamageIncreasedBySkillKey in skillsByKey, `Invalid skill: ${objectDamageIncreasedBySkillKey}`);
+    }
+
+    const { value: launcherDamageIncreasedBySkillKey, controlledBy: launcherDamageIncreasedBySkillKeyControlledBy } = getItemSetting(
+      'launcherDamageIncreasedBySkillKey',
+      rawType,
+      categoriesByKeys
+    );
+    if (isNotNullish(launcherDamageIncreasedBySkillKey) && launcherDamageIncreasedBySkillKeyControlledBy === 0) {
+      assert(launcherDamageIncreasedBySkillKey in skillsByKey, `Invalid skill: ${launcherDamageIncreasedBySkillKey}`);
     }
   }
 

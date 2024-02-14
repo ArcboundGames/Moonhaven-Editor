@@ -230,7 +230,9 @@ export interface ItemType {
   maxStackSize: number;
   categoryKey?: string;
   objectTypeKey?: string;
-  damage: number;
+  creatureDamage: number;
+  objectDamage: number;
+  launcherDamage: number;
   durability: number;
   hungerIncrease: number;
   thirstIncrease: number;
@@ -327,7 +329,9 @@ export interface ItemSettings {
   projectileItemKeys?: string[];
 
   // Skills
-  damagedIncreasedBySkillKey?: string;
+  creatureDamageIncreasedBySkillKey?: string;
+  objectDamageIncreasedBySkillKey?: string;
+  launcherDamageIncreasedBySkillKey?: string;
 }
 
 export interface ObjectDataFile {
