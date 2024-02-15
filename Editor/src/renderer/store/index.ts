@@ -17,6 +17,7 @@ import playerReducer from './slices/player';
 import questsReducer from './slices/quests';
 import skillsReducer from './slices/skills';
 import worldReducer from './slices/world';
+import worldZonesReducer from './slices/worldZones';
 
 export const store = configureStore({
   reducer: {
@@ -33,7 +34,8 @@ export const store = configureStore({
     fishing: fishingReducer,
     skills: skillsReducer,
     localizations: localizationsReducer,
-    quests: questsReducer
+    quests: questsReducer,
+    worldZones: worldZonesReducer
   },
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().prepend(thunkMiddleware).concat(loggerMiddleware),
   enhancers: [monitorReducersEnhancer]

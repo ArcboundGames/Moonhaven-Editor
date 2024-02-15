@@ -1,4 +1,5 @@
 import {
+  toCreatureCategory,
   toCreatureType,
   toDialogue,
   toDialogueResponse,
@@ -61,10 +62,10 @@ export function getNewCreature(creatureTypesByKey: Record<string, CreatureType>)
 
 export function getNewCreatureCategory(creatureCategoriesByKey: Record<string, CreatureCategory>): CreatureCategory {
   const key = generateKey('NEW_CREATURE_CATEGORY', creatureCategoriesByKey);
-  return {
+  return toCreatureCategory({
     ...toProcessedRawCreatureCategory({}),
     key
-  };
+  });
 }
 
 export function getNewItem(itemTypesByKey: Record<number, ItemType>): ItemType {

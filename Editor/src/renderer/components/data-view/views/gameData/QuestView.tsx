@@ -10,7 +10,7 @@ import {
 } from '../../../../../../../SharedLibrary/src/dataValidation';
 import { useAppDispatch, useAppSelector, useDebounce } from '../../../../hooks';
 import { selectCraftingRecipesByKey } from '../../../../store/slices/craftingRecipes';
-import { selectCreaturesByKeyWithName } from '../../../../store/slices/creatures';
+import { selectCreatureTypesByKeyWithName } from '../../../../store/slices/creatures';
 import { selectDialogueTreesByKey } from '../../../../store/slices/dialogue';
 import { selectEventLogsByKey } from '../../../../store/slices/eventLogs';
 import { selectItemTypesByKeyWithName } from '../../../../store/slices/items';
@@ -36,7 +36,7 @@ const QuestView = () => {
   const quests = useAppSelector(selectQuests);
 
   const itemsByKey = useAppSelector(selectItemTypesByKeyWithName);
-  const creaturesByKey = useAppSelector(selectCreaturesByKeyWithName);
+  const creaturesByKey = useAppSelector(selectCreatureTypesByKeyWithName);
   const dialogueTreesByKey = useAppSelector(selectDialogueTreesByKey);
   const craftingRecipesByKey = useAppSelector(selectCraftingRecipesByKey);
   const eventLogsByKey = useAppSelector(selectEventLogsByKey);

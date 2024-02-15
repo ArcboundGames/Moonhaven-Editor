@@ -1,17 +1,18 @@
 import parserBabel from 'prettier/parser-babel';
 import prettier from 'prettier/standalone';
 
-import { setRawCraftingRecipeData } from '../store/slices/craftingRecipes';
-import { setRawDialogueData } from '../store/slices/dialogue';
-import { setRawEventLogData } from '../store/slices/eventLogs';
-import { setRawFishingData } from '../store/slices/fishing';
-import { setRawItemData } from '../store/slices/items';
-import { setRawLocalizationData } from '../store/slices/localizations';
-import { setRawLootTableData } from '../store/slices/lootTables';
-import { setRawObjectData } from '../store/slices/objects';
-import { setRawPlayerData } from '../store/slices/player';
-import { setRawQuestData } from '../store/slices/quests';
-import { setRawSkillData } from '../store/slices/skills';
+import { setRawCraftingRecipeData } from 'renderer/store/slices/craftingRecipes';
+import { setRawDialogueData } from 'renderer/store/slices/dialogue';
+import { setRawEventLogData } from 'renderer/store/slices/eventLogs';
+import { setRawFishingData } from 'renderer/store/slices/fishing';
+import { setRawItemData } from 'renderer/store/slices/items';
+import { setRawLocalizationData } from 'renderer/store/slices/localizations';
+import { setRawLootTableData } from 'renderer/store/slices/lootTables';
+import { setRawObjectData } from 'renderer/store/slices/objects';
+import { setRawPlayerData } from 'renderer/store/slices/player';
+import { setRawQuestData } from 'renderer/store/slices/quests';
+import { setRawSkillData } from 'renderer/store/slices/skills';
+import { setRawWorldZoneData } from 'renderer/store/slices/worldZones';
 
 import type { AnyAction, Dispatch } from '@reduxjs/toolkit';
 import type { Section } from '../../../../SharedLibrary/src/interface';
@@ -61,6 +62,9 @@ const saveJsonToFile = async function (
       break;
     case 'quest':
       dispatch(setRawQuestData(dataString));
+      break;
+    case 'world-zone':
+      dispatch(setRawWorldZoneData(dataString));
       break;
     default:
       break;

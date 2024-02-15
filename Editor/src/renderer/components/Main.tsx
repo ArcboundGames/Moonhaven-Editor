@@ -14,7 +14,8 @@ import {
   PLAYER_DATA_FILE,
   QUESTS_DATA_FILE,
   SKILLS_DATA_FILE,
-  WORLD_DATA_FILE
+  WORLD_DATA_FILE,
+  WORLD_ZONES_DATA_FILE
 } from '../../../../SharedLibrary/src/constants';
 import { getDamagableData, getProjectileData } from '../../../../SharedLibrary/src/util/combat.util';
 import { getEnglishLocalization } from '../../../../SharedLibrary/src/util/localization.util';
@@ -94,6 +95,7 @@ import ErrorBoundary from './ErrorBoundary';
 import LandingArea from './LandingArea';
 import Menu from './Menu';
 import DataView from './data-view/DataView';
+import { loadWorldZoneData, selectWorldZones, validateWorldZones } from 'renderer/store/slices/worldZones';
 
 const Main = () => {
   const dispatch = useAppDispatch();
@@ -161,6 +163,9 @@ const Main = () => {
 
   // Quests
   const quests = useAppSelector(selectQuests);
+
+  // World Zones
+  const worldZones = useAppSelector(selectWorldZones);
 
   const { projectileItemCategoryKeys, projectileItemKeys } = useMemo(
     () => getProjectileData(itemCategories, itemCategoriesByKey, items),
@@ -236,6 +241,7 @@ const Main = () => {
       const skillsDataFilePath = await window.api.join(path, `${SKILLS_DATA_FILE}${DATA_FILE_EXTENSION}`);
       const localizationDataFilePath = await window.api.join(path, `${LOCALIZATION_DATA_FILE}${DATA_FILE_EXTENSION}`);
       const questsDataFilePath = await window.api.join(path, `${QUESTS_DATA_FILE}${DATA_FILE_EXTENSION}`);
+      const worldZonesDataFilePath = await window.api.join(path, `${WORLD_ZONES_DATA_FILE}${DATA_FILE_EXTENSION}`);
 
       const files = [
         creaturesDataFilePath,
@@ -248,7 +254,9 @@ const Main = () => {
         playerDataFilePath,
         fishingDataFilePath,
         skillsDataFilePath,
-        localizationDataFilePath
+        localizationDataFilePath,
+        questsDataFilePath,
+        worldZonesDataFilePath
       ];
 
       window.electron.ipcRenderer.on<[string, string]>('onFileChange', (file, data) => {
@@ -280,6 +288,8 @@ const Main = () => {
           dispatch(loadLocalizationData(data));
         } else if (file === questsDataFilePath) {
           dispatch(loadQuestData(data));
+        } else if (file === worldZonesDataFilePath) {
+          dispatch(loadWorldZoneData(data));
         }
       });
 
@@ -662,6 +672,18 @@ const Main = () => {
     craftingRecipesByKey,
     eventLogsByKey
   ]);
+
+  useEffect(() => {
+    if (!isLoaded) {
+      return;
+    }
+    dispatch(
+      validateWorldZones({
+        worldZones,
+        creaturesByKey
+      })
+    );
+  }, [dispatch, isLoaded, worldZones, creaturesByKey]);
 
   return (
     <ErrorBoundary>

@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 
 import { toTitleCaseFromKey } from '../../../../../../SharedLibrary/src/util/string.util';
 import { useAppSelector, useDebounce } from '../../../hooks';
-import { selectCreaturesByKeyWithName } from '../../../store/slices/creatures';
+import { selectCreatureTypesByKeyWithName } from '../../../store/slices/creatures';
 import { selectSearch } from '../../../store/slices/data';
 import {
   selectDialogueTreeErrors,
@@ -19,7 +19,7 @@ const DialogueTreeList = () => {
   const dialogueTrees = useAppSelector(
     useMemo(() => selectDialogueTreesByCreature(selectedCreature), [selectedCreature])
   );
-  const creaturesByKey = useAppSelector(selectCreaturesByKeyWithName);
+  const creaturesByKey = useAppSelector(selectCreatureTypesByKeyWithName);
 
   const errors = useAppSelector(selectDialogueTreeErrors);
 

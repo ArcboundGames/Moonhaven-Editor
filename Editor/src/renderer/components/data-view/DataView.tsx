@@ -39,6 +39,8 @@ import PlayerDataView from './views/gameData/PlayerDataView';
 import QuestView from './views/gameData/QuestView';
 import SkillView from './views/gameData/SkillView';
 import WorldSettingsView from './views/gameData/WorldSettingsView';
+import WorldZoneView from './views/gameData/WorldZoneView';
+import WorldZoneList from './lists/WorldZoneList';
 
 const DataView = () => {
   const section = useAppSelector(selectSection);
@@ -97,6 +99,9 @@ const DataView = () => {
     case 'quest':
       List = QuestList;
       break;
+    case 'world-zone':
+      List = WorldZoneList;
+      break;
     default:
       break;
   }
@@ -139,6 +144,7 @@ const DataView = () => {
           <Route path="/localization/main" element={<LocalizationKeysView />} />
           <Route path="/localization/:dataKey" element={<LocalizationView />} />
           <Route path="/quest/:dataKey" element={<QuestView />} />
+          <Route path="/world-zone/:dataKey" element={<WorldZoneView />} />
         </Routes>
       </Box>
     </Box>

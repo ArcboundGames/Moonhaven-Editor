@@ -37,13 +37,7 @@ export interface DataViewListProps {
   onSpritesChange?: () => void;
 }
 
-const DataViewList = ({
-  section,
-  items,
-  type = 'left-nav',
-  search = '',
-  onSpritesChange
-}: DataViewListProps) => {
+const DataViewList = ({ section, items, type = 'left-nav', search = '', onSpritesChange }: DataViewListProps) => {
   const location = useLocation();
   const navigate = useNavigate();
 

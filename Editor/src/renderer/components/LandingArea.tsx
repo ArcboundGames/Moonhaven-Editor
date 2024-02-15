@@ -1,46 +1,48 @@
-import { useCallback, useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
-import CardActions from '@mui/material/CardActions';
-import Button from '@mui/material/Button';
-import Snackbar from '@mui/material/Snackbar';
-import IconButton from '@mui/material/IconButton';
 import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import IconButton from '@mui/material/IconButton';
+import Snackbar from '@mui/material/Snackbar';
+import Typography from '@mui/material/Typography';
+import { useCallback, useEffect, useState } from 'react';
 
-import { useAppDispatch, useAppSelector } from '../hooks';
-import { loadObjectData, selectObjectDataFileLoaded } from '../store/slices/objects';
-import { loaded, setPath as setPathAction } from '../store/slices/data';
+import { loadWorldZoneData } from 'renderer/store/slices/worldZones';
 import {
-  ITEMS_DATA_FILE,
-  OBJECTS_DATA_FILE,
-  DATA_FILE_EXTENSION,
   CRAFTING_RECIPES_DATA_FILE,
-  LOOT_TABLES_DATA_FILE,
   CREATURES_DATA_FILE,
+  DATA_FILE_EXTENSION,
   DIALOGUE_DATA_FILE,
-  PLAYER_DATA_FILE,
   EVENTS_DATA_FILE,
-  WORLD_DATA_FILE,
   FISHING_DATA_FILE,
-  SKILLS_DATA_FILE,
+  ITEMS_DATA_FILE,
   LOCALIZATION_DATA_FILE,
-  QUESTS_DATA_FILE
+  LOOT_TABLES_DATA_FILE,
+  OBJECTS_DATA_FILE,
+  PLAYER_DATA_FILE,
+  QUESTS_DATA_FILE,
+  SKILLS_DATA_FILE,
+  WORLD_DATA_FILE,
+  WORLD_ZONES_DATA_FILE
 } from '../../../../SharedLibrary/src/constants';
-import { loadItemData } from '../store/slices/items';
+import { useAppDispatch, useAppSelector } from '../hooks';
 import { loadCraftingRecipeData } from '../store/slices/craftingRecipes';
-import { loadLootTableData } from '../store/slices/lootTables';
 import { loadCreatureData } from '../store/slices/creatures';
+import { loaded, setPath as setPathAction } from '../store/slices/data';
 import { loadDialogueData } from '../store/slices/dialogue';
-import { loadPlayerData } from '../store/slices/player';
 import { loadEventLogData } from '../store/slices/eventLogs';
-import { loadWorldSettingsData } from '../store/slices/world';
 import { loadFishingData } from '../store/slices/fishing';
-import { loadSkillData } from '../store/slices/skills';
+import { loadItemData } from '../store/slices/items';
 import { loadLocalizationData } from '../store/slices/localizations';
+import { loadLootTableData } from '../store/slices/lootTables';
+import { loadObjectData, selectObjectDataFileLoaded } from '../store/slices/objects';
+import { loadPlayerData } from '../store/slices/player';
 import { loadQuestData } from '../store/slices/quests';
+import { loadSkillData } from '../store/slices/skills';
+import { loadWorldSettingsData } from '../store/slices/world';
 
 import type { SyntheticEvent } from 'react';
 
@@ -141,6 +143,11 @@ const LandingArea = () => {
           ),
           loadFile(await window.api.join(filePath, `${QUESTS_DATA_FILE}${DATA_FILE_EXTENSION}`), 'Quests', (rawData) =>
             dispatch(loadQuestData(rawData))
+          ),
+          loadFile(
+            await window.api.join(filePath, `${WORLD_ZONES_DATA_FILE}${DATA_FILE_EXTENSION}`),
+            'World Zones',
+            (rawData) => dispatch(loadWorldZoneData(rawData))
           )
         ]);
 

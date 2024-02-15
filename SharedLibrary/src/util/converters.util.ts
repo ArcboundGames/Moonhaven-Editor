@@ -160,6 +160,8 @@ import type {
   ProcessedRawSprite,
   ProcessedRawWeatherSettings,
   ProcessedRawWorldSettings,
+  ProcessedRawWorldZone,
+  ProcessedRawWorldZoneSpawn,
   Quest,
   QuestCompletionTrigger,
   QuestObjective,
@@ -207,6 +209,8 @@ import type {
   RawSprite,
   RawWeatherSettings,
   RawWorldSettings,
+  RawWorldZone,
+  RawWorldZoneSpawn,
   Season,
   Section,
   Skill,
@@ -219,7 +223,9 @@ import type {
   Vector2,
   WeaponType,
   WeatherSettings,
-  WorldSettings
+  WorldSettings,
+  WorldZone,
+  WorldZoneSpawn
 } from '../interface';
 
 export function toDataObject<T>(section: Section, fileSection: string | undefined, raw: unknown): T {
@@ -260,6 +266,8 @@ export function toDataObject<T>(section: Section, fileSection: string | undefine
       return toLocalization(raw as ProcessedRawLocalization) as T;
     case 'quest':
       return toQuest(raw as ProcessedRawQuest) as T;
+    case 'world-zone':
+      return toWorldZone(raw as ProcessedRawWorldZone) as T;
     default:
       return toObjectType(raw as ProcessedRawObjectType) as T;
   }
@@ -344,7 +352,7 @@ export function toProcessedRawCreatureType(rawCreatureType: RawCreatureType | un
     attackStrafingTimeMin: rawCreatureType?.attackStrafingTimeMin ?? 0,
     attackStrafingTimeMax: rawCreatureType?.attackStrafingTimeMax ?? 0,
     attackDamage: rawCreatureType?.attackDamage ?? 0,
-    attackKnockback: rawCreatureType?.attackKnockback ?? 0,
+    attackKnockbackModifier: rawCreatureType?.attackKnockbackModifier ?? 0,
 
     randomSpawnsEnabled: rawCreatureType?.randomSpawnsEnabled ?? false,
     spawnDistanceMinFromPlayers: rawCreatureType?.spawnDistanceMinFromPlayers ?? 0,
@@ -1085,6 +1093,37 @@ export function toProcessedRawWeatherSettings(rawWeatherSettings: RawWeatherSett
     ...rawWeatherSettings,
     rainChance: rawWeatherSettings?.rainChance ?? 0,
     snowChance: rawWeatherSettings?.snowChance ?? 0
+  };
+}
+
+export function toWorldZone(processedRawWorldZone: ProcessedRawWorldZone): WorldZone {
+  return {
+    ...processedRawWorldZone,
+    spawns: processedRawWorldZone.spawns.map(toWorldZoneSpawn)
+  };
+}
+
+export function toProcessedRawWorldZone(rawWorldZone: RawWorldZone | undefined | null): ProcessedRawWorldZone {
+  return {
+    ...rawWorldZone,
+    id: rawWorldZone?.id ?? 0,
+    key: fromNullish(rawWorldZone?.key) ?? 'UNKNOWN_WORLD_ZONE',
+    spawns: fromNullishArray(rawWorldZone?.spawns, toProcessedRawWorldZoneSpawn) ?? []
+  };
+}
+
+export function toWorldZoneSpawn(processedRawWorldZoneSpawn: ProcessedRawWorldZoneSpawn): WorldZoneSpawn {
+  return {
+    ...processedRawWorldZoneSpawn
+  };
+}
+
+export function toProcessedRawWorldZoneSpawn(rawWorldZoneSpawn: RawWorldZoneSpawn | undefined | null): ProcessedRawWorldZoneSpawn {
+  return {
+    ...rawWorldZoneSpawn,
+    creatureKey: fromNullish(rawWorldZoneSpawn?.creatureKey),
+    probability: rawWorldZoneSpawn?.probability ?? 0,
+    limit: rawWorldZoneSpawn?.limit ?? 0
   };
 }
 

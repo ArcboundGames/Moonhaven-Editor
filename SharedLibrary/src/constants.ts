@@ -65,6 +65,7 @@ export const FISHING_DATA_FILE = 'fishing';
 export const SKILLS_DATA_FILE = 'skills';
 export const LOCALIZATION_DATA_FILE = 'localizations';
 export const QUESTS_DATA_FILE = 'quests';
+export const WORLD_ZONES_DATA_FILE = 'world_zones';
 export const SCRIPTS_FILE_PATH = '/scripts/';
 
 /**
@@ -89,6 +90,7 @@ export const ERROR_SECTION_LOCALIZATION_KEYS = 'keys';
 export const ERROR_SECTION_LOCALIZATIONS = 'localizations';
 export const ERROR_SECTION_SKILLS = 'skills';
 export const ERROR_SECTION_QUESTS = 'quests';
+export const ERROR_SECTION_WORLD_ZONES = 'world_zones';
 
 /**
  * Collider Types

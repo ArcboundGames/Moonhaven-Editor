@@ -29,6 +29,7 @@ import {
   ERROR_SECTION_PLAYER_WORLD_WEATHER,
   ERROR_SECTION_QUESTS,
   ERROR_SECTION_SKILLS,
+  ERROR_SECTION_WORLD_ZONES,
   EVENTS_DATA_FILE,
   FILLED_FROM_TYPES,
   FILLED_FROM_TYPE_SAND,
@@ -94,7 +95,8 @@ import {
   WEAPON_TYPE_POINT,
   WEAPON_TYPE_PROJECTILE,
   WEAPON_TYPE_PROJECTILE_LAUNCHER,
-  WORLD_DATA_FILE
+  WORLD_DATA_FILE,
+  WORLD_ZONES_DATA_FILE
 } from './constants';
 import * as dataValidation from './dataValidation';
 import { createAssert } from './util/assert.util';
@@ -119,7 +121,8 @@ import {
   toProcessedRawWorldSettings,
   toQuest,
   toSkill,
-  toWorldSettings
+  toWorldSettings,
+  toWorldZone
 } from './util/converters.util';
 import { getCreatureSetting } from './util/creatureType.util';
 import { getItemSetting } from './util/itemType.util';
@@ -187,7 +190,10 @@ import type {
   ProcessedRawSkill,
   ProcessedRawSkillLevel,
   ProcessedRawSprite,
+  ProcessedRawWeatherSettings,
   ProcessedRawWorldSettings,
+  ProcessedRawWorldZone,
+  ProcessedRawWorldZoneSpawn,
   Quest,
   QuestCompletionTrigger,
   QuestObjectiveType,
@@ -198,7 +204,8 @@ import type {
   StagesType,
   TimeComparator,
   WeaponType,
-  WorldSettings
+  WorldSettings,
+  WorldZone
 } from './interface';
 import type { Assert, AssertNotEmpty, AssertNotNullish } from './util/assert.util';
 
@@ -239,7 +246,8 @@ export function validateData(
   rawSkills: ProcessedRawSkill[] | null | undefined,
   rawLocalizationKeys: string[] | null | undefined,
   rawLocalizations: ProcessedRawLocalization[] | null | undefined,
-  rawQuests: ProcessedRawQuest[] | null | undefined
+  rawQuests: ProcessedRawQuest[] | null | undefined,
+  rawWorldZones: ProcessedRawWorldZone[] | null | undefined
 ): AllErrors | null {
   const allErrors: AllErrors = {};
 
@@ -397,6 +405,8 @@ export function validateData(
     englishLocalization,
     localizationKeys
   );
+
+  validateWorldZones(allErrors, rawWorldZones, creaturesByKey);
 
   if (Object.keys(allErrors).length > 0) {
     return allErrors;
@@ -753,8 +763,8 @@ export function validateCreatureBehaviorTab(
     assert(rawType.attackDamage <= 1000, 'Attack damage must be less than or equal to 1000');
     assert(rawType.attackDamage % 1 === 0, 'Attack damage must be a whole number');
 
-    assert(rawType.attackKnockback >= 0, 'Attack knockback must be greater than or equal to 0');
-    assert(rawType.attackKnockback <= 1000, 'Attack knockback must be less than or equal to 1000');
+    assert(rawType.attackKnockbackModifier >= 1, 'Attack knockback modifier must be greater than or equal to 1');
+    assert(rawType.attackKnockbackModifier <= 5, 'Attack knockback modifier must be less than or equal to 5');
 
     if (movementType !== MOVEMENT_TYPE_JUMP) {
       assert(rawType.attackDesiredRangeMin >= 1, 'Attack desired min range must be greater than or equal to 1');
@@ -3877,19 +3887,19 @@ export function validateWorldSettings(allErrors: AllErrors, rawWorldSettings: Pr
     return worldSettings;
   }
 
-  validateWorldSettingsWeatherTab(allErrors, rawWorldSettings);
+  validateWorldSettingsWeatherTab(allErrors, rawWorldSettings.weather);
 
-  return toWorldSettings(toProcessedRawWorldSettings(rawWorldSettings));
+  return worldSettings;
 }
 
-export function validateWorldSettingsWeatherTab(allErrors: AllErrors, rawWorldSettings: ProcessedRawWorldSettings) {
+export function validateWorldSettingsWeatherTab(allErrors: AllErrors, weather: ProcessedRawWeatherSettings) {
   const { errors, assert } = createAssert();
 
-  assert(rawWorldSettings.weather.rainChance > 0, 'Rain chance must be greater than 0');
-  assert(rawWorldSettings.weather.rainChance <= 100, 'Rain chance must be less than or equal to 100');
+  assert(weather.rainChance > 0, 'Rain chance must be greater than 0');
+  assert(weather.rainChance <= 100, 'Rain chance must be less than or equal to 100');
 
-  assert(rawWorldSettings.weather.snowChance > 0, 'Snow chance must be greater than 0');
-  assert(rawWorldSettings.weather.snowChance <= 100, 'Snow chance must be less than or equal to 100');
+  assert(weather.snowChance > 0, 'Snow chance must be greater than 0');
+  assert(weather.snowChance <= 100, 'Snow chance must be less than or equal to 100');
 
   if (errors.length > 0) {
     allErrors[WORLD_DATA_FILE] = {
@@ -4570,4 +4580,99 @@ export function validateQuestRewardsTab(quest: ProcessedRawQuest, itemsByKey: Re
   }
 
   return errors;
+}
+
+/**
+ * World Zones
+ */
+export function validateWorldZones(
+  allErrors: AllErrors,
+  rawWorldZones: ProcessedRawWorldZone[] | null | undefined,
+  creaturesByKey: Record<string, CreatureType>
+): {
+  worldZones: WorldZone[];
+  worldZonesById: Record<number, WorldZone>;
+} {
+  const worldZones: WorldZone[] = [];
+  const worldZonesById: Record<number, WorldZone> = {};
+
+  if (!isNotNullish(rawWorldZones)) {
+    return { worldZones, worldZonesById };
+  }
+
+  const worldZonesErrors: Record<string, string[]> = {};
+  const idsSeen: number[] = [];
+
+  let i = 1;
+  for (const rawWorldZone of rawWorldZones) {
+    const errors = validateWorldZone(rawWorldZone, creaturesByKey, idsSeen);
+
+    if (isNotNullish(rawWorldZone.id) && rawWorldZone.id > 0) {
+      const worldZone = toWorldZone(rawWorldZone);
+      worldZones.push(worldZone);
+      worldZonesById[worldZone.id] = worldZone;
+      idsSeen.push(worldZone.id);
+    }
+
+    if (errors.length > 0) {
+      worldZonesErrors[rawWorldZone.key ?? rawWorldZone.id ?? `World Zone ${i}`] = errors;
+    }
+
+    i++;
+  }
+
+  if (Object.keys(worldZonesErrors).length > 0) {
+    allErrors[WORLD_ZONES_DATA_FILE] = {
+      ...allErrors[WORLD_ZONES_DATA_FILE],
+      [ERROR_SECTION_WORLD_ZONES]: worldZonesErrors
+    };
+  }
+
+  return { worldZones, worldZonesById };
+}
+
+export function validateWorldZone(
+  rawWorldZone: ProcessedRawWorldZone,
+  creaturesByKey: Record<string, CreatureType>,
+  idsSeen: number[]
+): string[] {
+  const { errors, assert, assertNotNullish, assertNotEmpty } = createAssert();
+
+  if (assertNotNullish(rawWorldZone.id, 'No id') && assert(rawWorldZone.id != 0, 'Id cannot be 0')) {
+    assert(!idsSeen.includes(rawWorldZone.id), `Duplicate id: ${rawWorldZone.id}`);
+  }
+
+  assertNotEmpty(rawWorldZone.key, 'No key');
+
+  if (isNotNullish(rawWorldZone.spawns)) {
+    let totalProbability = 0;
+
+    rawWorldZone.spawns.forEach((spawn, index) => {
+      totalProbability += spawn.probability;
+      assertWorldZoneSpawn(assert, assertNotNullish, spawn, creaturesByKey, `World zone spawn ${index}`);
+    });
+
+    assert(totalProbability === 100, `Total probability does not equal 100 (${totalProbability})`);
+  }
+
+  return errors;
+}
+
+export function assertWorldZoneSpawn(
+  assert: Assert,
+  assertNotNullish: AssertNotNullish,
+  worldZoneSpawn: ProcessedRawWorldZoneSpawn,
+  creatureTypesByKey: Record<string, CreatureType>,
+  header: string
+) {
+  if (assertNotNullish(worldZoneSpawn.creatureKey, `${header}: No creature key`)) {
+    assert(worldZoneSpawn.creatureKey in creatureTypesByKey, `No creature with key ${worldZoneSpawn.creatureKey} exists`);
+  }
+
+  assert(worldZoneSpawn.probability > 0, `${header}: Probability must be greater than 0`);
+  assert(worldZoneSpawn.probability <= 100, `${header}: Probability must be less than or equal to 100`);
+
+  assert(worldZoneSpawn.limit > 0, `${header}: Limit must be greater than 0`);
+  assert(worldZoneSpawn.limit <= 250, `${header}: Limit must be less than or equal to 250`);
+  assert(worldZoneSpawn.limit % 1 === 0, 'Limit be a whole number');
 }

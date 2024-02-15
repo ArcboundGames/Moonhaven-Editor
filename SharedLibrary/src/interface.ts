@@ -28,6 +28,7 @@ import type {
   ERROR_SECTION_PLAYER_WORLD_WEATHER,
   ERROR_SECTION_QUESTS,
   ERROR_SECTION_SKILLS,
+  ERROR_SECTION_WORLD_ZONES,
   EVENTS_DATA_FILE,
   FALL,
   FARMLAND_CONDITION,
@@ -98,7 +99,8 @@ import type {
   WEAPON_TYPE_PROJECTILE,
   WEAPON_TYPE_PROJECTILE_LAUNCHER,
   WINTER,
-  WORLD_DATA_FILE
+  WORLD_DATA_FILE,
+  WORLD_ZONES_DATA_FILE
 } from './constants';
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -183,6 +185,9 @@ export interface AllErrors {
   [QUESTS_DATA_FILE]?: {
     [ERROR_SECTION_QUESTS]?: Record<string, string[]>;
   };
+  [WORLD_ZONES_DATA_FILE]?: {
+    [ERROR_SECTION_WORLD_ZONES]?: Record<string, string[]>;
+  };
 }
 
 export type Section =
@@ -205,7 +210,8 @@ export type Section =
   | 'skill'
   | 'localization-key'
   | 'localization'
-  | 'quest';
+  | 'quest'
+  | 'world-zone';
 
 export interface ItemDataFile {
   categories?: (RawItemCategory | undefined | null)[] | null;
@@ -767,7 +773,7 @@ export interface CreatureType {
   attackStrafingTimeMin: number;
   attackStrafingTimeMax: number;
   attackDamage: number;
-  attackKnockback: number;
+  attackKnockbackModifier: number;
 
   // Spawning
   randomSpawnsEnabled: boolean;
@@ -1195,4 +1201,35 @@ export interface QuestObjective {
   destinationRadius?: number;
   creatureTypeKey?: string;
   creatureDialogueTreeKey?: string;
+}
+
+/**
+ * World Zones
+ */
+export interface WorldZonesDataFile {
+  zones?: (RawWorldZone | undefined | null)[] | null;
+}
+
+export interface RawWorldZone extends Omit<ProcessedRawWorldZone, 'spawns'> {
+  spawns: RawWorldZoneSpawn[];
+}
+
+export interface ProcessedRawWorldZone extends Omit<WorldZone, 'spawns'> {
+  spawns: ProcessedRawWorldZoneSpawn[];
+}
+
+export interface WorldZone {
+  id: number;
+  key: string;
+  spawns: WorldZoneSpawn[];
+}
+
+export type RawWorldZoneSpawn = DeepNullish<ProcessedRawWorldZoneSpawn>;
+
+export type ProcessedRawWorldZoneSpawn = WorldZoneSpawn;
+
+export interface WorldZoneSpawn {
+  creatureKey?: string;
+  probability: number;
+  limit: number;
 }

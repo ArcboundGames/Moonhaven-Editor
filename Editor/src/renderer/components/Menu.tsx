@@ -10,6 +10,7 @@ import Toolbar from '@mui/material/Toolbar';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import { selectWorldZoneErrors } from 'renderer/store/slices/worldZones';
 import { toTitleCaseFromKey } from '../../../../SharedLibrary/src/util/string.util';
 import { useAppDispatch, useAppSelector, useQuery } from '../hooks';
 import {
@@ -186,6 +187,7 @@ const Menu = () => {
   const localizationKeyErrors = useAppSelector(selectLocalizationKeysErrors);
   const localizationErrors = useAppSelector(selectLocalizationsErrors);
   const questErrors = useAppSelector(selectQuestErrors);
+  const worldZoneErrors = useAppSelector(selectWorldZoneErrors);
 
   const allLocalizationErrors = useMemo(() => {
     const allErrors: string[] = [];
@@ -527,6 +529,20 @@ const Menu = () => {
                         titleAccess={`${Object.keys(worldSettingsErrors).length} error${
                           Object.keys(worldSettingsErrors).length !== 1 ? 's' : ''
                         }`}
+                      />
+                    ) : null}
+                  </Box>
+                </MenuItem>
+                <MenuItem value="world-zone">
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box>World Zones</Box>
+                    {worldZoneErrors && Object.keys(worldZoneErrors).length > 0 ? (
+                      <ReportProblemIcon
+                        color="error"
+                        sx={{ ml: 1 }}
+                        titleAccess={`Errors with: ${Object.keys(worldZoneErrors)
+                          .map((key) => toTitleCaseFromKey(key))
+                          .join(', ')}`}
                       />
                     ) : null}
                   </Box>

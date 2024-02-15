@@ -21,6 +21,7 @@ import {
   ERROR_SECTION_PLAYER_WORLD_WEATHER,
   ERROR_SECTION_QUESTS,
   ERROR_SECTION_SKILLS,
+  ERROR_SECTION_WORLD_ZONES,
   EVENTS_DATA_FILE,
   FISHING_DATA_FILE,
   IMAGE_FILE_EXTENSION,
@@ -33,7 +34,8 @@ import {
   PLAYER_SPRITE_WIDTH,
   QUESTS_DATA_FILE,
   SKILLS_DATA_FILE,
-  WORLD_DATA_FILE
+  WORLD_DATA_FILE,
+  WORLD_ZONES_DATA_FILE
 } from '../../../../SharedLibrary/src/constants';
 import * as dataValidation from '../../../../SharedLibrary/src/dataValidation';
 import { isNotNullish } from '../../../../SharedLibrary/src/util/null.util';
@@ -66,7 +68,8 @@ import type {
   PlayerData,
   Quest,
   Skill,
-  WorldSettings
+  WorldSettings,
+  WorldZone
 } from '../../../../SharedLibrary/src/interface';
 
 const PLAYER_PATH = '../player';
@@ -1076,7 +1079,7 @@ export function validateEventLogs(
 export function validateWorldSettingsWeatherTab(worldSettings: WorldSettings): string[] {
   const allErrors: AllErrors = {};
 
-  dataValidation.validateWorldSettingsWeatherTab(allErrors, worldSettings);
+  dataValidation.validateWorldSettingsWeatherTab(allErrors, worldSettings.weather);
 
   return allErrors[WORLD_DATA_FILE]?.[ERROR_SECTION_PLAYER_WORLD_WEATHER] ?? [];
 }
@@ -1199,4 +1202,22 @@ export function validateQuest(
     localizationKeys,
     []
   );
+}
+
+/**
+ * Validate World Zones
+ */
+export function validateWorldZones(
+  worldZones: WorldZone[],
+  creaturesByKey: Record<string, CreatureType>
+): Record<string, string[]> {
+  const allErrors: AllErrors = {};
+
+  dataValidation.validateWorldZones(allErrors, worldZones, creaturesByKey);
+
+  return allErrors[WORLD_ZONES_DATA_FILE]?.[ERROR_SECTION_WORLD_ZONES] ?? {};
+}
+
+export function validateWorldZone(worldZones: WorldZone, creaturesByKey: Record<string, CreatureType>): string[] {
+  return dataValidation.validateWorldZone(worldZones, creaturesByKey, []);
 }

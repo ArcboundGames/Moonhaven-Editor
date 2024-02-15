@@ -397,13 +397,13 @@ const CreatureTypeBehaviorTab = ({ data, disabled, movementType, handleOnChange 
                 </FormBox>
                 <FormBox>
                   <NumberTextField
-                    label="Attack Knockback"
-                    value={data.attackKnockback}
-                    min={0}
-                    max={20}
+                    label="Attack Knockback Modifier"
+                    value={data.attackKnockbackModifier}
+                    min={1}
+                    max={5}
                     onChange={(value) =>
                       handleOnChange({
-                        attackKnockback: value
+                        attackKnockbackModifier: value
                       })
                     }
                     required

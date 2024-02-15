@@ -266,7 +266,7 @@ export const selectCreatureTypesByKey = (state: RootState) => state.creatures.cr
 
 export const selectCreatureTypesSortedWithName = (state: RootState) => state.creatures.localizedCreatures;
 
-export const selectCreaturesByKeyWithName = (state: RootState) => state.creatures.localizedCreaturesByKey;
+export const selectCreatureTypesByKeyWithName = (state: RootState) => state.creatures.localizedCreaturesByKey;
 
 export const selectCreatureTypesByCategory = (categoryKey?: string) => (state: RootState) => {
   if (!categoryKey) {
