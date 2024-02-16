@@ -153,7 +153,7 @@
     "@typescript-eslint/eslint-plugin": "5.59.8",
     "@typescript-eslint/parser": "5.59.8",
     "browserslist-config-erb": "0.0.3",
-    "chalk": "4.1.2",
+    "chalk": "5.3.0",
     "concurrently": "7.6.0",
     "core-js": "3.36.0",
     "cross-env": "7.0.3",
