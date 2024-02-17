@@ -11929,10 +11929,10 @@ wide-align@^1.1.5:
   dependencies:
     string-width "^1.0.2 || 2 || 3 || 4"
 
-wikiapi@1.19.5:
-  version "1.19.5"
-  resolved "https://registry.yarnpkg.com/wikiapi/-/wikiapi-1.19.5.tgz#f2e7b8ac5e77944562b5fdfbae16bae334fa0c77"
-  integrity sha512-Hwzsa71of11/i4ZKNxgdM0oyIVa7lbL0lVbhZQOoTqJVeDHtrIwBuWFueB+6tNDGz7gl2bD9PF8OuqtcqQlDtA==
+wikiapi@1.20.0:
+  version "1.20.0"
+  resolved "https://registry.yarnpkg.com/wikiapi/-/wikiapi-1.20.0.tgz#fec306cf6c5c6d7f3e63d5d28176df8e2883bf9e"
+  integrity sha512-8iS9+2Pm1jzLiBIA5iBiCEnBLXcwjAJ7juHDn+kfVKXzOF9zia8CusD3BJiois2UqMApAT7i+kjVV8fRf3thzw==
   dependencies:
     cejs latest
 
