@@ -138,7 +138,7 @@
     "@electron/notarize": "1.2.4",
     "@electron/rebuild": "3.6.0",
     "@emotion/eslint-plugin": "11.10.0",
-    "@pmmmwh/react-refresh-webpack-plugin": "0.5.11",
+    "@pmmmwh/react-refresh-webpack-plugin": "0.5.15",
     "@svgr/webpack": "6.5.1",
     "@teamsupercell/typings-for-css-modules-loader": "2.5.2",
     "@testing-library/jest-dom": "5.17.0",
