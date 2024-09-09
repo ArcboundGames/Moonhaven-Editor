@@ -145,7 +145,7 @@
     "@testing-library/react": "13.4.0",
     "@types/jest": "29.5.1",
     "@types/node": "18.19.50",
-    "@types/path-browserify": "1.0.2",
+    "@types/path-browserify": "1.0.3",
     "@types/react-dom": "18.2.25",
     "@types/react-test-renderer": "18.0.7",
     "@types/react": "18.2.77",
