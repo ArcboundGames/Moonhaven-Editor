@@ -201,7 +201,7 @@
     "webpack-cli": "5.1.4",
     "webpack-dev-server": "4.15.2",
     "webpack-merge": "5.10.0",
-    "webpack": "5.91.0",
+    "webpack": "5.94.0",
     "wikiapi": "1.20.0"
   },
   "build": {
