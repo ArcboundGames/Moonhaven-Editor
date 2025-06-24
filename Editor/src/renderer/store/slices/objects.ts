@@ -299,6 +299,8 @@ export const objectsSlice = createSlice({
         name: isNotEmpty(objectNamesByKey[object.key]) ? objectNamesByKey[object.key] : object.key
       }));
 
+      localizedObjects.sort((a, b) => a.name.localeCompare(b.name));
+
       const localizedObjectsByKey: Record<string, LocalizedObjectType> = {};
       localizedObjects?.forEach((object) => {
         localizedObjectsByKey[object.key] = object;

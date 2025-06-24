@@ -30,13 +30,15 @@ export const lootTablesSlice = createSlice({
   reducers: {
     setRawLootTableData: (state, action: PayloadAction<string>) => ({ ...state, rawData: action.payload }),
     updateLootTables: (state, action: PayloadAction<LootTable[]>) => {
+      const lootTables = [...action.payload];
       const lootTablesByKey: Record<string, LootTable> = {};
       action.payload.forEach((lootTable) => {
         lootTablesByKey[lootTable.key] = lootTable;
       });
+      lootTables.sort((a, b) => a.key.localeCompare(b.key));
       return {
         ...state,
-        lootTables: action.payload,
+        lootTables,
         lootTablesByKey
       };
     },
@@ -68,6 +70,8 @@ export const lootTablesSlice = createSlice({
           lootTablesByKey[lootTable.key] = lootTable;
           return lootTable;
         }) ?? [];
+
+      lootTables.sort((a, b) => a.key.localeCompare(b.key));
 
       return {
         ...state,
