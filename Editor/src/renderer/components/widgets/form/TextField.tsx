@@ -5,12 +5,16 @@ import { isNotEmpty } from '../../../../../../SharedLibrary/src/util/string.util
 
 import type { TextFieldProps as MuiTextFieldProps } from '@mui/material/TextField';
 
-export type TextFieldProps = Omit<MuiTextFieldProps, 'label' | 'value' | 'defaultValue' | 'onChange' | 'error' | 'type'> & {
+export type TextFieldProps = Omit<
+  MuiTextFieldProps,
+  'label' | 'value' | 'defaultValue' | 'onChange' | 'error' | 'type'
+> & {
   label?: string;
   value?: string | undefined;
   defaultValue?: string | undefined;
   onChange?: (value: string) => void;
   error?: boolean;
+  multiline?: boolean;
 };
 
 const TextField = (props: TextFieldProps) => {

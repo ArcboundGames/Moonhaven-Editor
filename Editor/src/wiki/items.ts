@@ -1,4 +1,4 @@
-import { ALL_SEASONS } from '../../../SharedLibrary/src/constants';
+import { ALL_SEASONS, FALL, SPRING, SUMMER, WINTER } from '../../../SharedLibrary/src/constants';
 import { getCreatureSetting } from '../../../SharedLibrary/src/util/creatureType.util';
 import { isNotNullish } from '../../../SharedLibrary/src/util/null.util';
 import toRecord from '../../../SharedLibrary/src/util/record.util';
@@ -12,7 +12,8 @@ import type {
   LocalizedCreatureType,
   LocalizedItemType,
   LocalizedObjectType,
-  LootTable
+  LootTable,
+  Season
 } from '../../../SharedLibrary/src/interface';
 
 function generateCropSections(
@@ -20,7 +21,13 @@ function generateCropSections(
   objectsByKey: Record<string, LocalizedObjectType>,
   objectsToItem: Record<string, LocalizedItemType>,
   lootTablesByKey: Record<string, LootTable>
-) {
+): {
+  cropInfobox: string;
+  cropBody: string;
+  cropFooter: string;
+  stages: number | undefined;
+  season: Season | undefined;
+} {
   if (item.categoryKey === 'CROP' && item.key in objectsByKey) {
     const object = objectsByKey[item.key]; // Get crop object
 
@@ -100,8 +107,10 @@ function generateCropSections(
 
     let wikiCategory = '';
     let seasonInfobox = '';
+    let season: Season | undefined = undefined;
     if (isNotNullish(object.season) && object.season !== ALL_SEASONS) {
-      const seasonName = toTitleCaseFromKey(object.season);
+      season = object.season;
+      const seasonName = toTitleCaseFromKey(season);
       wikiCategory = `\n\n[[Category:${seasonName} crops]]`;
       seasonInfobox = `\n|season      = [[${seasonName}]]`;
     }
@@ -122,14 +131,18 @@ ${stagesTable}
 {{#lst:Crop Growth Calendars|${object.name}}}`,
       cropFooter: `
 
-{{NavboxCrop}}${wikiCategory}`
+{{NavboxCrop}}${wikiCategory}`,
+      stages: stages.length,
+      season
     };
   }
 
   return {
     cropInfobox: '',
     cropBody: '',
-    cropFooter: ''
+    cropFooter: '',
+    stages: undefined,
+    season: undefined
   };
 }
 
@@ -188,7 +201,17 @@ function generateSeedSections(
   };
 }
 
-export default function buildItemPages(localization: Localization, localizationKeys: string[]) {
+export default function buildItemPages(
+  localization: Localization,
+  localizationKeys: string[]
+): {
+  pages: {
+    name: string;
+    content: string;
+    stages: number | undefined;
+  }[];
+  crops: Record<Season, string[]>;
+} {
   const { craftingRecipes } = getCraftingRecipes(localization, localizationKeys);
   const { items, itemsByKey } = getItems(localization, localizationKeys);
   const { lootTables, lootTablesByKey } = getLootTables();
@@ -301,7 +324,13 @@ export default function buildItemPages(localization: Localization, localizationK
     return record;
   }, {} as Record<string, LocalizedObjectType[]>);
 
-  const itemPagesContent: { name: string; content: string }[] = [];
+  const itemPagesContent: ReturnType<typeof buildItemPages>['pages'] = [];
+  const crops: ReturnType<typeof buildItemPages>['crops'] = {
+    [SPRING]: [],
+    [SUMMER]: [],
+    [FALL]: [],
+    [WINTER]: []
+  };
 
   items.forEach((item) => {
     const source: string[] = [];
@@ -335,17 +364,23 @@ export default function buildItemPages(localization: Localization, localizationK
 
     const sourceText = source.length === 0 ? 'None' : source.join(' • ');
 
-    const { cropInfobox, cropBody, cropFooter } = generateCropSections(
+    const { cropInfobox, cropBody, cropFooter, stages, season } = generateCropSections(
       item,
       objectsByKey,
       objectsToItem,
       lootTablesByKey
     );
 
+    if (season != null) {
+      crops[season].push(item.name);
+    }
+
     const { seedInfobox, seedBody, seedFooter } = generateSeedSections(item, item.name, objectsByKey);
 
     let output = `<onlyinclude>{{{{{1|Infobox}}}
 |name        = ${item.name}
+|image       = ${item.name.replace(' ', '_')}.png
+|description = ${item.description}
 |sellprice   = ${item.sellPrice}`;
 
     output += `${cropInfobox}${seedInfobox}`;
@@ -411,8 +446,8 @@ export default function buildItemPages(localization: Localization, localizationK
 
     output += `${cropFooter}${seedFooter}`;
 
-    itemPagesContent.push({ name: item.name.replace(/ /g, '_'), content: output });
+    itemPagesContent.push({ name: item.name.replace(/ /g, '_'), content: output, stages });
   });
 
-  return itemPagesContent;
+  return { pages: itemPagesContent, crops };
 }

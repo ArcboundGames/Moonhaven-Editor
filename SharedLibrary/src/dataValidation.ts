@@ -1250,6 +1250,10 @@ export function validateItemGeneralTab(
 
   if (isNotNullish(rawType.key) && localization) {
     assertNotEmpty(getLocalizedValue(localization, localizationKeys, getLocalizationKey('item', 'name', rawType.key)), 'No name');
+    assertNotEmpty(
+      getLocalizedValue(localization, localizationKeys, getLocalizationKey('item', 'description', rawType.key)),
+      'No description'
+    );
   }
 
   if (assertNotNullish(rawType.sellPrice, 'No sell price')) {

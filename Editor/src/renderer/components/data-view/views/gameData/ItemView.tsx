@@ -200,7 +200,7 @@ const ItemView = () => {
     isLocalizationDirty
   } = useUpdateLocalization({
     prefix: 'item',
-    keys: useMemo(() => ['name'], []),
+    keys: useMemo(() => ['name', 'description'], []),
     fallbackName: 'Unknown Item',
     dataKeys
   });
@@ -418,6 +418,19 @@ const ItemView = () => {
                         onChange={(value) => updateLocalizedValue('name', value)}
                         required
                         disabled={disabled}
+                      />
+                    </FormBox>
+                  </Box>
+                  <Box sx={{ marginTop: 2 }}>
+                    <FormBox>
+                      <TextField
+                        label="Description"
+                        value={getLocalizedValue('description')}
+                        onChange={(value) => updateLocalizedValue('description', value)}
+                        required
+                        disabled={disabled}
+                        multiline
+                        rows={4}
                       />
                     </FormBox>
                   </Box>

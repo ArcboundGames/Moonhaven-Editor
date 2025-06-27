@@ -29,6 +29,7 @@ import {
 } from '../../../SharedLibrary/src/util/converters.util';
 import { getLocalizationKey, getLocalizedValue } from '../../../SharedLibrary/src/util/localization.util';
 import toRecord from '../../../SharedLibrary/src/util/record.util';
+import { getStreamingDataPath } from './wiki.util';
 
 import type {
   CraftingRecipeDataFile,
@@ -51,7 +52,7 @@ function toKeyLookup<T extends { key: string }>(array: T[]): Record<string, T> {
 
 export function getItems(localization: Localization, localizationKeys: string[]) {
   const data = JSON.parse(
-    readFileSync(join(__dirname, '../../../Moonhaven-Unity/Assets/StreamingAssets/data/items.json'), 'utf8')
+    readFileSync(join(__dirname, `${getStreamingDataPath()}/items.json`), 'utf8')
   ) as ItemDataFile;
 
   const items: LocalizedItemType[] = (data.items ?? [])
@@ -62,6 +63,11 @@ export function getItems(localization: Localization, localizationKeys: string[])
         localization,
         localizationKeys,
         getLocalizationKey('item', 'name', item.key.toLowerCase())
+      ),
+      description: getLocalizedValue(
+        localization,
+        localizationKeys,
+        getLocalizationKey('item', 'description', item.key.toLowerCase())
       )
     }));
   items.sort((a, b) => a.name.localeCompare(b.name));
@@ -79,7 +85,7 @@ export function getItems(localization: Localization, localizationKeys: string[])
 
 export function getLootTables() {
   const data = JSON.parse(
-    readFileSync(join(__dirname, '../../../Moonhaven-Unity/Assets/StreamingAssets/data/loot_tables.json'), 'utf8')
+    readFileSync(join(__dirname, `${getStreamingDataPath()}/loot_tables.json`), 'utf8')
   ) as LootTableDataFile;
 
   const lootTables = (data.lootTables ?? []).map((entry) => toLootTable(toProcessedRawLootTable(entry)));
@@ -93,7 +99,7 @@ export function getLootTables() {
 
 export function getObjects(localization: Localization, localizationKeys: string[]) {
   const data = JSON.parse(
-    readFileSync(join(__dirname, '../../../Moonhaven-Unity/Assets/StreamingAssets/data/objects.json'), 'utf8')
+    readFileSync(join(__dirname, `${getStreamingDataPath()}/objects.json`), 'utf8')
   ) as ObjectDataFile;
 
   const objects: LocalizedObjectType[] = (data.objects ?? [])
@@ -126,7 +132,7 @@ export function getObjects(localization: Localization, localizationKeys: string[
 
 export function getCraftingRecipes(localization: Localization, localizationKeys: string[]) {
   const data = JSON.parse(
-    readFileSync(join(__dirname, '../../../Moonhaven-Unity/Assets/StreamingAssets/data/crafting_recipes.json'), 'utf8')
+    readFileSync(join(__dirname, `${getStreamingDataPath()}/crafting_recipes.json`), 'utf8')
   ) as CraftingRecipeDataFile;
 
   const craftingRecipes: LocalizedCraftingRecipe[] = (data.recipes ?? [])
@@ -156,7 +162,7 @@ export function getCraftingRecipes(localization: Localization, localizationKeys:
 
 export function getFishingZones() {
   const data = JSON.parse(
-    readFileSync(join(__dirname, '../../../Moonhaven-Unity/Assets/StreamingAssets/data/fishing.json'), 'utf8')
+    readFileSync(join(__dirname, `${getStreamingDataPath()}/fishing.json`), 'utf8')
   ) as FishingDataFile;
 
   const fishingZones = (data.zones ?? []).map((entry) => toFishingZone(toProcessedRawFishingZone(entry)));
@@ -169,7 +175,7 @@ export function getFishingZones() {
 
 export function getCreatures(localization: Localization, localizationKeys: string[]) {
   const data = JSON.parse(
-    readFileSync(join(__dirname, '../../../Moonhaven-Unity/Assets/StreamingAssets/data/creatures.json'), 'utf8')
+    readFileSync(join(__dirname, `${getStreamingDataPath()}/creatures.json`), 'utf8')
   ) as CreatureDataFile;
 
   const creatures: LocalizedCreatureType[] = (data.creatures ?? [])
@@ -199,7 +205,7 @@ export function getCreatures(localization: Localization, localizationKeys: strin
 
 export function getLocalizations() {
   const data = JSON.parse(
-    readFileSync(join(__dirname, '../../../Moonhaven-Unity/Assets/StreamingAssets/data/localizations.json'), 'utf8')
+    readFileSync(join(__dirname, `${getStreamingDataPath()}/localizations.json`), 'utf8')
   ) as RawLocalizationFile;
 
   const { keys, localizations } = toLocalizationFile(toProcessedRawLocalizationFile(data));

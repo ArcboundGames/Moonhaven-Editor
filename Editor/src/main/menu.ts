@@ -234,7 +234,7 @@ export default class MenuBuilder {
           {
             label: 'Documentation',
             click() {
-              shell.openExternal('https://arcboundgames.ga/');
+              shell.openExternal('https://arcboundgames.mooo.com/');
             }
           }
         ]

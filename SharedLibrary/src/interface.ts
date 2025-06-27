@@ -228,6 +228,7 @@ export interface ProcessedRawItemType extends Omit<ItemType, 'key' | 'settings' 
 
 export interface LocalizedItemType extends ItemType {
   name: string;
+  description: string;
 }
 
 export interface ItemType {
