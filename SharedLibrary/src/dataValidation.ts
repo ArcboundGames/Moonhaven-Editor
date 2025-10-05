@@ -1243,9 +1243,11 @@ export function validateItemGeneralTab(
 
   assert(rawType.maxStackSize >= 0, 'Max stack size cannot be negative');
   assert(rawType.maxStackSize % 1 === 0, 'Max stack size must be a whole number');
-  if (assertNotNullish(iconSize.width, 'No icon width') && assertNotNullish(iconSize.height, 'No icon height')) {
-    assert(iconSize.width === ICON_WIDTH, `Icon width must be ${ICON_WIDTH} pixels, currently is ${iconSize.width}`);
-    assert(iconSize.height === ICON_HEIGHT, `Icon height must be ${ICON_HEIGHT} pixels, currently is ${iconSize.height}`);
+  if (assertNotNullish(iconSize, 'No icon')) {
+    if (assertNotNullish(iconSize.width, 'No icon width') && assertNotNullish(iconSize.height, 'No icon height')) {
+      assert(iconSize.width === ICON_WIDTH, `Icon width must be ${ICON_WIDTH} pixels, currently is ${iconSize.width}`);
+      assert(iconSize.height === ICON_HEIGHT, `Icon height must be ${ICON_HEIGHT} pixels, currently is ${iconSize.height}`);
+    }
   }
 
   if (isNotNullish(rawType.key) && localization) {
