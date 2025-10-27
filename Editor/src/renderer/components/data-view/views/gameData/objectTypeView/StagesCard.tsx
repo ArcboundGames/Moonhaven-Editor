@@ -223,13 +223,13 @@ const StageFields = ({
                   ) : (
                     <Box key="empty-harvestable-box" />
                   )}
-                  <FormBox key="collidable-box">
+                  <FormBox key="autoWiggleCollidable-box">
                     <Checkbox
-                      label="Collidable"
-                      checked={stage.collidable}
+                      label="Auto Wiggle Collidable"
+                      checked={stage.autoWiggleCollidable}
                       onChange={(value) =>
                         onChange({
-                          collidable: value
+                          autoWiggleCollidable: value
                         })
                       }
                       disabled={disabled}

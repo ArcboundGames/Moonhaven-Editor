@@ -866,7 +866,7 @@ export function toProcessedRawObjectTypeStage(rawStage: RawObjectTypeStage | und
     health: fromNullish(rawStage?.health) ?? 0,
     threshold: fromNullish(rawStage?.threshold) ?? 0,
     harvestable: fromNullish(rawStage?.harvestable) ?? false,
-    collidable: fromNullish(rawStage?.collidable) ?? true,
+    autoWiggleCollidable: fromNullish(rawStage?.autoWiggleCollidable) ?? true,
     pause: fromNullish(rawStage?.pause) ?? false,
     jumpToStage: fromNullish(rawStage?.jumpToStage),
     jumpCondition: fromNullish(rawStage?.jumpCondition)
@@ -879,7 +879,7 @@ export function createObjectTypeStage(): ObjectTypeStage {
     health: 0,
     threshold: 0,
     harvestable: false,
-    collidable: true,
+    autoWiggleCollidable: true,
     pause: false
   };
 }

@@ -553,7 +553,7 @@ export interface ObjectTypeStage {
   lootTableKey?: string;
   threshold: number;
   harvestable: boolean;
-  collidable: boolean;
+  autoWiggleCollidable: boolean;
   pause: boolean;
   jumpToStage?: number;
   jumpCondition?: StageJumpCondition;
