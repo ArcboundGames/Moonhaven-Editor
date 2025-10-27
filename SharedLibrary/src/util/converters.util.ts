@@ -721,13 +721,16 @@ export function toProcessedRawSprite(objectSprite: RawSprite | null | undefined)
 export function toSprites(sprites: Record<string, ProcessedRawSprite> | undefined): Record<string, Sprite> | undefined {
   return isNullish(sprites)
     ? undefined
-    : Object.keys(sprites).reduce((spriteSettings, sprite) => {
-        const objectSprite = sprites?.[sprite];
-        if (isNotNullish(objectSprite)) {
-          spriteSettings[sprite] = toSprite(objectSprite);
-        }
-        return spriteSettings;
-      }, {} as Record<string, Sprite>);
+    : Object.keys(sprites).reduce(
+        (spriteSettings, sprite) => {
+          const objectSprite = sprites?.[sprite];
+          if (isNotNullish(objectSprite)) {
+            spriteSettings[sprite] = toSprite(objectSprite);
+          }
+          return spriteSettings;
+        },
+        {} as Record<string, Sprite>
+      );
 }
 
 export function toSprite(objectSprite: ProcessedRawSprite): Sprite {
@@ -792,10 +795,13 @@ export function toProcessedRawSpriteColliders(
     return {};
   }
 
-  return Object.keys(rawSpriteColliders).reduce((spriteColliders, sprite) => {
-    spriteColliders[sprite] = rawSpriteColliders?.[sprite]?.map(toProcessedRawObjectCollider) ?? [];
-    return spriteColliders;
-  }, {} as Record<string, ProcessedRawCollider[]>);
+  return Object.keys(rawSpriteColliders).reduce(
+    (spriteColliders, sprite) => {
+      spriteColliders[sprite] = rawSpriteColliders?.[sprite]?.map(toProcessedRawObjectCollider) ?? [];
+      return spriteColliders;
+    },
+    {} as Record<string, ProcessedRawCollider[]>
+  );
 }
 
 export function toSpriteColliders(
@@ -805,10 +811,13 @@ export function toSpriteColliders(
     return {};
   }
 
-  return Object.keys(rawSpriteColliders).reduce((spriteColliders, sprite) => {
-    spriteColliders[sprite] = rawSpriteColliders?.[sprite]?.map(toObjectCollider) ?? [];
-    return spriteColliders;
-  }, {} as Record<string, Collider[]>);
+  return Object.keys(rawSpriteColliders).reduce(
+    (spriteColliders, sprite) => {
+      spriteColliders[sprite] = rawSpriteColliders?.[sprite]?.map(toObjectCollider) ?? [];
+      return spriteColliders;
+    },
+    {} as Record<string, Collider[]>
+  );
 }
 
 export function toProcessedRawObjectSpriteRules(rawRulset: RawObjectSpriteRuleset | undefined | null): ProcessedRawObjectSpriteRuleset {
@@ -857,6 +866,7 @@ export function toProcessedRawObjectTypeStage(rawStage: RawObjectTypeStage | und
     health: fromNullish(rawStage?.health) ?? 0,
     threshold: fromNullish(rawStage?.threshold) ?? 0,
     harvestable: fromNullish(rawStage?.harvestable) ?? false,
+    collidable: fromNullish(rawStage?.collidable) ?? true,
     pause: fromNullish(rawStage?.pause) ?? false,
     jumpToStage: fromNullish(rawStage?.jumpToStage),
     jumpCondition: fromNullish(rawStage?.jumpCondition)
@@ -869,6 +879,7 @@ export function createObjectTypeStage(): ObjectTypeStage {
     health: 0,
     threshold: 0,
     harvestable: false,
+    collidable: true,
     pause: false
   };
 }
@@ -1762,10 +1773,13 @@ export function fromNullishRecord<U, T>(
     return undefined;
   }
 
-  return Object.keys(rawRecord).reduce((record, key) => {
-    record[key] = converter(rawRecord[key]);
-    return record;
-  }, {} as Record<string, T>);
+  return Object.keys(rawRecord).reduce(
+    (record, key) => {
+      record[key] = converter(rawRecord[key]);
+      return record;
+    },
+    {} as Record<string, T>
+  );
 }
 
 export function toTypedArray<T>(input: string[] | undefined, converter: (value: string) => T | undefined): T[] | undefined {
@@ -1790,18 +1804,24 @@ export function toTypedKeyRecord<K extends string, V>(
     return undefined;
   }
 
-  return Object.keys(input).reduce((map, key) => {
-    const newKey = converter(key);
-    if (newKey) {
-      map[newKey] = input[key];
-    }
-    return map;
-  }, {} as Record<K, V>);
+  return Object.keys(input).reduce(
+    (map, key) => {
+      const newKey = converter(key);
+      if (newKey) {
+        map[newKey] = input[key];
+      }
+      return map;
+    },
+    {} as Record<K, V>
+  );
 }
 
 export function mapTypedKeyRecord<K extends string | number, U, V>(input: Record<K, U>, converter: (value: U) => V): Record<K, V> {
-  return (Object.keys(input) as K[]).reduce((map, key) => {
-    map[key] = converter(input[key]);
-    return map;
-  }, {} as Record<K, V>);
+  return (Object.keys(input) as K[]).reduce(
+    (map, key) => {
+      map[key] = converter(input[key]);
+      return map;
+    },
+    {} as Record<K, V>
+  );
 }

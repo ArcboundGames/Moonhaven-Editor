@@ -294,7 +294,10 @@ const CollidersCard = React.memo((props: CollidersCardProps) => {
     if (spriteToDelete && !isCollidersProps(props)) {
       const { colliders, onChange } = props;
       const newColliders = { ...colliders };
-      delete newColliders[spriteToDelete].colliders;
+      newColliders[spriteToDelete] = {
+        ...newColliders[spriteToDelete],
+        colliders: undefined
+      };
       onChange(newColliders);
     }
     setSpriteToDelete(undefined);

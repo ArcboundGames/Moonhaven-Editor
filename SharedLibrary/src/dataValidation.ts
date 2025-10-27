@@ -3047,6 +3047,7 @@ export function assertGrowableStage(
       assert(stage.harvestable, `Stage ${index}: Stages with a jump condition of ${STAGE_JUMP_CONDITION_HARVEST} must be harvestable`);
     }
   }
+  assertNotNullish(stage.collidable, `Stage ${index}: Collidable flag must be set`);
 }
 
 export function assertHealthStage(assert: Assert, stage: ProcessedRawObjectTypeStage, index: number) {

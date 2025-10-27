@@ -185,8 +185,10 @@ const StageFields = ({
               onChange={onSpriteChange}
             />
             <Box sx={{ ml: 3 }}>
-              {stagesType === STAGES_TYPE_GROWABLE || stagesType === STAGES_TYPE_GROWABLE_WITH_HEALTH ? (
-                <Box key="stage-growth" sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
+              <Box
+                sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', alignItems: 'flex-start' }}
+              >
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                   <FormBox>
                     <Checkbox
                       label="Pause"
@@ -204,8 +206,41 @@ const StageFields = ({
                       sx={{ ml: 1 }}
                     />
                   </FormBox>
-                  {(index < total - 1 && !stage.pause) ||
-                  (stage.jumpToStage !== undefined && stage.jumpCondition === STAGE_JUMP_CONDITION_TIME) ? (
+                  {stagesType === STAGES_TYPE_GROWABLE || stagesType === STAGES_TYPE_GROWABLE_WITH_HEALTH ? (
+                    <FormBox key="harvestable-box">
+                      <Checkbox
+                        label="Harvestable"
+                        checked={stage.harvestable}
+                        onChange={(value) =>
+                          onChange({
+                            harvestable: value
+                          })
+                        }
+                        disabled={disabled}
+                        sx={{ ml: 1 }}
+                      />
+                    </FormBox>
+                  ) : (
+                    <Box key="empty-harvestable-box" />
+                  )}
+                  <FormBox key="collidable-box">
+                    <Checkbox
+                      label="Collidable"
+                      checked={stage.collidable}
+                      onChange={(value) =>
+                        onChange({
+                          collidable: value
+                        })
+                      }
+                      disabled={disabled}
+                      sx={{ ml: 1 }}
+                    />
+                  </FormBox>
+                </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                  {(stagesType === STAGES_TYPE_GROWABLE || stagesType === STAGES_TYPE_GROWABLE_WITH_HEALTH) &&
+                  ((index < total - 1 && !stage.pause) ||
+                    (stage.jumpToStage !== undefined && stage.jumpCondition === STAGE_JUMP_CONDITION_TIME)) ? (
                     <FormBox key="stage-growth-days">
                       <NumberTextField
                         label="Growth Days"
@@ -223,29 +258,6 @@ const StageFields = ({
                       />
                     </FormBox>
                   ) : null}
-                </Box>
-              ) : null}
-              <Box
-                sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', alignItems: 'flex-start' }}
-              >
-                {stagesType === STAGES_TYPE_GROWABLE || stagesType === STAGES_TYPE_GROWABLE_WITH_HEALTH ? (
-                  <FormBox key="harvestable-box">
-                    <Checkbox
-                      label="Harvestable"
-                      checked={stage.harvestable}
-                      onChange={(value) =>
-                        onChange({
-                          harvestable: value
-                        })
-                      }
-                      disabled={disabled}
-                      sx={{ ml: 1 }}
-                    />
-                  </FormBox>
-                ) : (
-                  <Box key="empty-harvestable-box" />
-                )}
-                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' }}>
                   {stagesType === STAGES_TYPE_GROWABLE_WITH_HEALTH ? (
                     <FormBox key="stage-health">
                       <NumberTextField
@@ -300,57 +312,55 @@ const StageFields = ({
                     </FormBox>
                   ) : null}
                   {stagesType === STAGES_TYPE_GROWABLE || stagesType === STAGES_TYPE_GROWABLE_WITH_HEALTH ? (
-                    <Box key="stage-jump-to" sx={{ gridColumn: '1 / span 2', alignItems: 'flex-start' }}>
-                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                        <FormBox>
-                          <Select
-                            label="Jumps To"
-                            disabled={disabled}
-                            value={stage.jumpToStage}
-                            onChange={(value) => {
-                              if (value === undefined) {
-                                onChange({ jumpToStage: undefined, jumpCondition: undefined });
-                              } else {
-                                onChange({ jumpToStage: value });
-                              }
-                            }}
-                            options={[...Array(total)].map((_, i) => ({
-                              label: `Stage ${i + 1}`,
-                              value: i
-                            }))}
-                            error={
-                              stage.jumpToStage !== undefined &&
-                              (Number.isNaN(stage.jumpToStage) || stage.jumpToStage < 0 || stage.jumpToStage >= total)
+                    <>
+                      <FormBox>
+                        <Select
+                          label="Jumps To"
+                          disabled={disabled}
+                          value={stage.jumpToStage}
+                          onChange={(value) => {
+                            if (value === undefined) {
+                              onChange({ jumpToStage: undefined, jumpCondition: undefined });
+                            } else {
+                              onChange({ jumpToStage: value });
                             }
+                          }}
+                          options={[...Array(total)].map((_, i) => ({
+                            label: `Stage ${i + 1}`,
+                            value: i
+                          }))}
+                          error={
+                            stage.jumpToStage !== undefined &&
+                            (Number.isNaN(stage.jumpToStage) || stage.jumpToStage < 0 || stage.jumpToStage >= total)
+                          }
+                        />
+                      </FormBox>
+                      {stage.jumpToStage !== undefined ? (
+                        <FormBox key="stage-jump-condition">
+                          <Select
+                            label="Jump Condition"
+                            disabled={disabled}
+                            value={stage.jumpCondition}
+                            onChange={(value) =>
+                              onChange({
+                                jumpCondition: value
+                              })
+                            }
+                            options={[
+                              {
+                                label: 'Time',
+                                value: STAGE_JUMP_CONDITION_TIME
+                              },
+                              {
+                                label: 'Harvest',
+                                value: STAGE_JUMP_CONDITION_HARVEST
+                              }
+                            ]}
+                            error={stage.jumpToStage !== undefined && stage.jumpCondition === undefined}
                           />
                         </FormBox>
-                        {stage.jumpToStage !== undefined ? (
-                          <FormBox key="stage-jump-condition">
-                            <Select
-                              label="Jump Condition"
-                              disabled={disabled}
-                              value={stage.jumpCondition}
-                              onChange={(value) =>
-                                onChange({
-                                  jumpCondition: value
-                                })
-                              }
-                              options={[
-                                {
-                                  label: 'Time',
-                                  value: STAGE_JUMP_CONDITION_TIME
-                                },
-                                {
-                                  label: 'Harvest',
-                                  value: STAGE_JUMP_CONDITION_HARVEST
-                                }
-                              ]}
-                              error={stage.jumpToStage !== undefined && stage.jumpCondition === undefined}
-                            />
-                          </FormBox>
-                        ) : null}
-                      </Box>
-                    </Box>
+                      ) : null}
+                    </>
                   ) : null}
                 </Box>
               </Box>
