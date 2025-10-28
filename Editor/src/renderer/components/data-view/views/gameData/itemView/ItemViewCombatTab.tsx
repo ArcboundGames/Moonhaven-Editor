@@ -259,6 +259,29 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
                     />
                   </FormBox>
                 ) : null}
+                {/* Knockback input: only show if weaponType is not NONE or PROJECTILE */}
+                {!isWeaponTypeNone && weaponType !== WEAPON_TYPE_PROJECTILE ? (
+                  <FormBox>
+                    <NumberTextField
+                      label="Knockback"
+                      value={data.knockback ?? 0}
+                      min={0}
+                      max={10}
+                      step={0.1}
+                      onChange={(value) => handleOnChange({ knockback: value })}
+                      required
+                      disabled={isWeaponTypeNone || disabled}
+                      helperText={(() => {
+                        const val = data.knockback ?? 0;
+                        if (val === 0) return 'No Knockback';
+                        if (val > 0 && val <= 3) return 'Light Knockback';
+                        if (val > 3 && val <= 6) return 'Moderate Knockback';
+                        if (val > 6) return 'Heavy Knockback';
+                        return '';
+                      })()}
+                    />
+                  </FormBox>
+                ) : null}
               </Card>
             ) : null}
           </Box>

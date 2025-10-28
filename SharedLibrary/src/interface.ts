@@ -259,6 +259,9 @@ export interface ItemType {
   projectileSpeed: number;
   projectileDistance: number;
 
+  // Knockback
+  knockback?: number;
+
   settings?: ItemSettings;
 
   // Fishing - Pole

@@ -1341,7 +1341,7 @@ export function validateItemCombatTab(
   categoriesByKeys: Record<string, ItemCategory>,
   skillsByKey: Record<string, Skill>
 ): string[] {
-  const { errors, assert } = createAssert();
+  const { errors, assert, assertNotNullish } = createAssert();
   const { value: weaponType, controlledBy: weaponTypeControlledBy } = getItemSetting('weaponType', rawType, categoriesByKeys);
   if (isNotNullish(weaponType) && weaponType != WEAPON_TYPE_NONE) {
     const canDamageObjects =
@@ -1382,6 +1382,16 @@ export function validateItemCombatTab(
     } else if (weaponType === WEAPON_TYPE_PROJECTILE_LAUNCHER) {
       assert(rawType.launcherDamage > 0, 'Launcher damage must be greater than 0');
       assert(rawType.launcherDamage % 1 === 0, 'Launcher damage must be a whole number');
+    }
+
+    // Knockback validation
+    if (weaponType !== WEAPON_TYPE_PROJECTILE) {
+      if (assertNotNullish(rawType.knockback, 'Knockback value is required for items with weaponType ' + weaponType)) {
+        assert(
+          typeof rawType.knockback === 'number' && rawType.knockback >= 0 && rawType.knockback <= 10,
+          'Knockback must be a number between 0 and 10'
+        );
+      }
     }
 
     const { value: creatureDamageIncreasedBySkillKey, controlledBy: creatureDamageIncreasedBySkillKeyControlledBy } = getItemSetting(

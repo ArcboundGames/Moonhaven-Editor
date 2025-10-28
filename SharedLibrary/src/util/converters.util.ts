@@ -488,6 +488,7 @@ export function toProcessedRawItemType(rawItemType: RawItemType | undefined | nu
     objectDamage: rawItemType?.objectDamage ?? 0,
     launcherDamage: rawItemType?.launcherDamage ?? 0,
     damageArcRadius: rawItemType?.damageArcRadius ?? 0,
+    knockback: rawItemType?.knockback ?? 0,
     settings: toProcessedRawItemSettings(rawItemType?.settings),
     durability: rawItemType?.durability ?? 0,
     hungerIncrease: rawItemType?.hungerIncrease ?? 0,
