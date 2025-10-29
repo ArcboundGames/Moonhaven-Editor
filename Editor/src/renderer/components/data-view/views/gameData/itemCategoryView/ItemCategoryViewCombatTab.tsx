@@ -171,21 +171,6 @@ const ItemCategoryViewCombatTab = ({ data, disabled, handleOnChange }: ItemCateg
               <Card header="Input">
                 <FormBox sx={{ pb: 0, mb: 0 }}>
                   <Checkbox
-                    label="Has Combat Priority"
-                    checked={Boolean(data.settings?.hasCombatPriority)}
-                    onChange={(value) =>
-                      handleOnChange({
-                        settings: {
-                          ...data.settings,
-                          hasCombatPriority: value
-                        }
-                      })
-                    }
-                    disabled={isWeaponTypeNone || disabled}
-                  />
-                </FormBox>
-                <FormBox sx={{ pb: 0, mb: 0 }}>
-                  <Checkbox
                     label="Reset Trigger on Attack"
                     checked={Boolean(data.settings?.resetTriggerOnAttack)}
                     onChange={(value) =>

@@ -289,16 +289,6 @@ const ItemViewCombatTab = ({ data, disabled, handleOnChange }: ItemViewCombatTab
             <Box display="flex" flexDirection="column" sx={{ width: '100%' }}>
               <Card header="Input">
                 <OverriddenItemPropertyCard
-                  label="Has Combat Priority"
-                  type={data}
-                  layout="inline"
-                  setting="hasCombatPriority"
-                  onChange={handleOnChange}
-                  defaultValue={false}
-                  disabled={isWeaponTypeNone || disabled}
-                  variant="boolean"
-                />
-                <OverriddenItemPropertyCard
                   label="Reset Trigger on Attack"
                   type={data}
                   layout="inline"

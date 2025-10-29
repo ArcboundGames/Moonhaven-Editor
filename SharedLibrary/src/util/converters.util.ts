@@ -1648,7 +1648,6 @@ export function toProcessedRawItemSettings(rawItemSettings: RawItemSettings | un
     isEdible: fromNullish(rawItemSettings?.isEdible),
     filledFromType: fromNullish(rawItemSettings?.filledFromType),
     hasLight: fromNullish(rawItemSettings?.hasLight),
-    hasCombatPriority: fromNullish(rawItemSettings?.hasCombatPriority),
     resetTriggerOnAttack: fromNullish(rawItemSettings?.resetTriggerOnAttack),
     projectileItemCategoryKeys: fromNullishArray(rawItemSettings?.projectileItemCategoryKeys, (entry) => entry ?? ''),
     projectileItemKeys: fromNullishArray(rawItemSettings?.projectileItemKeys, (entry) => entry ?? ''),

@@ -321,7 +321,6 @@ export interface ItemSettings {
   createsFarmland?: boolean;
   destroysFarmland?: boolean;
   weaponType?: WeaponType;
-  hasCombatPriority?: boolean;
   resetTriggerOnAttack?: boolean;
   damagesObjectCategoryKeys?: string[];
   damagesObjectSubCategoryKeys?: string[];
