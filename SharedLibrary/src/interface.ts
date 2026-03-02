@@ -1046,7 +1046,7 @@ export interface FishingZone {
  * Skills
  */
 export interface SkillDataFile {
-  skills?: (RawFishingZone | undefined | null)[] | null;
+  skills?: (RawSkill | undefined | null)[] | null;
 }
 
 export interface RawSkill extends DeepNullish<Omit<ProcessedRawSkill, 'levels'>> {
