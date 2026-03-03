@@ -23,7 +23,6 @@ import { editPage, getApiUrl, uploadImage } from './wiki.util';
 
   // Items
   const { pages: itemPagesContent, crops } = buildItemPages(englishLocalization, localizationKeys);
-  // eslint-disable-next-line no-restricted-syntax
   for (let i = 0; i < itemPagesContent.length; i++) {
     const page = itemPagesContent[i];
     console.info(`Uploading page ${i + 1} / ${itemPagesContent.length}`);

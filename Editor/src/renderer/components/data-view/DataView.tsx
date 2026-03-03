@@ -1,5 +1,4 @@
 import Box from '@mui/material/Box';
-import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 import { useAppSelector } from '../../hooks';
@@ -41,6 +40,8 @@ import SkillView from './views/gameData/SkillView';
 import WorldSettingsView from './views/gameData/WorldSettingsView';
 import WorldZoneView from './views/gameData/WorldZoneView';
 import WorldZoneList from './lists/WorldZoneList';
+
+import type React from 'react';
 
 const DataView = () => {
   const section = useAppSelector(selectSection);

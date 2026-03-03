@@ -7,7 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import IconButton from '@mui/material/IconButton';
-import { useCallback, useState } from 'react';
+import { type JSX, useCallback, useState } from 'react';
 
 import NumberTextField from '../../../../widgets/form/NumberTextField';
 import Card from '../../../../widgets/layout/Card';

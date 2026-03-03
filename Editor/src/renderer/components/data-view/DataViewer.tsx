@@ -1,4 +1,3 @@
-/* eslint-disable react/destructuring-assignment */
 import Alert from '@mui/material/Alert';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -12,7 +11,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Typography from '@mui/material/Typography';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { type JSX, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { DATA_FILE_EXTENSION } from '../../../../../SharedLibrary/src/constants';
@@ -366,7 +365,6 @@ const DataViewer = <T extends object, F extends Record<string, unknown>>(props: 
     return (
       <List dense>
         {allErrors.map((error, index) => (
-          // eslint-disable-next-line react/no-array-index-key
           <ListItem key={`${section}-error-${index}`}>
             <ListItemText primary={error} />
           </ListItem>

@@ -7,7 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Toolbar from '@mui/material/Toolbar';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { selectWorldZoneErrors } from 'renderer/store/slices/worldZones';
@@ -63,6 +63,7 @@ import { selectWorldSettingsErrors } from '../store/slices/world';
 
 import type { SelectChangeEvent } from '@mui/material/Select';
 import type { Section } from '../../../../SharedLibrary/src/interface';
+import type React from 'react';
 
 const Menu = () => {
   const section = useAppSelector(selectSection);

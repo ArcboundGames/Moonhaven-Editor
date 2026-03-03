@@ -1,4 +1,3 @@
-/* eslint-disable no-else-return */
 import { useMemo } from 'react';
 
 import {

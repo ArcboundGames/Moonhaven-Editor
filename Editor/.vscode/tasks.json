@@ -4,8 +4,9 @@
 		{
 			"type": "npm",
 			"script": "start",
+			"path": "Editor",
 			"problemMatcher": [],
-			"label": "npm: start",
+			"label": "npm: start - Editor",
 			"detail": "ts-node ./.erb/scripts/check-port-in-use.js && npm run start:renderer",
 			"group": {
 				"kind": "build",

@@ -73,7 +73,7 @@ const MultiSelect = ({
       <InputLabel id={labelId} shrink>
         {label}
       </InputLabel>
-      <MuiSelect
+      <MuiSelect<string[]>
         labelId={labelId}
         id={id}
         multiple

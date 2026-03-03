@@ -3,11 +3,11 @@ name: Build Editor
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: ['main']
     paths:
       - Editor/**
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
     paths:
       - Editor/**
 
@@ -20,28 +20,28 @@ jobs:
         node-version: [18.x]
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        cache: yarn
-        cache-dependency-path: |
-          Editor/yarn.lock
-          Editor/release/app/yarn.lock
-        node-version: ${{ matrix.node-version }}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          cache: npm
+          cache-dependency-path: |
+            Editor/package-lock.json
+            Editor/release/app/package-lock.json
+          node-version: ${{ matrix.node-version }}
 
-    - name: Setup
-      working-directory: ./Editor
-      run: |
-        yarn install --frozen-lockfile
+      - name: Setup
+        working-directory: ./Editor
+        run: |
+          npm ci
 
-    - name: Lint
-      working-directory: ./Editor
-      run: |
-        yarn lint
+      - name: Lint
+        working-directory: ./Editor
+        run: |
+          npm run lint
 
-    - name: Build
-      working-directory: ./Editor
-      run: |
-        yarn build
+      - name: Build
+        working-directory: ./Editor
+        run: |
+          npm run build

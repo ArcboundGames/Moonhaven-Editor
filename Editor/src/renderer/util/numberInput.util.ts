@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 export function getNumberFromInput(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): number {
   const { target } = event;
   if (target.value === '-') {

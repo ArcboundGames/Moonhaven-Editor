@@ -6,7 +6,7 @@ import TextField from '../../../../widgets/form/TextField';
 import FormBox from '../../../../widgets/layout/FormBox';
 
 interface LocalizationPairProps {
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLInputElement | null>;
   localizationKey: string;
   defaultValue: string;
   disabled: boolean;

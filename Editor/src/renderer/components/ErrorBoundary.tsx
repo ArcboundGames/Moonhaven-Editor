@@ -1,6 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable react/prop-types */
-/* eslint-disable react/destructuring-assignment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 

@@ -122,7 +122,6 @@ const LocalizationKeysView = () => {
     return editData.keys
       .filter((key) => !debouncedSearchTerm || key.replace(/_/g, ' ').toLowerCase().includes(debouncedSearchTerm))
       .map((key) => (
-        // eslint-disable-next-line react/no-array-index-key
         <Box key={`localization-keys-${key}`} sx={{ display: 'grid', gridTemplateColumns: '1fr auto' }}>
           <Box sx={{ mt: 1, mb: 1, p: 1 }}>
             <Typography variant="body1">{key}</Typography>

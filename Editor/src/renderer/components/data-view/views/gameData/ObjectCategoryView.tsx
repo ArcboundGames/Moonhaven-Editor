@@ -1,4 +1,3 @@
-/* eslint-disable no-else-return */
 import Box from '@mui/material/Box';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';

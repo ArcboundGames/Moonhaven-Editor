@@ -264,9 +264,19 @@ export const itemsSlice = createSlice({
         return namesByKey;
       }, {} as Record<string, string>);
 
+      const itemDescriptionsByKey = state.items.reduce((descsByKey, item) => {
+        descsByKey[item.key] = getLocalizedValue(
+          localization,
+          localizationKeys,
+          getLocalizationKey('item', 'description', item.key)
+        );
+        return descsByKey;
+      }, {} as Record<string, string>);
+
       const localizedItems: LocalizedItemType[] = state.items.map((item) => ({
         ...item,
-        name: isNotEmpty(itemNamesByKey[item.key]) ? itemNamesByKey[item.key] : item.key
+        name: isNotEmpty(itemNamesByKey[item.key]) ? itemNamesByKey[item.key] : item.key,
+        description: itemDescriptionsByKey[item.key] ?? ''
       }));
 
       const localizedItemsById: Record<number, LocalizedItemType> = {};

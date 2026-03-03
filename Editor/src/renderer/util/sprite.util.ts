@@ -142,7 +142,6 @@ export async function getObjectSpriteCountsWithSeason(
       SEASONS.map((season) => getObjectSpriteCounts(type, path, `${type.key}-${season}`))
     );
 
-    // eslint-disable-next-line no-restricted-syntax
     for (const { key, spriteCount, accentSpriteCounts } of seasonCounts) {
       spriteCounts = { ...spriteCounts, [key]: spriteCount };
       accentSpritesCounts = { ...accentSpritesCounts, [key]: accentSpriteCounts };
@@ -187,7 +186,6 @@ export async function getObjectsSpritesCountsWithSeason(
     }
   > = {};
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const { spriteCounts, accentSpritesCounts } of results) {
     allSpriteCounts = { ...allSpriteCounts, ...spriteCounts };
     allAccentSpritesCounts = { ...allAccentSpritesCounts, ...accentSpritesCounts };

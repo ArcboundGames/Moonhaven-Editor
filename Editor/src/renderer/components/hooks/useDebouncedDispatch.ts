@@ -14,7 +14,7 @@ export default function useDebouncedDispatch(
 ) {
   const debouncedDispatch: DebouncedDispatch = useMemo(
     () => ({
-      // eslint-disable-next-line func-names, object-shorthand
+      // eslint-disable-next-line object-shorthand
       dispatch: function (this: DebouncedDispatch) {
         if (this.timeout) {
           return;

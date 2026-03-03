@@ -103,7 +103,7 @@ import type {
   WORLD_ZONES_DATA_FILE
 } from './constants';
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 export type DeepNullish<T> = T extends Function ? T : T extends object ? { [P in keyof T]?: DeepNullish<T[P]> | null } : T;
 
 export interface GameData {

@@ -2,7 +2,7 @@
   "compilerOptions": {
     "incremental": true,
     "target": "es2021",
-    "module": "commonjs",
+    "module": "es2022",
     "lib": ["dom", "es2021"],
     "jsx": "react-jsx",
     "strict": true,
@@ -17,7 +17,10 @@
     "skipLibCheck": true
   },
   "ts-node": {
-    "files": true
+    "files": true,
+    "compilerOptions": {
+      "module": "commonjs"
+    }
   },
   "exclude": ["test", "release/build", "release/app/dist", ".erb/dll", "node_modules"]
 }

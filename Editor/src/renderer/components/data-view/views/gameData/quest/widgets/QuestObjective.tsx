@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Box from '@mui/material/Box';
@@ -13,8 +12,10 @@ import Typography from '@mui/material/Typography';
 import { useCallback, useMemo, useState } from 'react';
 
 import {
-  QUEST_OBJECTIVE_TYPE_CRAFT, QUEST_OBJECTIVE_TYPE_DESTINATION,
-  QUEST_OBJECTIVE_TYPE_GATHER, QUEST_OBJECTIVE_TYPE_TALK_TO_CREATURE
+  QUEST_OBJECTIVE_TYPE_CRAFT,
+  QUEST_OBJECTIVE_TYPE_DESTINATION,
+  QUEST_OBJECTIVE_TYPE_GATHER,
+  QUEST_OBJECTIVE_TYPE_TALK_TO_CREATURE
 } from '../../../../../../../../../SharedLibrary/src/constants';
 import { createQuestObjective } from '../../../../../../../../../SharedLibrary/src/util/converters.util';
 import { useAppSelector } from '../../../../../../hooks';

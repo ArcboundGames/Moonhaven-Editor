@@ -22,7 +22,6 @@ const TimesBox = ({ times, timesComparator, sx = {} }: TimesBoxProps) => {
   }
 
   let text;
-  // eslint-disable-next-line default-case
   switch (timesComparator) {
     case TIME_COMPARATOR_BEFORE:
       if (times.length === 1) {

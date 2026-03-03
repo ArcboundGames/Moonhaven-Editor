@@ -1,5 +1,4 @@
 import { configureStore } from '@reduxjs/toolkit';
-import thunkMiddleware from 'redux-thunk';
 
 import loggerMiddleware from '../middleware/logger';
 import monitorReducersEnhancer from '../middleware/monitorReducer';
@@ -37,8 +36,8 @@ export const store = configureStore({
     quests: questsReducer,
     worldZones: worldZonesReducer
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().prepend(thunkMiddleware).concat(loggerMiddleware),
-  enhancers: [monitorReducersEnhancer]
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(loggerMiddleware),
+  enhancers: (getDefaultEnhancers) => getDefaultEnhancers().concat(monitorReducersEnhancer)
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

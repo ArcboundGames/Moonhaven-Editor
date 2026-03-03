@@ -3,11 +3,11 @@ name: Shared Library
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: ['main']
     paths:
       - SharedLibrary/**
   pull_request:
-    branches: [ "main" ]
+    branches: ['main']
     paths:
       - SharedLibrary/**
 
@@ -20,27 +20,27 @@ jobs:
         node-version: [18.x]
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        cache: yarn
-        cache-dependency-path: |
-          SharedLibrary/yarn.lock
-        node-version: ${{ matrix.node-version }}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          cache: npm
+          cache-dependency-path: |
+            SharedLibrary/package-lock.json
+          node-version: ${{ matrix.node-version }}
 
-    - name: Setup
-      working-directory: ./SharedLibrary
-      run: |
-        yarn install --frozen-lockfile
-  
-    - name: Lint
-      working-directory: ./SharedLibrary
-      run: |
-        yarn lint
+      - name: Setup
+        working-directory: ./SharedLibrary
+        run: |
+          npm ci
 
-    - name: Test
-      working-directory: ./SharedLibrary
-      run: |
-        yarn test
+      - name: Lint
+        working-directory: ./SharedLibrary
+        run: |
+          npm run lint
+
+      - name: Test
+        working-directory: ./SharedLibrary
+        run: |
+          npm test

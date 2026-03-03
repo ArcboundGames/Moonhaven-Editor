@@ -1,10 +1,8 @@
-/* eslint-disable react/no-array-index-key */
-import TextField from '@mui/material/TextField';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
-import getHours from 'date-fns/getHours';
-import getMinutes from 'date-fns/getMinutes';
-import setHours from 'date-fns/setHours';
-import setMinutes from 'date-fns/setMinutes';
+import { getHours } from 'date-fns/getHours';
+import { getMinutes } from 'date-fns/getMinutes';
+import { setHours } from 'date-fns/setHours';
+import { setMinutes } from 'date-fns/setMinutes';
 import { useCallback, useEffect, useState } from 'react';
 
 import { ONE_HOUR, ONE_MINUTE } from '../../../../../SharedLibrary/src/constants';
@@ -59,14 +57,13 @@ const TimeInput = ({ label, value, disabled = false, required = false, onChange 
         label={label}
         value={date}
         onChange={onTimeChange}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            disabled={disabled}
-            required={required}
-            error={value < (required ? 0 : -1) || value > 1080}
-          />
-        )}
+        disabled={disabled}
+        slotProps={{
+          textField: {
+            required,
+            error: value < (required ? 0 : -1) || value > 1080
+          }
+        }}
       />
     </FormBox>
   );

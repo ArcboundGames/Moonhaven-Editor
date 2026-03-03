@@ -50,7 +50,6 @@ export function useTraceUpdate(props: Record<string, unknown>) {
       return ps;
     }, {} as Record<string, unknown>);
     if (Object.keys(changedProps).length > 0) {
-      // eslint-disable-next-line no-console
       console.info('Changed props:', changedProps);
     }
     prev.current = props;

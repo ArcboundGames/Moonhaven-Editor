@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import FormHelperText from '@mui/material/FormHelperText';
 import Typography from '@mui/material/Typography';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { type JSX, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { getCreatureSetting } from '../../../../../../../../SharedLibrary/src/util/creatureType.util';
 import { getItemSetting } from '../../../../../../../../SharedLibrary/src/util/itemType.util';

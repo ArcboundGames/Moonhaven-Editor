@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -91,7 +90,7 @@ const LocalizationView = () => {
   const onLocalizationPairChange = useCallback(() => setDirty(true), []);
 
   const { localizationPairs, refs } = useMemo(() => {
-    const tempRefs: Record<string, React.RefObject<HTMLInputElement>> = {};
+    const tempRefs: Record<string, React.RefObject<HTMLInputElement | null>> = {};
     const tempPairs = keys
       .filter((key) => {
         if (showOnlyMissing) {
