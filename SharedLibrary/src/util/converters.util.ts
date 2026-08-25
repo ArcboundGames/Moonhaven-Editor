@@ -353,6 +353,8 @@ export function toProcessedRawCreatureType(rawCreatureType: RawCreatureType | un
     attackStrafingTimeMax: rawCreatureType?.attackStrafingTimeMax ?? 0,
     attackDamage: rawCreatureType?.attackDamage ?? 0,
     attackKnockbackModifier: rawCreatureType?.attackKnockbackModifier ?? 0,
+    attackTargetPlacedObjects: rawCreatureType?.attackTargetPlacedObjects ?? false,
+    attackObjectDamage: rawCreatureType?.attackObjectDamage ?? 0,
 
     randomSpawnsEnabled: rawCreatureType?.randomSpawnsEnabled ?? false,
     spawnDistanceMinFromPlayers: rawCreatureType?.spawnDistanceMinFromPlayers ?? 0,

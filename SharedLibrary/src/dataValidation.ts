@@ -763,18 +763,23 @@ export function validateCreatureBehaviorTab(
     assert(rawType.attackDamage <= 1000, 'Attack damage must be less than or equal to 1000');
     assert(rawType.attackDamage % 1 === 0, 'Attack damage must be a whole number');
 
-    assert(rawType.attackKnockbackModifier >= 1, 'Attack knockback modifier must be greater than or equal to 1');
+    assert(rawType.attackKnockbackModifier > 0, 'Attack knockback modifier must be greater than 0');
     assert(rawType.attackKnockbackModifier <= 5, 'Attack knockback modifier must be less than or equal to 5');
 
     if (movementType !== MOVEMENT_TYPE_JUMP) {
-      assert(rawType.attackDesiredRangeMin >= 1, 'Attack desired min range must be greater than or equal to 1');
+      assert(rawType.attackDesiredRangeMin >= 0, 'Attack desired min range must be greater than or equal to 0');
       assert(rawType.attackDesiredRangeMin <= 20, 'Attack desired min range must be less than or equal to 20');
-      assert(rawType.attackDesiredRangeMax >= 1, 'Attack desired max range must be greater than or equal to 1');
+      assert(rawType.attackDesiredRangeMax > 0, 'Attack desired max range must be greater than 0');
       assert(rawType.attackDesiredRangeMax <= 20, 'Attack desired max range must be less than or equal to 20');
       assert(
         rawType.attackDesiredRangeMin < rawType.attackDesiredRangeMax,
         'Attack desired min range must be less than attack desired max range'
       );
+
+      assert(rawType.attackObjectDamage >= 0, 'Attack object damage must be greater than or equal to 0');
+      if (rawType.attackTargetPlacedObjects) {
+        assert(rawType.attackObjectDamage > 0, 'Attack object damage must be greater than 0 when targeting placed objects');
+      }
 
       if (rawType.attackUseStrafing) {
         assert(rawType.attackStrafingTimeMin >= 1, 'Strafing min time must be greater than or equal to 1');

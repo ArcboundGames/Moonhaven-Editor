@@ -778,6 +778,8 @@ export interface CreatureType {
   attackStrafingTimeMax: number;
   attackDamage: number;
   attackKnockbackModifier: number;
+  attackTargetPlacedObjects: boolean;
+  attackObjectDamage: number;
 
   // Spawning
   randomSpawnsEnabled: boolean;
