@@ -1,47 +1,59 @@
-name: Build Editor
+name: Editor
 
 on:
   workflow_dispatch:
   push:
-    branches: ['main']
+    branches: [main]
     paths:
       - Editor/**
+      - SharedLibrary/**
+      - .github/workflows/editor.yml
   pull_request:
-    branches: ['main']
+    branches: [main]
     paths:
       - Editor/**
+      - SharedLibrary/**
+      - .github/workflows/editor.yml
+
+concurrency:
+  group: editor-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x]
-
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
+          node-version: 24
           cache: npm
           cache-dependency-path: |
             Editor/package-lock.json
             Editor/release/app/package-lock.json
-          node-version: ${{ matrix.node-version }}
-
-      - name: Setup
+      - name: Use npm 11
+        run: npm install -g npm@11
+      - name: Install
+        working-directory: ./Editor
+        run: npm ci --ignore-scripts
+      - name: Discover tests
         working-directory: ./Editor
         run: |
-          npm ci
-
+          count=$(npx jest --listTests | wc -l)
+          echo "Discovered $count tests"
+          test "$count" -gt 0
+      - name: Type-check
+        working-directory: ./Editor
+        run: npm run type-check
       - name: Lint
         working-directory: ./Editor
-        run: |
-          npm run lint
-
+        run: npm run lint
+      - name: Test
+        working-directory: ./Editor
+        run: npm test -- --runInBand --ci
       - name: Build
         working-directory: ./Editor
-        run: |
-          npm run build
+        run: npm run build

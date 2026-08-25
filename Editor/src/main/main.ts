@@ -5,29 +5,32 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint global-require: off, no-console: off */
 
-/**
- * This module executes inside of electron's main process. You can start
- * electron renderer process from here and communicate with the other processes
- * through IPC.
- *
- * When running `npm run build` or `npm run build:main`, this file is compiled to
- * `./src/main.js` using webpack. This gives us some performance wins.
- */
-import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, session, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import sizeOf from 'image-size';
 import { join } from 'path';
 
-import { subscribeToFile, unsubscribeFromFile } from './file.util';
+import { setFileWatchWindow, subscribeToFile, unsubscribeFromFile } from './file.util';
 import MenuBuilder from './menu';
+import {
+  assertWriteSize,
+  atomicWriteFile,
+  isTrustedSender,
+  joinPaths,
+  normalizeFsPath,
+  resolveAllowedPath,
+  resolveStreamingAssetsRoot,
+  toPathString
+} from './path-guard';
 import { resolveHtmlPath } from './util';
-
-import type { PathLike, PathOrFileDescriptor, WriteFileOptions } from 'fs';
 
 class AppUpdater {
   constructor() {
+    if (!app.isPackaged) {
+      return;
+    }
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
     autoUpdater.checkForUpdatesAndNotify();
@@ -35,79 +38,108 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let workspaceRoot: string | undefined;
 
-/**
- * Custom IPC API
- */
+function assertSender(event: Electron.IpcMainInvokeEvent | Electron.IpcMainEvent) {
+  if (!isTrustedSender(event, mainWindow?.webContents.id)) {
+    throw new Error('Untrusted IPC sender');
+  }
+}
+
+function trustedExternalUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:') {
+      return false;
+    }
+    return parsed.hostname === 'github.com' && parsed.pathname.startsWith('/ArcboundGames/');
+  } catch {
+    return false;
+  }
+}
+
+function developmentUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1';
+  } catch {
+    return false;
+  }
+}
+
 ipcMain.on('getDataFolder', async (event) => {
+  assertSender(event);
   const result = await dialog.showOpenDialog({
     properties: ['openDirectory']
   });
 
   if (result.filePaths.length > 0) {
     const filePath = result.filePaths[0];
-    event.reply('getDataFolder', filePath);
+    workspaceRoot = resolveStreamingAssetsRoot(filePath);
+    event.reply('getDataFolder', normalizeFsPath(filePath));
     return;
   }
 
   event.reply('getDataFolder', undefined);
 });
 
-ipcMain.on('subscribeToFile', subscribeToFile);
-ipcMain.on('unsubscribeFromFile', unsubscribeFromFile);
+ipcMain.on('subscribeToFile', (event, filePath: unknown) => {
+  assertSender(event);
+  subscribeToFile(event, resolveAllowedPath(workspaceRoot, filePath, { allowMissing: true }));
+});
 
-ipcMain.handle('existsSync', (_, file: PathLike) => {
-  return existsSync(file);
+ipcMain.on('unsubscribeFromFile', (event, filePath: unknown) => {
+  assertSender(event);
+  unsubscribeFromFile(event, resolveAllowedPath(workspaceRoot, filePath, { allowMissing: true }));
+});
+
+ipcMain.handle('existsSync', (event, file: unknown) => {
+  assertSender(event);
+  return existsSync(resolveAllowedPath(workspaceRoot, file, { allowMissing: true }));
+});
+
+ipcMain.handle('readFileSync', (event, file: unknown, options: BufferEncoding | { encoding: BufferEncoding }) => {
+  assertSender(event);
+  return readFileSync(resolveAllowedPath(workspaceRoot, file), options);
 });
 
 ipcMain.handle(
-  'readFileSync',
-  (
-    _,
-    file: PathOrFileDescriptor,
-    options:
-      | {
-          encoding: BufferEncoding;
-          flag?: string | undefined;
-        }
-      | BufferEncoding
-  ) => {
-    console.info(file);
-    return readFileSync(file, options);
-  }
-);
-
-ipcMain.handle(
   'writeFileSync',
-  (_, file: PathOrFileDescriptor, data: string | NodeJS.ArrayBufferView, options?: WriteFileOptions | undefined) => {
-    return writeFileSync(file, data, options);
+  (event, file: unknown, data: string | NodeJS.ArrayBufferView, _options?: unknown) => {
+    assertSender(event);
+    if (typeof data !== 'string' && !ArrayBuffer.isView(data)) {
+      throw new Error('Invalid write payload');
+    }
+    assertWriteSize(data);
+    atomicWriteFile(resolveAllowedPath(workspaceRoot, file, { allowMissing: true }), data);
   }
 );
 
-ipcMain.handle('sizeOf', (_, fileName: string) => {
-  return existsSync(fileName)
-    ? sizeOf(fileName)
+ipcMain.handle('sizeOf', (event, fileName: unknown) => {
+  assertSender(event);
+  const allowed = resolveAllowedPath(workspaceRoot, fileName, { allowMissing: true });
+  return existsSync(allowed)
+    ? sizeOf(allowed)
     : {
         width: undefined,
         height: undefined
       };
 });
 
-ipcMain.handle('getImage', async (_, fileName: string) => {
-  if (!existsSync(fileName)) {
+ipcMain.handle('getImage', (event, fileName: unknown) => {
+  assertSender(event);
+  const allowed = resolveAllowedPath(workspaceRoot, fileName, { allowMissing: true });
+  if (!existsSync(allowed)) {
     return undefined;
   }
-  const buffer = readFileSync(fileName);
+  const buffer = readFileSync(allowed);
   return `data:image/png;base64,${buffer.toString('base64')}`;
 });
 
-ipcMain.handle('join', (_, ...paths: string[]) => {
-  return join(...paths);
+ipcMain.handle('join', (event, ...paths: unknown[]) => {
+  assertSender(event);
+  return joinPaths(...paths.map((segment) => toPathString(segment)));
 });
-
-/**
- * Main Setup
- */
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -127,7 +159,7 @@ const installExtensions = async () => {
 
   return installer
     .default(
-      extensions.map((name) => installer[name]),
+      extensions.map((name: string) => installer[name]),
       forceDownload
     )
     .catch(console.log);
@@ -151,11 +183,39 @@ const createWindow = async () => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged ? join(__dirname, 'preload.js') : join(__dirname, '../../.erb/dll/preload.js'),
-      webSecurity: false
+      webSecurity: true,
+      contextIsolation: true,
+      sandbox: true,
+      nodeIntegration: false
     }
+  });
+  setFileWatchWindow(mainWindow);
+
+  const contentSecurityPolicy = [
+    "default-src 'self'",
+    "script-src 'self'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob:",
+    "font-src 'self' data:",
+    "connect-src 'self' http://localhost:* ws://localhost:*"
+  ].join('; ');
+
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [contentSecurityPolicy]
+      }
+    });
   });
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
+
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    if (!developmentUrl(url) && !url.startsWith('file:')) {
+      event.preventDefault();
+    }
+  });
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
@@ -169,29 +229,24 @@ const createWindow = async () => {
   });
 
   mainWindow.on('closed', () => {
+    setFileWatchWindow(null);
     mainWindow = null;
   });
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
 
-  // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
-    shell.openExternal(edata.url);
+    if (trustedExternalUrl(edata.url) || (isDebug && developmentUrl(edata.url))) {
+      shell.openExternal(edata.url);
+    }
     return { action: 'deny' };
   });
 
-  // Remove this if your app does not use auto updates
   new AppUpdater();
 };
 
-/**
- * Add event listeners...
- */
-
 app.on('window-all-closed', () => {
-  // Respect the OSX convention of having the application in memory even
-  // after all windows have been closed
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -202,8 +257,6 @@ app
   .then(() => {
     createWindow();
     app.on('activate', () => {
-      // On macOS it's common to re-create a window in the app when the
-      // dock icon is clicked and there are no other windows open.
       if (mainWindow === null) createWindow();
     });
   })

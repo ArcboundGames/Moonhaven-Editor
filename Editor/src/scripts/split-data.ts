@@ -1,45 +1,49 @@
 import dotenv from 'dotenv';
-import { mkdir, readFile, writeFile } from 'fs/promises';
-import { join } from 'path';
-import { format } from 'prettier';
+import { existsSync, mkdirSync, readFileSync } from 'fs';
+import { join, resolve } from 'path';
 
-/**
- * Splits a combined JSON file into individual JSON files,
- * writing them to the specified input folder.
- *
- * @param combinedFilePath Path to the combined JSON file
- * @param outputDir Path to the folder where individual files will be written
- */
-async function splitJsonFile(inputDir: string, outputDir: string, outputFileName = 'combined.json'): Promise<void> {
-  try {
-    const outputPath = join(inputDir, outputFileName);
-    const fileContent = await readFile(outputPath, 'utf-8');
-    const data: Record<string, unknown> = JSON.parse(fileContent);
+import { atomicWrite, splitCombinedJson } from './json-io';
 
-    await mkdir(outputDir, { recursive: true });
+dotenv.config();
 
-    for (const [key, value] of Object.entries(data)) {
-      const rawJson = JSON.stringify(value, null, 2);
-
-      // Format using Prettier with JSON parser
-      const formatted = format(rawJson, { parser: 'json' });
-
-      const filePath = join(outputDir, `${key}.json`);
-      await writeFile(filePath, formatted, 'utf-8');
-      console.log(`Wrote and formatted: ${filePath}`);
-    }
-
-    console.log('Split complete.');
-  } catch (err) {
-    console.error('Error splitting JSON file:', err);
-  }
+function getArg(name: string): string | undefined {
+  const index = process.argv.indexOf(name);
+  return index >= 0 ? process.argv[index + 1] : undefined;
 }
 
-(async () => {
-  dotenv.config();
+const check = process.argv.includes('--check');
+const combinedDir = resolve(getArg('--combined-dir') ?? process.env.COMBINED_DATA_PATH ?? '');
+const outputDir = resolve(getArg('--data-dir') ?? process.env.STREAMING_DATA_PATH ?? '');
+const combinedFile = getArg('--in-file') ?? 'combined.json';
 
-  const dataPath = process.env.STREAMING_DATA_PATH ?? '';
-  const outputPath = process.env.COMBINED_DATA_PATH ?? '';
+if (!combinedDir || !outputDir) {
+  console.error('Usage: data:split -- --combined-dir <dir> --data-dir <dir> [--check]');
+  process.exit(1);
+}
 
-  await splitJsonFile(outputPath, dataPath);
-})();
+try {
+  const combinedPath = join(combinedDir, combinedFile);
+  const data = JSON.parse(readFileSync(combinedPath, 'utf8')) as Record<string, unknown>;
+  const files = splitCombinedJson(data);
+  if (Object.keys(files).length === 0) {
+    throw new Error('Combined JSON contained no sections');
+  }
+  if (check) {
+    for (const [key, contents] of Object.entries(files)) {
+      const filePath = join(outputDir, `${key}.json`);
+      if (!existsSync(filePath) || readFileSync(filePath, 'utf8').replace(/\r\n/g, '\n') !== contents) {
+        throw new Error(`Split output is stale: ${filePath}`);
+      }
+    }
+    console.info('data:split --check passed');
+  } else {
+    mkdirSync(outputDir, { recursive: true });
+    for (const [key, contents] of Object.entries(files)) {
+      atomicWrite(join(outputDir, `${key}.json`), contents);
+      console.info(`Wrote ${key}.json`);
+    }
+  }
+} catch (error) {
+  console.error(error instanceof Error ? error.message : error);
+  process.exit(1);
+}

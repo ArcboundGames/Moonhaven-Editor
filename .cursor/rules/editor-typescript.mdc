@@ -1,0 +1,18 @@
+---
+description: Electron Editor TypeScript, React, Redux, and MUI conventions
+globs: Editor/src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Editor TypeScript
+
+- Use strict TypeScript and prefer `unknown` plus narrowing over `any`.
+- Use PascalCase for types/components and camelCase for values/functions.
+- Keep renderer code unprivileged; filesystem and Electron operations cross a
+  narrow typed preload API.
+- Follow existing Redux Toolkit slice/selectors and MUI 7 component patterns.
+- A new data section must update loading, raw-state synchronization, watching,
+  saving, validation display, and tests.
+- Use stable imports/aliases rather than adding deeper relative paths.
+- Run Editor type-check, lint, Jest, and production build checks.
+- Follow `Editor/upgrade-plan.md` for dependency upgrades.

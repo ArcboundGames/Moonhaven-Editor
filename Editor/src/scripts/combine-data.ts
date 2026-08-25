@@ -1,45 +1,45 @@
 import dotenv from 'dotenv';
-import { mkdir, readdir, readFile, writeFile } from 'fs/promises';
-import { basename, join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
+import { join, resolve } from 'path';
 
-/**
- * Combines all JSON files in a given input directory into a single object
- * and writes it to a specified output directory.
- *
- * @param inputDir Path to the folder containing JSON files
- * @param outputDir Path to the folder where the combined JSON should be saved
- * @param outputFileName Name of the output JSON file (default: combined.json)
- */
-async function combineJsonFiles(inputDir: string, outputDir: string, outputFileName = 'combined.json'): Promise<void> {
-  try {
-    const files = await readdir(inputDir);
-    const jsonFiles = files.filter((file) => file.endsWith('.json'));
+import { atomicWrite, combineJsonFiles, stableJson } from './json-io';
 
-    const combined: Record<string, unknown> = {};
+dotenv.config();
 
-    for (const file of jsonFiles) {
-      const filePath = join(inputDir, file);
-      const fileContent = await readFile(filePath, 'utf-8');
-      const parsed = JSON.parse(fileContent);
-      const key = basename(file, '.json');
-      combined[key] = parsed;
-    }
-
-    await mkdir(outputDir, { recursive: true });
-    const outputPath = join(outputDir, outputFileName);
-    await writeFile(outputPath, JSON.stringify(combined, null, 2), 'utf-8');
-
-    console.log(`Combined JSON written to: ${outputPath}`);
-  } catch (err) {
-    console.error('Error combining JSON files:', err);
-  }
+function getArg(name: string): string | undefined {
+  const index = process.argv.indexOf(name);
+  return index >= 0 ? process.argv[index + 1] : undefined;
 }
 
-(async () => {
-  dotenv.config();
+const check = process.argv.includes('--check');
+const inputDir = resolve(getArg('--data-dir') ?? process.env.STREAMING_DATA_PATH ?? '');
+const outputDir = resolve(getArg('--out-dir') ?? process.env.COMBINED_DATA_PATH ?? '');
+const outputFileName = getArg('--out-file') ?? 'combined.json';
 
-  const dataPath = process.env.STREAMING_DATA_PATH ?? '';
-  const outputPath = process.env.COMBINED_DATA_PATH ?? '';
+if (!inputDir || !outputDir) {
+  console.error('Usage: data:combine -- --data-dir <dir> --out-dir <dir> [--check]');
+  process.exit(1);
+}
 
-  await combineJsonFiles(dataPath, outputPath);
-})();
+try {
+  const combined = combineJsonFiles(inputDir);
+  const output = stableJson(combined);
+  const outputPath = join(outputDir, outputFileName);
+  if (check) {
+    if (!existsSync(outputPath)) {
+      throw new Error(`Combined file missing for --check: ${outputPath}`);
+    }
+    const { readFileSync } = require('fs') as typeof import('fs');
+    if (readFileSync(outputPath, 'utf8').replace(/\r\n/g, '\n') !== output) {
+      throw new Error(`Combined JSON is stale: ${outputPath}`);
+    }
+    console.info('data:combine --check passed');
+  } else {
+    mkdirSync(outputDir, { recursive: true });
+    atomicWrite(outputPath, output);
+    console.info(`Combined JSON written to: ${outputPath}`);
+  }
+} catch (error) {
+  console.error(error instanceof Error ? error.message : error);
+  process.exit(1);
+}

@@ -1,0 +1,19 @@
+---
+description: Electron main, preload, IPC, filesystem, and navigation security
+globs: Editor/src/main/**/*.ts
+alwaysApply: false
+---
+
+# Electron Security
+
+- Keep `webSecurity`, context isolation, and sandboxing enabled.
+- Expose one narrow typed preload method per operation; never expose raw
+  `ipcRenderer`, Node modules, or arbitrary channel names.
+- Validate sender frame/window and every payload in the main process.
+- Canonicalize paths, reject traversal/symlink escapes, allowlist extensions,
+  and restrict access to the user-selected StreamingAssets root.
+- Limit payload sizes and use atomic writes for authoritative JSON.
+- Restrict navigation/window creation and allow only trusted external URL
+  schemes and hosts.
+- Add negative tests for untrusted senders, malformed payloads, traversal,
+  symlink escape, oversized data, and interrupted writes.

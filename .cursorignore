@@ -1,0 +1,14 @@
+# Dependencies and caches
+**/node_modules/
+**/.eslintcache
+**/coverage/
+
+# Generated and packaging output
+SharedLibrary/dist/
+Editor/output/
+Editor/release/build/
+Editor/release/app/dist/
+Editor/.erb/dll/
+
+# Local secrets
+**/.env

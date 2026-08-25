@@ -1,0 +1,16 @@
+---
+description: Generated output and cross-repository artifact policy
+globs: "{SharedLibrary/dist/**,Editor/output/**}"
+alwaysApply: false
+---
+
+# Generated Artifacts
+
+- `SharedLibrary/dist` is untracked generated output; edit `src`, not `dist`.
+- Wiki build/assets output belongs in tool-owned staging and is not a source of
+  truth.
+- The Unity Jint `app.js` artifact is owned by the sibling Moonhaven repository
+  and must be rebuilt through its Scripts project.
+- Verification commands must not leave generated changes in either worktree.
+- Never overwrite manually maintained wiki art without an explicit apply plan
+  and user approval.

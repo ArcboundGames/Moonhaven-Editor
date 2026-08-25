@@ -2,49 +2,40 @@
   "name": "moonhaven-editor",
   "version": "0.1.0",
   "productName": "MoonhavenEditor",
-  "description": "Modding tool for Moonhaven",
+  "description": "Authoring tool for Moonhaven",
   "license": "MIT",
   "keywords": [
+    "moonhaven",
     "electron",
-    "boilerplate",
     "react",
-    "typescript",
-    "ts",
-    "sass",
-    "webpack",
-    "hot",
-    "reload"
+    "typescript"
   ],
-  "homepage": "https://github.com/electron-react-boilerplate/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/ArcboundGames/Moonhaven-Editor#readme",
   "bugs": {
-    "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
+    "url": "https://github.com/ArcboundGames/Moonhaven-Editor/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
+    "url": "git+https://github.com/ArcboundGames/Moonhaven-Editor.git"
   },
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://electron-react-boilerplate.js.org"
+    "name": "Arcbound Games",
+    "url": "https://github.com/ArcboundGames"
   },
-  "contributors": [
-    {
-      "name": "Amila Welihinda",
-      "email": "amilajack@gmail.com",
-      "url": "https://github.com/amilajack"
-    }
-  ],
   "main": "./src/main/main.ts",
   "scripts": {
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
     "build:renderer": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.prod.ts",
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
+    "check": "npm run type-check && npm run lint && npm test -- --runInBand && npm run build",
+    "ci:install": "npm ci --ignore-scripts",
     "data:combine": "ts-node src/scripts/combine-data.ts",
+    "data:validate": "ts-node src/scripts/validate-data.ts",
     "data:split": "ts-node src/scripts/split-data.ts",
     "lint": "cross-env NODE_ENV=development eslint .",
     "package": "ts-node ./.erb/scripts/clean.js dist && npm run build && electron-builder build --publish never",
     "postinstall": "ts-node .erb/scripts/check-native-dep.js && electron-builder install-app-deps && cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.renderer.dev.dll.ts",
+    "setup:dev": "npm run postinstall",
     "rebuild": "electron-rebuild --parallel --types prod,dev,optional --module-dir release/app",
     "start:main": "cross-env NODE_ENV=development NODE_OPTIONS=--import=tsx electronmon .",
     "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
@@ -53,7 +44,11 @@
     "test": "jest",
     "type-check:watch": "npm run type-check -- --watch",
     "type-check": "tsc --noEmit",
-    "wiki": "ts-node src/wiki/index.ts"
+    "wiki:build": "ts-node src/wiki/build.ts",
+    "wiki:assets": "ts-node src/wiki/assets.ts",
+    "wiki:check": "ts-node src/wiki/build.ts --check",
+    "wiki:publish": "ts-node src/wiki/publish.ts",
+    "wiki": "ts-node src/wiki/publish.ts"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -103,9 +98,7 @@
       "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/.erb/mocks/fileMock.js",
       "\\.(css|less|sass|scss)$": "identity-obj-proxy"
     },
-    "setupFiles": [
-      "./.erb/scripts/check-build-exists.ts"
-    ],
+    "setupFiles": [],
     "testEnvironment": "jsdom",
     "testEnvironmentOptions": {
       "url": "http://localhost/"
@@ -271,17 +264,14 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "ArcboundGames",
+      "repo": "Moonhaven-Editor"
     }
   },
   "overrides": {
     "@emotion/eslint-plugin": {
       "eslint": "^9.0.0"
     }
-  },
-  "collective": {
-    "url": "https://opencollective.com/electron-react-boilerplate-594"
   },
   "devEngines": {
     "runtime": {

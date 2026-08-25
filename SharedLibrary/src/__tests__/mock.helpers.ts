@@ -47,6 +47,8 @@ export function mockCreatureType(overrides: Partial<CreatureType> = {}): Creatur
     attackDesiredRangeMin: 0,
     attackDesiredRangeMax: 0,
     attackTargetPlayers: false,
+    attackTargetPlacedObjects: false,
+    attackObjectDamage: 0,
     attackTargetCreatureCategoryKeys: [],
     attackTargetCreatureKeys: [],
     attackUseStrafing: false,

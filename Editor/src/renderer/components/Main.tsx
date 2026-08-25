@@ -6,6 +6,7 @@ import {
   CREATURES_DATA_FILE,
   DATA_FILE_EXTENSION,
   DIALOGUE_DATA_FILE,
+  EVENTS_DATA_FILE,
   FISHING_DATA_FILE,
   ITEMS_DATA_FILE,
   LOCALIZATION_DATA_FILE,
@@ -47,7 +48,7 @@ import {
   selectDialogueTreesByKey,
   validateDialogueTrees
 } from '../store/slices/dialogue';
-import { selectEventLogs, selectEventLogsByKey, validateEventLogs } from '../store/slices/eventLogs';
+import { loadEventLogData, selectEventLogs, selectEventLogsByKey, validateEventLogs } from '../store/slices/eventLogs';
 import { loadFishingData, selectFishingZones, validateFishingZones } from '../store/slices/fishing';
 import {
   loadItemData,
@@ -237,6 +238,7 @@ const Main = () => {
       const dialogueDataFilePath = await window.api.join(path, `${DIALOGUE_DATA_FILE}${DATA_FILE_EXTENSION}`);
       const worldDataFilePath = await window.api.join(path, `${WORLD_DATA_FILE}${DATA_FILE_EXTENSION}`);
       const playerDataFilePath = await window.api.join(path, `${PLAYER_DATA_FILE}${DATA_FILE_EXTENSION}`);
+      const eventsDataFilePath = await window.api.join(path, `${EVENTS_DATA_FILE}${DATA_FILE_EXTENSION}`);
       const fishingDataFilePath = await window.api.join(path, `${FISHING_DATA_FILE}${DATA_FILE_EXTENSION}`);
       const skillsDataFilePath = await window.api.join(path, `${SKILLS_DATA_FILE}${DATA_FILE_EXTENSION}`);
       const localizationDataFilePath = await window.api.join(path, `${LOCALIZATION_DATA_FILE}${DATA_FILE_EXTENSION}`);
@@ -252,43 +254,47 @@ const Main = () => {
         dialogueDataFilePath,
         worldDataFilePath,
         playerDataFilePath,
+        eventsDataFilePath,
         fishingDataFilePath,
         skillsDataFilePath,
         localizationDataFilePath,
         questsDataFilePath,
         worldZonesDataFilePath
-      ];
+      ].map((file) => file.replace(/\\/g, '/'));
 
       window.electron.ipcRenderer.on<[string, string]>('onFileChange', (file, data) => {
-        if (!data || !files.includes(file)) {
+        const normalized = file.replace(/\\/g, '/');
+        if (!data || !files.includes(normalized)) {
           return;
         }
 
-        if (file === creaturesDataFilePath) {
+        if (normalized === creaturesDataFilePath.replace(/\\/g, '/')) {
           dispatch(loadCreatureData(data));
-        } else if (file === itemsDataFilePath) {
+        } else if (normalized === itemsDataFilePath.replace(/\\/g, '/')) {
           dispatch(loadItemData(data));
-        } else if (file === objectsDataFilePath) {
+        } else if (normalized === objectsDataFilePath.replace(/\\/g, '/')) {
           dispatch(loadObjectData(data));
-        } else if (file === craftingRecipesDataFilePath) {
+        } else if (normalized === craftingRecipesDataFilePath.replace(/\\/g, '/')) {
           dispatch(loadCraftingRecipeData(data));
-        } else if (file === lootTablesDataFilePath) {
+        } else if (normalized === lootTablesDataFilePath.replace(/\\/g, '/')) {
           dispatch(loadLootTableData(data));
-        } else if (file === dialogueDataFilePath) {
+        } else if (normalized === dialogueDataFilePath.replace(/\\/g, '/')) {
           dispatch(loadDialogueData(data));
-        } else if (file === worldDataFilePath) {
+        } else if (normalized === worldDataFilePath.replace(/\\/g, '/')) {
           dispatch(loadWorldSettingsData(data));
-        } else if (file === playerDataFilePath) {
+        } else if (normalized === playerDataFilePath.replace(/\\/g, '/')) {
           dispatch(loadPlayerData(data));
-        } else if (file === fishingDataFilePath) {
+        } else if (normalized === eventsDataFilePath.replace(/\\/g, '/')) {
+          dispatch(loadEventLogData(data));
+        } else if (normalized === fishingDataFilePath.replace(/\\/g, '/')) {
           dispatch(loadFishingData(data));
-        } else if (file === skillsDataFilePath) {
+        } else if (normalized === skillsDataFilePath.replace(/\\/g, '/')) {
           dispatch(loadSkillData(data));
-        } else if (file === localizationDataFilePath) {
+        } else if (normalized === localizationDataFilePath.replace(/\\/g, '/')) {
           dispatch(loadLocalizationData(data));
-        } else if (file === questsDataFilePath) {
+        } else if (normalized === questsDataFilePath.replace(/\\/g, '/')) {
           dispatch(loadQuestData(data));
-        } else if (file === worldZonesDataFilePath) {
+        } else if (normalized === worldZonesDataFilePath.replace(/\\/g, '/')) {
           dispatch(loadWorldZoneData(data));
         }
       });

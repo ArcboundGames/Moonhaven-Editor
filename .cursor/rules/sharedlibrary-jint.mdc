@@ -1,0 +1,19 @@
+---
+description: SharedLibrary TypeScript and ES5/Jint compatibility
+globs: SharedLibrary/**/*.ts
+alwaysApply: false
+---
+
+# SharedLibrary
+
+- Keep shared contracts in `src/interface.ts` and shared constants in
+  `src/constants.ts`.
+- Output must remain ES5/CommonJS compatible with Unity's Jint runtime.
+- Avoid runtime APIs unavailable to ES5/Jint, dynamic imports, and hidden
+  browser/Node dependencies.
+- Keep utilities pure and deterministic.
+- Use existing converters and assertion utilities instead of parallel schema
+  logic.
+- Add focused Jest coverage and run `npm run check`.
+- After interface, converter, utility, or validation changes, run the sibling
+  Moonhaven Jint freshness check and record the companion revision.

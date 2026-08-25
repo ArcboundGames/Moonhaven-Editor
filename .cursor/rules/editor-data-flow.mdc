@@ -1,0 +1,20 @@
+---
+description: Editor data loading, Redux synchronization, saving, and watching
+globs: "{Editor/src/renderer/store/slices/**/*.ts,Editor/src/renderer/util/save.util.ts,Editor/src/renderer/components/{Main,LandingArea}.tsx}"
+alwaysApply: false
+---
+
+# Editor Data Flow
+
+For every data section:
+
+- load the authoritative JSON into processed and raw Redux state;
+- validate through SharedLibrary and display structured errors;
+- preserve raw state after every save;
+- include the file in external-change watching;
+- normalize Windows and POSIX paths before comparison;
+- save atomically through the restricted main-process API;
+- add reducer/save/watch regression tests.
+
+Do not add section-specific validation that competes with SharedLibrary or the
+shared content registry.

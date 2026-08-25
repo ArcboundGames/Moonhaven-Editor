@@ -3,6 +3,7 @@ import { getCreatureSetting } from '../../../SharedLibrary/src/util/creatureType
 import { isNotNullish } from '../../../SharedLibrary/src/util/null.util';
 import toRecord from '../../../SharedLibrary/src/util/record.util';
 import { toTitleCaseFromKey } from '../../../SharedLibrary/src/util/string.util';
+import { wikiFileName } from './filename';
 import { getCraftingRecipes, getCreatures, getFishingZones, getItems, getLootTables, getObjects } from './file';
 
 import type {
@@ -64,15 +65,15 @@ function generateCropSections(
         stagesTableDaysRow += `\n|Regrowth: ${stage.growthDays} Day${stage.growthDays === 1 ? '' : 's'}`;
       }
 
-      stagesTableImageRow += `\n|[[File:${object.name} Stage ${index + 1}.png|center|link=]]`;
+      stagesTableImageRow += `\n|[[File:${wikiFileName(object.name)} Stage ${index + 1}.png|center|link=]]`;
     });
 
     const stagesTable = `${stagesTableHeader}${stagesTableImageRow}${stagesTableDaysRow}
 |-
 |}`;
 
-    const seed = objectsToItem[object.key]; // Get seed
-    const seedName = seed.name;
+    const seed = objectsToItem[object.key];
+    const seedName = seed?.name;
 
     let extra = '';
     let giveOrProduce = 'produces';
@@ -116,9 +117,9 @@ function generateCropSections(
     }
 
     return {
-      cropInfobox: `\n|seed        = {{name|${seedName}}}
+      cropInfobox: `${seedName ? `\n|seed        = {{name|${seedName}}}` : ''}
 |growth      = ${growthTime} days${seasonInfobox}`,
-      cropBody: `\n\nThe '''${item.name}''' is a [[Vegetable|vegetable]] [[Crops|crop]] that grows from [[${seedName}]] after ${growthTime} days.
+      cropBody: `\n\nThe '''${item.name}''' is a [[Vegetable|vegetable]] [[Crops|crop]]${seedName ? ` that grows from [[${seedName}]]` : ''} after ${growthTime} days.
 
 == Stages ==
 
@@ -206,6 +207,7 @@ export default function buildItemPages(
   localizationKeys: string[]
 ): {
   pages: {
+    key: string;
     name: string;
     content: string;
     stages: number | undefined;
@@ -222,16 +224,22 @@ export default function buildItemPages(
   const recipesByItemKey = toRecord(craftingRecipes, (entry) => entry.itemTypeKey);
   const fishingZonesByLootTableKey = toRecord(fishingZones, (entry) => entry.lootTableKey);
 
-  const shopKeepers = creatures.filter(
-    (creature) => getCreatureSetting('isShopkeeper', creature, creatureCategoriesByKey).value === true
-  );
+  const shopKeepers = creatures.filter((creature) => {
+    const flagged = getCreatureSetting('isShopkeeper', creature, creatureCategoriesByKey).value === true;
+    const hasPrices = Object.values(creature.shop?.prices ?? {}).some(
+      (seasonPrices) => Object.keys(seasonPrices ?? {}).length > 0
+    );
+    return flagged || hasPrices;
+  });
   const itemsToShopKeepers = shopKeepers.reduce((record, shopKeeper) => {
-    if (isNotNullish(shopKeeper.shop)) {
-      Object.keys(shopKeeper.shop.prices).forEach((soldItemKey) => {
-        if (!(soldItemKey in record)) {
-          record[soldItemKey] = [];
-        }
-        record[soldItemKey].push(shopKeeper);
+    if (isNotNullish(shopKeeper.shop?.prices)) {
+      Object.values(shopKeeper.shop.prices).forEach((seasonPrices) => {
+        Object.keys(seasonPrices ?? {}).forEach((soldItemKey) => {
+          if (!(soldItemKey in record)) {
+            record[soldItemKey] = [];
+          }
+          record[soldItemKey].push(shopKeeper);
+        });
       });
     }
 
@@ -379,7 +387,7 @@ export default function buildItemPages(
 
     let output = `<onlyinclude>{{{{{1|Infobox}}}
 |name        = ${item.name}
-|image       = ${item.name.replace(' ', '_')}.png
+|image       = ${wikiFileName(item.name)}.png
 |description = ${item.description}
 |sellprice   = ${item.sellPrice}`;
 
@@ -446,7 +454,7 @@ export default function buildItemPages(
 
     output += `${cropFooter}${seedFooter}`;
 
-    itemPagesContent.push({ name: item.name.replace(/ /g, '_'), content: output, stages });
+    itemPagesContent.push({ key: item.key, name: wikiFileName(item.name), content: output, stages });
   });
 
   return { pages: itemPagesContent, crops };

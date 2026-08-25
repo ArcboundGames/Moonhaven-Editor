@@ -1,6 +1,7 @@
 import { isNotNullish, isNullish } from '../../../SharedLibrary/src/util/null.util';
 import { toTitleCaseFromKey } from '../../../SharedLibrary/src/util/string.util';
 import { getCraftingRecipes, getItems } from './file';
+import { wikiFileName } from './filename';
 
 import type { CraftingRecipe, Localization } from '../../../SharedLibrary/src/interface';
 
@@ -39,7 +40,7 @@ export default function buildCraftingPage(localization: Localization, localizati
         }
 
         tempOutput += `|-
-|[[File:${item.name}.png|center]]
+|[[File:${wikiFileName(item.name)}.png|center]]
 |[[${item.name}]]
 |{{Description|${item.name}}}\n|`;
 

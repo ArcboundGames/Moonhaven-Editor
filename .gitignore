@@ -22,6 +22,13 @@ Editor/release/app/dist
 Editor/release/build
 Editor/.erb/dll
 
+# Generated SharedLibrary output
+SharedLibrary/dist
+
+# Local secrets
+.env
+Editor/.env
+
 .idea
 npm-debug.log.*
 *.css.d.ts

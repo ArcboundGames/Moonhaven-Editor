@@ -17,7 +17,7 @@ describe('Autocomplete', () => {
 
   it('displays the selected option label', () => {
     render(<Autocomplete label="Color" value="green" options={options} onChange={jest.fn()} />);
-    const input = screen.getByRole('combobox');
+    const input = screen.getByRole('combobox') as HTMLInputElement;
     expect(input.value).toBe('Green');
   });
 
@@ -41,7 +41,7 @@ describe('Autocomplete', () => {
 
   it('shows empty input when value does not match any option', () => {
     render(<Autocomplete label="Color" value="purple" options={options} onChange={jest.fn()} />);
-    const input = screen.getByRole('combobox');
+    const input = screen.getByRole('combobox') as HTMLInputElement;
     expect(input.value).toBe('');
   });
 });
